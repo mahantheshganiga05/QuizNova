@@ -1869,90 +1869,123 @@ img, video, canvas, svg {
 @media (max-width: 1023px) {
   .stat-5-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
 }
-@media (max-width: 640px) {
-  .stat-5-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-}
-@media (max-width: 360px) {
-  .stat-5-grid { grid-template-columns: 1fr; gap: 10px; }
-}
 
 /* ============================================================
- * SMALL MOBILE PHONES (320px – 480px) & GLOBAL OVERFLOW GUARDS
+ * HOME PAGE MOBILE RESPONSIVE COMPACT REDESIGN (320px – 430px)
  * ============================================================ */
 @media (max-width: 767px) {
+  /* HERO SECTION COMPACT */
   .hero-section {
-    padding-block: 24px 20px !important;
+    padding-block: 16px 12px !important;
     min-height: auto !important;
   }
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    text-align: center !important;
+  }
+  .hero-left {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .section-eyebrow {
+    font-size: 10px !important;
+    padding: 4px 10px !important;
+    margin-bottom: 8px !important;
+  }
   .hero-title {
-    font-size: clamp(1.75rem, 6.5vw, 2.5rem) !important;
-    line-height: 1.2 !important;
-    margin-bottom: 12px !important;
+    font-size: clamp(1.35rem, 5.2vw, 1.8rem) !important;
+    line-height: 1.18 !important;
+    margin-bottom: 8px !important;
   }
   .hero-subtitle {
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-    margin-bottom: 20px !important;
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    margin-bottom: 14px !important;
+    max-width: 100% !important;
+    text-align: center !important;
   }
   .hero-cta {
-    flex-direction: column !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     width: 100% !important;
-    gap: 10px !important;
-    margin-bottom: 20px !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+    justify-content: center !important;
   }
   .hero-cta .btn {
-    width: 100% !important;
-    min-height: 48px !important;
+    flex: 1 1 calc(50% - 6px) !important;
+    min-width: 125px !important;
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
     justify-content: center !important;
-    font-size: 14px !important;
+    border-radius: var(--r-full) !important;
   }
+  
+  /* GLOBE SECTION COMPACT */
   .hero-globe-card {
-    max-width: 280px !important;
+    width: 80vw !important;
+    max-width: 240px !important;
     margin: 0 auto !important;
   }
   .hero-globe-img {
-    max-width: 240px !important;
+    width: 100% !important;
+    max-width: 200px !important;
   }
-  .pip-top-left { top: 4% !important; left: 0px !important; }
-  .pip-mid-right { top: 45% !important; right: 0px !important; }
-  .pip-bottom-left { bottom: 4% !important; left: 0px !important; }
   .hero-badge-pip {
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+  }
+  .pip-top-left { top: 2% !important; left: 0px !important; }
+  .pip-mid-right { top: 48% !important; right: 0px !important; }
+  .pip-bottom-left { bottom: 2% !important; left: 0px !important; }
+
+  /* STATS & CATEGORIES COMPACT */
+  .section-sm { padding-block: 16px 12px !important; }
+  .section { padding-block: 20px 16px !important; }
+  
+  .stat-5-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .top-cats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .top-cat-img-wrap {
+    height: 85px !important;
+  }
+  .top-cat-body {
+    padding: 10px 12px !important;
+    gap: 2px !important;
+  }
+  .top-cat-title {
+    font-size: 12px !important;
+  }
+  .top-cat-count {
     font-size: 10px !important;
-    padding: 4px 10px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-cta .btn {
+    flex: 1 1 100% !important;
+  }
+  .stat-5-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
 @media (max-width: 480px) {
   .container, .container-sm { padding-inline: 14px !important; }
-  .section { padding-block: 32px !important; }
-  
   .card, .form-section, .quiz-details-card, .result-panel-card {
-    padding: 16px !important;
-    border-radius: 14px !important;
+    padding: 14px !important;
+    border-radius: 12px !important;
   }
-  
   .hero-stats { grid-template-columns: 1fr !important; }
-  
-  /* Quiz Attempt Mobile Palette */
   .palette-grid { grid-template-columns: repeat(4, 1fr) !important; }
-  
-  /* Buttons & Inputs */
-  .btn { width: 100% !important; justify-content: center !important; }
-  
-  .w-mobile-full {
-    width: 100% !important;
-    flex-direction: column !important;
-  }
-  .w-mobile-full input, .w-mobile-full button {
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-  
-  .cat-hero-right, .user-globe-stage {
-    transform: scale(0.85);
-    margin-top: -15px;
-    margin-bottom: -15px;
-  }
 }
 
 /* Ensure Zero Horizontal Scroll Globally */
@@ -1974,6 +2007,7 @@ html, body {
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch;
 }
+
 
 
 
