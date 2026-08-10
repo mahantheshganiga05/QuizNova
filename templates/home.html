@@ -102,7 +102,7 @@
 ════════════════════════════════════════════════════════ -->
 <section class="section-sm" aria-label="Platform Stats">
   <div class="container">
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;" data-aos="fade-up">
+    <div class="stat-5-grid" data-aos="fade-up">
 
       <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
         <div style="width:40px;height:40px;border-radius:10px;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">
@@ -225,6 +225,25 @@
     }
   }
   @media (max-width: 480px) {
+    .top-cats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .top-cat-img-wrap {
+      height: 95px;
+    }
+    .top-cat-body {
+      padding: 12px 14px;
+      gap: 4px;
+    }
+    .top-cat-title {
+      font-size: 13px !important;
+    }
+    .top-cat-count {
+      font-size: 11px !important;
+    }
+  }
+  @media (max-width: 350px) {
     .top-cats-grid {
       grid-template-columns: 1fr;
     }
