@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ comp.title }} — Official Leaderboard{% endblock %}
+
+{% block content %}
+<div class="section" style="padding-top:40px;padding-bottom:80px;">
+  <div class="container" style="max-width:1000px;">
+
+    <!-- Top Banner -->
+    <div style="text-align:center;margin-bottom:40px;" data-aos="fade-up">
+      <span class="badge badge-purple" style="font-size:12px;padding:6px 16px;margin-bottom:12px;">🏆 Tournament Results</span>
+      <h1 class="font-display" style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:white;margin-bottom:8px;">
+        {{ comp.title }}
+      </h1>
+      <p style="font-size:14px;color:var(--text-2);">Official Leaderboard and Contest Winners</p>
+    </div>
+
+    <!-- Podium View (Top 3) -->
+    {% if results | length >= 3 %}
+    <div style="display:flex;justify-content:center;align-items:flex-end;gap:20px;margin-bottom:48px;" data-aos="fade-up">
+      
+      <!-- 2nd Place -->
+      <div class="card p-4" style="flex:1;max-width:240px;text-align:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-size:36px;margin-bottom:8px;">🥈</div>
+        <div style="font-weight:800;color:white;font-size:16px;">{{ results[1].user.username }}</div>
+        <div style="font-size:12px;color:var(--text-2);margin-bottom:8px;">2nd Place Runner-Up</div>
+        <span class="badge badge-purple" style="font-size:14px;font-weight:800;">{{ results[1].score }} pts</span>
+      </div>
+
+      <!-- 1st Place (Gold Center) -->
+      <div class="card p-5" style="flex:1;max-width:280px;text-align:center;background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(108,99,255,0.2));border:2px solid #F59E0B;box-shadow:0 0 30px rgba(245,158,11,0.3);">
+        <div style="font-size:48px;margin-bottom:8px;">🥇</div>
+        <div style="font-weight:900;color:white;font-size:18px;">{{ results[0].user.username }}</div>
+        <div style="font-size:13px;color:var(--warning);font-weight:700;margin-bottom:12px;">CHAMPION</div>
+        <span class="badge badge-warning" style="font-size:16px;font-weight:900;padding:6px 16px;">{{ results[0].score }} pts</span>
+      </div>
+
+      <!-- 3rd Place -->
+      <div class="card p-4" style="flex:1;max-width:240px;text-align:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-size:36px;margin-bottom:8px;">🥉</div>
+        <div style="font-weight:800;color:white;font-size:16px;">{{ results[2].user.username }}</div>
+        <div style="font-size:12px;color:var(--text-2);margin-bottom:8px;">3rd Place Rank</div>
+        <span class="badge badge-purple" style="font-size:14px;font-weight:800;">{{ results[2].score }} pts</span>
+      </div>
+
+    </div>
+    {% endif %}
+
+    <!-- Full Leaderboard Table -->
+    <div class="card p-4" data-aos="fade-up">
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Participant</th>
+              <th>Score</th>
+              <th>Percentage</th>
+              <th>Correct Qs</th>
+              <th>Time Taken</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr style="{{ 'background:rgba(108,99,255,0.15);' if current_user.is_authenticated and r.user_id == current_user.id else '' }}">
+              <td style="font-weight:800;color:{{ 'var(--warning)' if loop.index == 1 else 'white' }};">
+                {% if loop.index == 1 %}🥇 #1
+                {% elif loop.index == 2 %}🥈 #2
+                {% elif loop.index == 3 %}🥉 #3
+                {% else %}#{{ loop.index }}
+                {% endif %}
+              </td>
+              <td style="font-weight:700;color:white;">{{ r.user.username }}</td>
+              <td style="font-weight:800;color:var(--brand-cyan);">{{ r.score }} pts</td>
+              <td><span class="badge badge-success">{{ r.percentage | round | int }}%</span></td>
+              <td style="font-size:12px;color:var(--text-2);">{{ r.correct_count }} / {{ comp.total_questions }}</td>
+              <td style="font-size:12px;color:var(--text-3);">{{ r.time_taken_seconds // 60 }}m {{ r.time_taken_seconds % 60 }}s</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" style="text-align:center;padding:32px;color:var(--text-3);">No submissions recorded yet for this competition.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

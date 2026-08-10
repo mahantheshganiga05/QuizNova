@@ -1,0 +1,701 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} — QuizNova{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb + Hero -->
+<section style="background:var(--bg-1);border-bottom:1px solid var(--border);padding:32px 0;" aria-label="Category hero">
+  <div class="container">
+    <div class="breadcrumb" data-aos="fade-down" style="margin-bottom:16px;">
+      <a href="{{ url_for('quiz.categories') }}">Categories</a>
+      <svg class="breadcrumb-sep" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <span style="color:var(--text-1);font-weight:500;">{{ category.name }}</span>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;">
+      <div data-aos="fade-right" style="flex:1;min-width:300px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:56px;height:56px;border-radius:16px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.35);box-shadow:0 0 16px rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div>
+            <h1 class="font-display" style="font-size:clamp(1.75rem,3vw,2.25rem);font-weight:800;color:white;margin-bottom:4px;">{{ category.name }}</h1>
+            <p style="font-size:14px;color:var(--text-2);margin-bottom:10px;">{{ category.description or 'Core concepts across popular topics.' }}</p>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#FBBF24;font-weight:600;display:inline-flex;align-items:center;gap:4px;">⭐ Popular</span>
+              <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60A5FA;font-weight:600;display:inline-flex;align-items:center;gap:4px;">📈 High Demand</span>
+              <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-2);font-weight:500;display:inline-flex;align-items:center;gap:4px;">👥 12.5K+ Students</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;" data-aos="fade-left">
+        <div style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;text-align:center;min-width:100px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#9D5FFC;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          </div>
+          <div class="font-display" style="font-size:1.5rem;font-weight:800;color:white;">{{ subcategories | length }}</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">TOPICS</div>
+        </div>
+
+        <div style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;text-align:center;min-width:100px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#34D399;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <div class="font-display" style="font-size:1.5rem;font-weight:800;color:#34D399;">{{ subcategories[0].pass_threshold if subcategories else 60 }}%</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">PASS MARK</div>
+        </div>
+
+        <div style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;text-align:center;min-width:100px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#9D5FFC;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="font-display" style="font-size:1.5rem;font-weight:800;color:white;">20</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">QS/QUIZ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% macro render_sub_icon(slug, name) %}
+{% set s = slug.lower() %}
+{% set n = name.lower() %}
+{% if 'python' in s or 'python' in n %}
+  <div class="sub-icon-wrap icon-theme-python" title="{{ name }}">
+    <!-- Official Python Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M11.927 0C5.642 0 6.033 2.735 6.033 2.735l.006 2.835h5.992v.85H3.595S0 5.986 0 12.302c0 6.315 3.13 6.082 3.13 6.082h1.87v-2.637s-.103-3.13 3.09-3.13h5.29s2.956.05 2.956-2.876V3.13S16.86 0 11.927 0z" fill="#60A5FA"/>
+      <circle cx="8.697" cy="2.88" r="1.05" fill="#FFFFFF"/>
+      <path d="M12.073 24c6.285 0 5.894-2.735 5.894-2.735l-.006-2.835h-5.992v-.85h8.437s3.595.434 3.595-5.882c0-6.315-3.13-6.082-3.13-6.082h-1.87v2.637s.103 3.13-3.09 3.13h-5.29s-2.956-.05-2.956 2.876v6.584S7.14 24 12.073 24z" fill="#FBBF24"/>
+      <circle cx="15.303" cy="21.12" r="1.05" fill="#FFFFFF"/>
+    </svg>
+  </div>
+{% elif 'java' in s and 'javascript' not in s and 'java' in n and 'javascript' not in n %}
+  <div class="sub-icon-wrap icon-theme-java" title="{{ name }}">
+    <!-- Official Java Coffee Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true">
+      <path d="M18 8h1a4 4 0 0 1 0 8h-1" stroke="#FB923C"/>
+      <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="#F87171"/>
+      <line x1="6" y1="1" x2="6" y2="4" stroke="#FB923C"/>
+      <line x1="10" y1="1" x2="10" y2="4" stroke="#FB923C"/>
+      <line x1="14" y1="1" x2="14" y2="4" stroke="#FB923C"/>
+    </svg>
+  </div>
+{% elif 'javascript' in s or 'js' in s or 'javascript' in n %}
+  <div class="sub-icon-wrap icon-theme-javascript" title="{{ name }}">
+    <!-- Official JavaScript Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="#FBBF24" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="#FBBF24" stroke-width="2"/>
+      <path d="M11 16.5c.5.8 1.4 1.2 2.3 1.2 1.3 0 2.2-.7 2.2-2.3v-5.4h-2.3v5.4c0 .4-.2.6-.5.6-.4 0-.7-.3-.9-.6L11 16.5zm-5.2 0c.7.9 1.8 1.4 3 1.4 2 0 3.3-1 3.3-2.6 0-1.5-.9-2.2-2.4-2.8l-.5-.2c-.7-.3-1-.6-1-1 0-.4.4-.7 1-.7.6 0 1.1.2 1.5.8l1.3-1c-.7-1-1.7-1.5-2.8-1.5-1.9 0-3.1 1.1-3.1 2.5 0 1.4.8 2.1 2.2 2.6l.5.2c.8.3 1.1.6 1.1 1 0 .5-.4.8-1.1.8-.8 0-1.4-.4-1.9-1.1l-1.1 1.2z"/>
+    </svg>
+  </div>
+{% elif 'cpp' in s or 'c++' in s or 'c++' in n %}
+  <div class="sub-icon-wrap icon-theme-cpp" title="{{ name }}">
+    <!-- Official C++ Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" aria-hidden="true">
+      <path d="M10 9a4 4 0 1 0 0 6h2"/>
+      <path d="M14 12h4m-2-2v4m3-2h4m-2-2v4"/>
+    </svg>
+  </div>
+{% elif s == 'c' or n == 'c' or 'c language' in s or 'c programming' in n %}
+  <div class="sub-icon-wrap icon-theme-cpp" title="{{ name }}">
+    <!-- Official C Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" aria-hidden="true">
+      <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+      <path d="M14 9.5a4 4 0 1 0 0 5"/>
+    </svg>
+  </div>
+{% elif 'html' in s or 'html' in n %}
+  <div class="sub-icon-wrap icon-theme-html" title="{{ name }}">
+    <!-- Official HTML5 Shield Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2" aria-hidden="true">
+      <path d="M4 3l1.8 16.2L12 21l6.2-1.8L20 3H4z"/>
+      <path d="M16.5 7.5H7.5l.5 4.5h8l-.5 4.5-3.5 1-3.5-1-.2-2"/>
+    </svg>
+  </div>
+{% elif 'css' in s or 'css' in n %}
+  <div class="sub-icon-wrap icon-theme-css" title="{{ name }}">
+    <!-- Official CSS3 Shield Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" aria-hidden="true">
+      <path d="M4 3l1.8 16.2L12 21l6.2-1.8L20 3H4z"/>
+      <path d="M16.5 7.5H7.5l.5 4.5h8l-.5 4.5-3.5 1-3.5-1-.2-2"/>
+    </svg>
+  </div>
+{% elif 'physics' in s or 'physics' in n or 'atom' in s %}
+  <div class="sub-icon-wrap icon-theme-sys" title="{{ name }}">
+    <!-- Physics Atom Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2" aria-hidden="true">
+      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(30 12 12)"/>
+      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(150 12 12)"/>
+      <circle cx="12" cy="12" r="2.5" fill="#38BDF8"/>
+    </svg>
+  </div>
+{% elif 'chemistry' in s or 'chemistry' in n or 'flask' in s %}
+  <div class="sub-icon-wrap icon-theme-flask" title="{{ name }}">
+    <!-- Chemistry Flask Beaker Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F3F4F6" stroke-width="2" aria-hidden="true">
+      <path d="M9 3h6m-3 0v6.2a4 4 0 0 0 1 2.8l4.4 5.3a2 2 0 0 1-1.5 3.2H7.1a2 2 0 0 1-1.5-3.2L10 12a4 4 0 0 0 1-2.8V3z"/>
+    </svg>
+  </div>
+{% elif 'biology' in s or 'biology' in n or 'dna' in s or 'cell' in s %}
+  <div class="sub-icon-wrap icon-theme-mongodb" title="{{ name }}">
+    <!-- Biology DNA Helix Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" aria-hidden="true">
+      <path d="M2 15c6.667-6 13.333 0 20-6M2 9c6.667 6 13.333 0 20 6"/>
+      <line x1="7" y1="10.5" x2="7" y2="13.5"/>
+      <line x1="12" y1="9" x2="12" y2="15"/>
+      <line x1="17" y1="10.5" x2="17" y2="13.5"/>
+    </svg>
+  </div>
+{% elif 'finance' in s or 'finance' in n or 'economics' in s or 'market' in s %}
+  <div class="sub-icon-wrap icon-theme-javascript" title="{{ name }}">
+    <!-- Finance / Economics Market Chart Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" aria-hidden="true">
+      <line x1="12" y1="1" x2="12" y2="23"/>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  </div>
+{% elif 'geography' in s or 'geography' in n or 'gk' in s or 'history' in s %}
+  <div class="sub-icon-wrap icon-theme-sys" title="{{ name }}">
+    <!-- Geography / GK Globe Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  </div>
+{% elif 'arrays' in s or 'array' in n %}
+  <div class="sub-icon-wrap icon-theme-cpp" title="{{ name }}">
+    <!-- Arrays & Strings Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" aria-hidden="true">
+      <rect x="3" y="6" width="18" height="12" rx="2"/>
+      <line x1="9" y1="6" x2="9" y2="18"/>
+      <line x1="15" y1="6" x2="15" y2="18"/>
+    </svg>
+  </div>
+{% elif 'trees' in s or 'tree' in n or 'graph' in n or 'dsa' in s %}
+  <div class="sub-icon-wrap icon-theme-mongodb" title="{{ name }}">
+    <!-- Trees & Graphs / DSA Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" aria-hidden="true">
+      <circle cx="12" cy="5" r="3"/>
+      <circle cx="6" cy="19" r="3"/>
+      <circle cx="18" cy="19" r="3"/>
+      <line x1="10" y1="7.5" x2="7.5" y2="16.5"/>
+      <line x1="14" y1="7.5" x2="16.5" y2="16.5"/>
+    </svg>
+  </div>
+{% elif 'dynamic' in s or 'dp' in s or 'algorithm' in s %}
+  <div class="sub-icon-wrap icon-theme-ai" title="{{ name }}">
+    <!-- Dynamic Programming / Algorithm Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2" aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="2"/>
+      <path d="M4 10h16M10 4v16"/>
+      <circle cx="7" cy="7" r="1.5" fill="#C084FC"/>
+      <circle cx="13" cy="13" r="1.5" fill="#C084FC"/>
+    </svg>
+  </div>
+{% elif 'sorting' in s or 'sort' in n or 'search' in n %}
+  <div class="sub-icon-wrap icon-theme-html" title="{{ name }}">
+    <!-- Sorting & Searching Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2" aria-hidden="true">
+      <line x1="4" y1="18" x2="4" y2="14"/>
+      <line x1="9" y1="18" x2="9" y2="10"/>
+      <line x1="14" y1="18" x2="14" y2="6"/>
+      <circle cx="18" cy="11" r="3"/>
+      <line x1="20.5" y1="13.5" x2="22" y2="15"/>
+    </svg>
+  </div>
+{% elif 'sql' in s or 'sql' in n or 'mysql' in s or 'dbms' in s or 'database' in s %}
+  <div class="sub-icon-wrap icon-theme-mysql" title="{{ name }}">
+    <!-- SQL / MySQL / Database Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true">
+      <ellipse cx="12" cy="5" rx="9" ry="3" stroke="#38BDF8"/>
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="#FB923C"/>
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="#38BDF8"/>
+    </svg>
+  </div>
+{% elif 'mongodb' in s or 'nosql' in s %}
+  <div class="sub-icon-wrap icon-theme-mongodb" title="{{ name }}">
+    <!-- MongoDB Leaf Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" aria-hidden="true">
+      <path d="M12 2S7 7 7 13.5A5.5 5.5 0 0 0 12.5 19v3h-1v-3A5.5 5.5 0 0 0 17 13.5C17 7 12 2 12 2z"/>
+    </svg>
+  </div>
+{% elif 'operating' in s or 'os' in s %}
+  <div class="sub-icon-wrap icon-theme-react" title="{{ name }}">
+    <!-- Operating Systems Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="12" rx="2"/>
+      <line x1="8" y1="20" x2="16" y2="20"/>
+      <line x1="12" y1="16" x2="12" y2="20"/>
+      <path d="M7 9h3m-3 3h5"/>
+    </svg>
+  </div>
+{% elif 'network' in s or 'networks' in n %}
+  <div class="sub-icon-wrap icon-theme-cpp" title="{{ name }}">
+    <!-- Computer Networks Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" aria-hidden="true">
+      <rect x="9" y="2" width="6" height="5" rx="1"/>
+      <rect x="2" y="17" width="6" height="5" rx="1"/>
+      <rect x="16" y="17" width="6" height="5" rx="1"/>
+      <path d="M12 7v5M5 17v-3h14v3M12 12v2"/>
+    </svg>
+  </div>
+{% elif 'architecture' in s or 'arch' in s %}
+  <div class="sub-icon-wrap icon-theme-aws" title="{{ name }}">
+    <!-- Computer Architecture Chip Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" aria-hidden="true">
+      <rect x="5" y="5" width="14" height="14" rx="2"/>
+      <rect x="9" y="9" width="6" height="6"/>
+      <line x1="9" y1="1" x2="9" y2="5"/>
+      <line x1="15" y1="1" x2="15" y2="5"/>
+      <line x1="9" y1="19" x2="9" y2="23"/>
+      <line x1="15" y1="19" x2="15" y2="23"/>
+      <line x1="1" y1="9" x2="5" y2="9"/>
+      <line x1="1" y1="15" x2="5" y2="15"/>
+      <line x1="19" y1="9" x2="23" y2="9"/>
+      <line x1="19" y1="15" x2="23" y2="15"/>
+    </svg>
+  </div>
+{% elif 'theory' in s or 'computation' in s %}
+  <div class="sub-icon-wrap icon-theme-ai" title="{{ name }}">
+    <!-- Theory of Computation Turing Gear Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </div>
+{% elif 'ml' in s or 'deep' in s or 'ai' in s or 'nlp' in s %}
+  <div class="sub-icon-wrap icon-theme-ai" title="{{ name }}">
+    <!-- Machine Learning / Deep Learning / AI Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2" aria-hidden="true">
+      <rect x="5" y="5" width="14" height="14" rx="3"/>
+      <path d="M9 9h6v6H9z"/>
+      <path d="M9 1v4m6-4v4M9 19v4m6-4v4M1 9h4m-4 6h4m14-6h4m-4 6h4"/>
+    </svg>
+  </div>
+{% elif 'apis' in s or 'api' in s or 'rest' in s %}
+  <div class="sub-icon-wrap icon-theme-mongodb" title="{{ name }}">
+    <!-- REST APIs Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </svg>
+  </div>
+{% elif 'flask' in s or 'django' in s %}
+  <div class="sub-icon-wrap icon-theme-flask" title="{{ name }}">
+    <!-- Flask / Django Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F3F4F6" stroke-width="2" aria-hidden="true">
+      <path d="M9 3h6m-3 0v6.2a4 4 0 0 0 1 2.8l4.4 5.3a2 2 0 0 1-1.5 3.2H7.1a2 2 0 0 1-1.5-3.2L10 12a4 4 0 0 0 1-2.8V3z"/>
+    </svg>
+  </div>
+{% elif 'math' in s or 'algebra' in s or 'probability' in s or 'statistics' in s or 'quant' in s or 'calculus' in s %}
+  <div class="sub-icon-wrap icon-theme-react" title="{{ name }}">
+    <!-- Mathematics / Quantitative Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="2"/>
+      <line x1="8" y1="10" x2="16" y2="10"/>
+      <line x1="12" y1="6" x2="12" y2="14"/>
+      <line x1="8" y1="17" x2="16" y2="17"/>
+    </svg>
+  </div>
+{% elif 'logical' in s or 'reasoning' in s or 'critical' in s or 'thinking' in s %}
+  <div class="sub-icon-wrap icon-theme-aws" title="{{ name }}">
+    <!-- Logical Reasoning / Critical Thinking Lightbulb Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" aria-hidden="true">
+      <path d="M9 18h6m-3-15a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/>
+    </svg>
+  </div>
+{% elif 'verbal' in s or 'grammar' in s or 'english' in s or 'communication' in s %}
+  <div class="sub-icon-wrap icon-theme-mongodb" title="{{ name }}">
+    <!-- Verbal / Communication / Grammar Book Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+    </svg>
+  </div>
+{% elif 'gate' in s or 'cat' in s or 'gre' in s or 'placement' in s %}
+  <div class="sub-icon-wrap icon-theme-bootstrap" title="{{ name }}">
+    <!-- Competitive Exams & Placement Trophy Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2" aria-hidden="true">
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+      <path d="M4 22h16"/>
+      <path d="M10 14.66V17c0 .55-.45 1-1 1H7"/>
+      <path d="M14 14.66V17c0 .55.45 1 1 1h2"/>
+      <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+    </svg>
+  </div>
+{% elif 'aws' in s or 'cloud' in s or 'devops' in s or 'docker' in s or 'k8s' in s %}
+  <div class="sub-icon-wrap icon-theme-aws" title="{{ name }}">
+    <!-- AWS / Cloud / DevOps Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" aria-hidden="true">
+      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
+    </svg>
+  </div>
+{% elif 'sec' in s or 'security' in s or 'crypto' in s or 'hacking' in s %}
+  <div class="sub-icon-wrap icon-theme-security" title="{{ name }}">
+    <!-- Cybersecurity Shield Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  </div>
+{% elif 'leadership' in s or 'management' in s %}
+  <div class="sub-icon-wrap icon-theme-aws" title="{{ name }}">
+    <!-- Leadership Star Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" aria-hidden="true">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  </div>
+{% else %}
+  <div class="sub-icon-wrap icon-theme-default" title="{{ name }}">
+    <!-- Reusable Topic Code Icon -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2" aria-hidden="true">
+      <polyline points="16 18 22 12 16 6"/>
+      <polyline points="8 6 2 12 8 18"/>
+    </svg>
+  </div>
+{% endif %}
+{% endmacro %}
+
+<!-- Subcategory Cards -->
+<section style="padding:24px 0 64px 0;">
+  <div class="container">
+    <div class="sub-card-grid">
+      {% for sub in subcategories %}
+      <div class="sub-glass-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 % 3 * 70 }}">
+        
+        <!-- Top Neon Accent Line -->
+        <div class="sub-card-accent-bar"></div>
+
+        <div class="sub-card-inner">
+          <!-- Card Header (Official Technology Icon + Difficulty Badge) -->
+          <div class="sub-card-header">
+            {{ render_sub_icon(sub.slug, sub.name) }}
+
+            <span class="sub-diff-badge {{ 'diff-easy' if sub.difficulty_default == 'easy' else ('diff-medium' if sub.difficulty_default == 'medium' else 'diff-hard') }}">
+              <span class="diff-dot"></span>
+              {{ sub.difficulty_default | capitalize }}
+            </span>
+          </div>
+
+          <!-- Card Content -->
+          <div class="sub-card-body">
+            <h3 class="sub-card-title">{{ sub.name }}</h3>
+            <p class="sub-card-desc">Master {{ sub.name }} with {{ sub.questions_per_quiz }} interactive questions and instant certification.</p>
+          </div>
+
+          <!-- Meta Badges (Questions, Time, Pass Mark) -->
+          <div class="sub-meta-row">
+            <div class="sub-meta-pill" title="Total Questions">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2.2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>{{ sub.questions_per_quiz }} Qs</span>
+            </div>
+
+            <div class="sub-meta-pill" title="Time Limit">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>{{ sub.time_limit_minutes }} min</span>
+            </div>
+
+            <div class="sub-meta-pill pill-pass" title="Pass Percentage">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span>{{ sub.pass_threshold }}% Pass</span>
+            </div>
+          </div>
+
+          <!-- Start Button -->
+          <form method="POST" action="{{ url_for('quiz.start', subcategory_id=sub.id) }}" class="sub-card-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if current_user.is_authenticated %}
+            <button type="submit" class="sub-start-btn" id="start-quiz-{{ sub.id }}-btn">
+              <span>Start Quiz</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}?next={{ url_for('quiz.subcategories', category_slug=category.slug) }}"
+               class="sub-login-btn" id="login-to-start-{{ sub.id }}-btn">
+              <span>Sign in to Start</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            </a>
+            {% endif %}
+          </form>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- STYLES FOR SUB CATEGORY CARDS ONLY -->
+<style>
+  .sub-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 992px) {
+    .sub-card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .sub-card-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .sub-glass-card {
+    background: linear-gradient(135deg, rgba(14, 14, 28, 0.9) 0%, rgba(20, 18, 42, 0.8) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(124, 58, 237, 0.1);
+  }
+
+  .sub-glass-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 58, 237, 0.45);
+    box-shadow: 0 12px 28px rgba(124, 58, 237, 0.2), 0 0 12px rgba(59, 130, 246, 0.1);
+  }
+
+  .sub-card-accent-bar {
+    height: 2.5px;
+    width: 100%;
+    background: linear-gradient(90deg, #7C3AED 0%, #3B82F6 100%);
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+  }
+  .sub-glass-card:hover .sub-card-accent-bar {
+    opacity: 1;
+  }
+
+  .sub-card-inner {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 16px;
+  }
+
+  .sub-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sub-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9D5FFC;
+    box-shadow: 0 0 14px rgba(124, 58, 237, 0.2);
+    transition: transform 0.3s ease;
+  }
+  .sub-glass-card:hover .sub-icon-wrap {
+    transform: scale(1.06);
+  }
+
+  .sub-diff-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #FBBF24;
+  }
+  .diff-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #FBBF24;
+  }
+  .diff-easy {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34D399;
+  }
+  .diff-easy .diff-dot { background: #34D399; }
+  .diff-hard {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #F87171;
+  }
+  .diff-hard .diff-dot { background: #F87171; }
+
+  .sub-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sub-card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0;
+  }
+
+  .sub-card-desc {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.45;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 38px;
+  }
+
+  .sub-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .sub-meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    height: 28px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .pill-pass {
+    color: #34D399;
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .sub-card-form {
+    margin-top: auto;
+    width: 100%;
+  }
+
+  .sub-start-btn, .sub-login-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%);
+    border: none;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+  }
+  .sub-start-btn:hover, .sub-login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+    color: #FFFFFF;
+  }
+
+  /* BRAND ACCENT ICON THEMES */
+  .icon-theme-python {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.25), 0 0 8px rgba(245, 158, 11, 0.15) !important;
+  }
+  .icon-theme-java {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1px solid rgba(239, 68, 68, 0.35) !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.25), 0 0 8px rgba(249, 115, 22, 0.15) !important;
+  }
+  .icon-theme-javascript {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border: 1px solid rgba(245, 158, 11, 0.35) !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.25) !important;
+  }
+  .icon-theme-cpp, .icon-theme-css, .icon-theme-postgres, .icon-theme-dsa {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.25) !important;
+  }
+  .icon-theme-html {
+    background: rgba(249, 115, 22, 0.12) !important;
+    border: 1px solid rgba(249, 115, 22, 0.35) !important;
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.25) !important;
+  }
+  .icon-theme-bootstrap {
+    background: rgba(147, 51, 234, 0.12) !important;
+    border: 1px solid rgba(147, 51, 234, 0.35) !important;
+    box-shadow: 0 0 14px rgba(147, 51, 234, 0.25) !important;
+  }
+  .icon-theme-flask {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(192, 132, 252, 0.35) !important;
+    box-shadow: 0 0 14px rgba(192, 132, 252, 0.2) !important;
+  }
+  .icon-theme-mysql {
+    background: rgba(14, 165, 233, 0.12) !important;
+    border: 1px solid rgba(14, 165, 233, 0.35) !important;
+    box-shadow: 0 0 14px rgba(14, 165, 233, 0.25) !important;
+  }
+  .icon-theme-mongodb, .icon-theme-node {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+  }
+  .icon-theme-react, .icon-theme-sys {
+    background: rgba(6, 182, 212, 0.12) !important;
+    border: 1px solid rgba(6, 182, 212, 0.35) !important;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.25) !important;
+  }
+  .icon-theme-aws {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border: 1px solid rgba(245, 158, 11, 0.35) !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.25) !important;
+  }
+  .icon-theme-ai {
+    background: rgba(168, 85, 247, 0.12) !important;
+    border: 1px solid rgba(168, 85, 247, 0.35) !important;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.25) !important;
+  }
+  .icon-theme-security {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1px solid rgba(239, 68, 68, 0.35) !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.25) !important;
+  }
+  .icon-theme-default {
+    background: rgba(124, 58, 237, 0.12) !important;
+    border: 1px solid rgba(124, 58, 237, 0.35) !important;
+    box-shadow: 0 0 14px rgba(124, 58, 237, 0.25) !important;
+  }
+</style>
+
+{% endblock %}

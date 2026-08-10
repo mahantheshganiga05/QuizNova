@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}My Certificates — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+  {% include 'partials/_sidebar.html' %}
+
+  <main class="dash-main" aria-label="Certificates">
+
+    <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <!-- Header -->
+    <div class="dash-topbar">
+      <div>
+        <h1 class="font-display" style="font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:800;">My Certificates</h1>
+        <p style="font-size:14px;color:var(--text-2);">Download and share your verified achievement certificates.</p>
+      </div>
+      <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary" id="earn-more-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Earn More
+      </a>
+    </div>
+
+    {% if certificates %}
+
+    <!-- Summary -->
+    <div class="card p-4" style="display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap;" data-aos="fade-up">
+      <div style="display:flex;align-items:center;gap:var(--s2);">
+        <div style="width:52px;height:52px;border-radius:var(--r-lg);background:var(--g-brand);display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        </div>
+        <div>
+          <div class="font-display" style="font-size:1.75rem;font-weight:700;">{{ certificates | length }}</div>
+          <div class="label-caps">Total Certificates</div>
+        </div>
+      </div>
+      <div style="width:1px;height:48px;background:var(--border);" aria-hidden="true"></div>
+      <div>
+        <div class="font-display" style="font-size:1.75rem;font-weight:700;color:var(--success);">
+          {{ (certificates | map(attribute='percentage') | sum / certificates | length) | round }}%
+        </div>
+        <div class="label-caps">Average Score</div>
+      </div>
+      <div style="width:1px;height:48px;background:var(--border);" aria-hidden="true"></div>
+      <div>
+        <div class="font-display" style="font-size:1.75rem;font-weight:700;color:var(--brand-purple-light);">
+          {{ certificates | max(attribute='percentage') | attr('percentage') | round }}%
+        </div>
+        <div class="label-caps">Best Score</div>
+      </div>
+    </div>
+
+    <!-- Certificates Grid -->
+    <div class="certs-grid">
+      {% for cert in certificates %}
+      <div class="card cert-card p-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 % 3 * 70 }}" id="cert-{{ cert.id }}">
+
+        <!-- Header -->
+        <div class="cert-card-header">
+          <div class="cert-card-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div>
+            <div class="cert-card-title">{{ cert.result.attempt.subcategory.name }}</div>
+            <div class="cert-card-cat">{{ cert.result.attempt.subcategory.category.name }}</div>
+          </div>
+        </div>
+
+        <!-- Score -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:var(--s2) 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+          <div>
+            <div class="label-caps" style="margin-bottom:4px;">Score Achieved</div>
+            <div class="cert-card-score">{{ cert.percentage | round }}%</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="cert-card-date">{{ cert.issue_date.strftime('%d %b %Y') if cert.issue_date else '—' }}</div>
+            <div style="margin-top:4px;">
+              {% if cert.percentage >= 90 %}
+                <span class="badge badge-warning">Distinction</span>
+              {% elif cert.percentage >= 75 %}
+                <span class="badge badge-success">Merit</span>
+              {% else %}
+                <span class="badge badge-blue">Pass</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification ID -->
+        <div style="background:var(--bg-2);border-radius:var(--r-md);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <div class="label-caps" style="margin-bottom:2px;">Certificate ID</div>
+            <div class="cert-card-id font-mono">{{ cert.verification_id }}</div>
+          </div>
+          <button class="btn btn-icon-sm btn-ghost" type="button"
+                  onclick="window.QuizNova?.copyToClipboard('{{ cert.verification_id }}', this)"
+                  title="Copy certificate ID" aria-label="Copy certificate ID">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="cert-card-actions">
+          <a href="{{ url_for('api.download_certificate', cert_id=cert.id) }}"
+             class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" id="dl-cert-{{ cert.id }}-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
+          <a href="/verify/{{ cert.verification_id }}"
+             class="btn btn-ghost btn-sm" id="verify-cert-{{ cert.id }}-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Verify
+          </a>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="card empty-state" data-aos="fade-up">
+      <div class="empty-state-icon" aria-hidden="true">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      </div>
+      <h2 class="empty-state-title">No Certificates Yet</h2>
+      <p class="empty-state-desc">Complete a quiz with a passing score (60%+) to earn your first verified certificate.</p>
+      <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary" id="empty-certs-start-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Browse Quizzes
+      </a>
+    </div>
+
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}

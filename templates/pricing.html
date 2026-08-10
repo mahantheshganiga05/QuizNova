@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Pricing — QuizNova{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="text-align:center;">
+    <div class="section-eyebrow" style="display:inline-flex;margin-bottom:var(--s3);">Pricing</div>
+    <h1 class="font-display" style="font-size:clamp(2rem,5vw,3rem);font-weight:800;margin-bottom:var(--s2);">
+      Simple, Transparent Pricing
+    </h1>
+    <p style="font-size:17px;color:var(--text-2);margin-bottom:var(--s8);">Start free. Upgrade when you need more.</p>
+    <div class="grid-3" style="gap:24px;max-width:900px;margin-inline:auto;">
+      {% for plan in [
+        ('Free','0','forever',['Unlimited quizzes','Basic categories','PDF certificates','Global leaderboard'],False),
+        ('Pro','₹199','per month',['Everything in Free','All 12 categories','Priority support','Advanced analytics','AI practice mode (soon)'],True),
+        ('Team','₹999','per month',['Everything in Pro','Up to 10 members','Team leaderboard','Admin dashboard','Custom categories'],False),
+      ] %}
+      <div class="card p-5 {{ 'card-brand' if plan[4] }}" style="{{ 'border-color:var(--border-brand);' if plan[4] }}">
+        {% if plan[4] %}<div class="badge badge-purple" style="margin-bottom:var(--s3);">Most Popular</div>{% endif %}
+        <h3 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px;">{{ plan[0] }}</h3>
+        <div class="font-display" style="font-size:2.5rem;font-weight:800;margin-bottom:4px;background:var(--g-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ plan[1] }}</div>
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:var(--s4);">{{ plan[2] }}</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;text-align:left;margin-bottom:var(--s5);">
+          {% for feature in plan[3] %}
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-2);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ feature }}
+          </li>
+          {% endfor %}
+        </ul>
+        <a href="{{ url_for('auth.register') }}" class="btn {{ 'btn-primary' if plan[4] else 'btn-ghost' }} btn-full">
+          Get Started
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

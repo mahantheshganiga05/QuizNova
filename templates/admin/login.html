@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Admin Sign In — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: var(--bg-0); overflow-x: hidden; }
+  .admin-auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(108,99,255,0.2), transparent 70%), var(--bg-0);
+  }
+  .admin-auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(15,23,42,0.85);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(108,99,255,0.35);
+    border-radius: 24px;
+    padding: 36px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(108,99,255,0.2);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-auth-wrap">
+  <div class="admin-auth-card" data-aos="fade-up">
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#6C5CE7,#3B82F6);display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:22px;margin-bottom:12px;">Q</div>
+      <h1 class="font-display" style="font-size:22px;font-weight:800;color:white;margin-bottom:4px;">Admin Portal</h1>
+      <p style="font-size:13px;color:var(--text-2);">Sign in with administrator credentials.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.login') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label" for="email" style="font-size:11px;color:var(--text-2);margin-bottom:6px;display:block;">ADMIN EMAIL</label>
+        <input type="email" id="email" name="email" class="input" placeholder="admin@quiznova.com" required style="width:100%;">
+      </div>
+
+      <div class="form-group" style="margin-bottom:24px;">
+        <label class="form-label" for="password" style="font-size:11px;color:var(--text-2);margin-bottom:6px;display:block;">ADMIN PASSWORD</label>
+        <input type="password" id="password" name="password" class="input" placeholder="••••••••" required style="width:100%;">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;border-radius:12px;font-weight:700;">
+        Sign In to Console →
+      </button>
+    </form>
+
+    <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <a href="{{ url_for('public.home') }}" style="font-size:12px;color:var(--text-3);text-decoration:none;">← Return to Main Site</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

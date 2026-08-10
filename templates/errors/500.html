@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}500 — Server Error — QuizNova{% endblock %}
+{% block content %}
+<div style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--space-12);">
+  <div style="font-size:6rem;margin-bottom:var(--space-4);" aria-hidden="true">⚡</div>
+  <h1 class="font-display" style="font-size:var(--text-5xl);font-weight:800;color:var(--warning);margin-bottom:var(--space-4);">500</h1>
+  <h2 style="font-size:var(--text-2xl);font-weight:600;margin-bottom:var(--space-4);">Server Error</h2>
+  <p style="color:var(--text-secondary);max-width:420px;line-height:1.7;margin-bottom:var(--space-8);">
+    Something went wrong on our end. Our team has been notified. Please try again in a moment.
+  </p>
+  <div style="display:flex;gap:var(--space-4);">
+    <a href="{{ url_for('public.home') }}" class="btn btn-primary btn-lg" id="err-500-home-btn">← Go Home</a>
+    <button onclick="window.location.reload()" class="btn btn-ghost btn-lg" id="err-500-retry-btn">Retry</button>
+  </div>
+</div>
+{% endblock %}

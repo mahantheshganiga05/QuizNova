@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% block title %}{{ comp.title }} — QuizNova Competition{% endblock %}
+
+{% block content %}
+<div class="section" style="padding-top:40px;padding-bottom:80px;">
+  <div class="container" style="max-width:1000px;">
+
+    <!-- Banner Header Card -->
+    <div class="card p-5" style="border:1px solid rgba(108,99,255,0.35);margin-bottom:32px;background:linear-gradient(135deg,rgba(15,23,42,0.9),rgba(30,27,75,0.7));" data-aos="fade-up">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+        {% if comp.current_status == 'live' %}
+        <span class="badge badge-error" style="animation:pulseGlow 2s infinite;">🔴 LIVE NOW</span>
+        {% elif comp.current_status == 'upcoming' %}
+        <span class="badge badge-warning">📅 UPCOMING</span>
+        {% else %}
+        <span class="badge badge-neutral">🏁 COMPLETED</span>
+        {% endif %}
+        
+        <span class="badge badge-purple">{{ comp.category.name if comp.category else 'Competition' }}</span>
+      </div>
+
+      <h1 class="font-display" style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:white;margin-bottom:12px;">
+        {{ comp.title }}
+      </h1>
+
+      <p style="font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">
+        {{ comp.short_description or comp.full_description }}
+      </p>
+
+      <!-- Key Metadata Grid -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;background:rgba(255,255,255,0.03);padding:16px;border-radius:14px;border:1px solid var(--border);margin-bottom:24px;">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;">PRIZE POOL</div>
+          <div style="font-size:16px;font-weight:800;color:var(--warning);">{{ comp.prize_pool_text }}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;">QUESTIONS</div>
+          <div style="font-size:16px;font-weight:800;color:white;">{{ comp.total_questions }} Qs</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;">DURATION</div>
+          <div style="font-size:16px;font-weight:800;color:white;">{{ comp.duration_minutes }} Mins</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;">PARTICIPANTS</div>
+          <div style="font-size:16px;font-weight:800;color:var(--brand-cyan);">{{ comp.registered_count }} Registered</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex;gap:14px;align-items:center;">
+        {% if comp.current_status == 'live' %}
+          {% if is_registered or current_user.is_admin %}
+            {% if has_attempted %}
+            <a href="{{ url_for('competitions.leaderboard', slug=comp.slug) }}" class="btn btn-primary">&#x1F3C6; View Leaderboard &amp; Winners</a>
+            {% else %}
+            <form method="POST" action="{{ url_for('competitions.start', slug=comp.slug) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-primary btn-lg" style="box-shadow:0 0 25px rgba(108,99,255,0.6);">&#x1F680; Start Competition Now</button>
+            </form>
+            {% endif %}
+          {% else %}
+          <button class="btn btn-primary btn-lg" onclick="document.getElementById('reg-modal').style.display='flex'">Register &amp; Enter Contest &#x2192;</button>
+          {% endif %}
+
+        {% elif comp.current_status == 'upcoming' %}
+          {% if is_registered %}
+          <button class="btn btn-ghost" disabled>&#x2713; Registered for Contest</button>
+          {% else %}
+          <button class="btn btn-primary btn-lg" onclick="document.getElementById('reg-modal').style.display='flex'">Register for Free &#x2192;</button>
+          {% endif %}
+
+        {% else %}
+        <a href="{{ url_for('competitions.leaderboard', slug=comp.slug) }}" class="btn btn-primary">&#x1F3C6; View Final Leaderboard</a>
+        {% endif %}
+      </div>
+
+    </div>
+
+ <!-- Student Registration Modal -->
+<div id="reg-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div class="card" style="max-width:680px;width:100%;margin:auto;border:1px solid rgba(124,58,237,0.5);border-radius:20px;overflow:hidden;">
+
+    <!-- Modal Header -->
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(37,99,235,0.2));padding:20px 24px;border-bottom:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h2 class="font-display" style="font-size:18px;font-weight:800;color:white;margin-bottom:2px;">🏆 Competition Registration</h2>
+        <p style="font-size:12px;color:var(--text-2);">{{ comp.title }}</p>
+      </div>
+      <button id="close-modal-btn" onclick="document.getElementById('reg-modal').style.display='none'" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:white;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:16px;">✕</button>
+    </div>
+
+    <!-- Success Screen (hidden initially) -->
+    <div id="reg-success" style="display:none;padding:48px 24px;text-align:center;">
+      <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+      <h3 class="font-display" style="font-size:22px;font-weight:800;color:white;margin-bottom:8px;">Registration Successful!</h3>
+      <p style="color:var(--text-2);margin-bottom:20px;">You are now registered for <strong style="color:white;">{{ comp.title }}</strong></p>
+      <div style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.4);border-radius:12px;padding:16px;margin:0 auto 24px;max-width:280px;">
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:4px;">YOUR REGISTRATION ID</div>
+        <div id="reg-id-display" class="font-display" style="font-size:22px;font-weight:800;color:var(--brand-purple-light);">QN-00000</div>
+      </div>
+      <button onclick="document.getElementById('reg-modal').style.display='none';location.reload();" class="btn btn-primary">Continue →</button>
+    </div>
+
+    <!-- Registration Form -->
+    <div id="reg-form-wrap" style="padding:24px;max-height:70vh;overflow-y:auto;">
+      <form id="reg-form" method="POST" action="{{ url_for('competitions.register', slug=comp.slug) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Step 1: Personal Info -->
+        <div style="font-size:11px;font-weight:700;color:var(--brand-purple-light);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">👤 Personal Information</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">FULL NAME *</label>
+            <input type="text" name="full_name" class="input" value="{{ current_user.display_name if current_user.is_authenticated else '' }}" required style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">EMAIL *</label>
+            <input type="email" name="email" class="input" value="{{ current_user.email if current_user.is_authenticated else '' }}" required style="width:100%;">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">MOBILE *</label>
+            <input type="tel" name="phone" class="input" placeholder="+91 9876543210" required style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">GENDER</label>
+            <select name="gender" class="input" style="width:100%;">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">DATE OF BIRTH</label>
+            <input type="date" name="date_of_birth" class="input" style="width:100%;">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">COUNTRY</label>
+            <select name="country" class="input" style="width:100%;">
+              <option value="India" selected>India</option>
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">STATE *</label>
+            <input type="text" name="state" class="input" placeholder="e.g. Karnataka" required style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">CITY *</label>
+            <input type="text" name="city" class="input" placeholder="e.g. Bengaluru" required style="width:100%;">
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:14px;font-size:11px;font-weight:700;color:var(--brand-purple-light);text-transform:uppercase;letter-spacing:0.08em;">🎓 Academic Information</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">COLLEGE / UNIVERSITY *</label>
+            <input type="text" name="college" class="input" placeholder="e.g. IIT Bombay" required style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">DEPARTMENT</label>
+            <input type="text" name="department" class="input" placeholder="e.g. Computer Science" style="width:100%;">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">COURSE</label>
+            <select name="course" class="input" style="width:100%;">
+              <option value="B.Tech / B.E." selected>B.Tech / B.E.</option>
+              <option value="BCA / MCA">BCA / MCA</option>
+              <option value="B.Sc / M.Sc CS">B.Sc / M.Sc CS</option>
+              <option value="MBA">MBA</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">YEAR / SEMESTER</label>
+            <select name="year_of_study" class="input" style="width:100%;">
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year" selected>3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">USN / ROLL NO.</label>
+            <input type="text" name="usn_roll" class="input" placeholder="e.g. 1MS21CS001" style="width:100%;">
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:14px;font-size:11px;font-weight:700;color:var(--brand-purple-light);text-transform:uppercase;letter-spacing:0.08em;">🔗 Social Profiles (Optional)</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">LINKEDIN URL</label>
+            <input type="url" name="linkedin_url" class="input" placeholder="https://linkedin.com/in/..." style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:5px;">GITHUB URL</label>
+            <input type="url" name="github_url" class="input" placeholder="https://github.com/..." style="width:100%;">
+          </div>
+        </div>
+
+        <div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px;margin-bottom:20px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--text-2);cursor:pointer;">
+            <input type="checkbox" required style="margin-top:3px;">
+            <span>I agree to the <a href="#" style="color:var(--brand-purple-light);">Official Tournament Rules</a>, <a href="#" style="color:var(--brand-purple-light);">Anti-Cheat Policy</a>, and <a href="#" style="color:var(--brand-purple-light);">Terms of Conduct</a>. I confirm all information provided is accurate.</span>
+          </label>
+        </div>
+
+        <button type="submit" id="reg-submit-btn" class="btn btn-primary btn-lg" style="width:100%;box-shadow:0 0 25px rgba(124,58,237,0.4);">
+          🚀 Submit Registration &amp; Claim Entry Pass →
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// AJAX Registration Form
+document.getElementById('reg-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('reg-submit-btn');
+  btn.textContent = '⏳ Submitting...';
+  btn.disabled = true;
+
+  const formData = new FormData(this);
+  try {
+    const res = await fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('reg-form-wrap').style.display = 'none';
+      document.getElementById('reg-success').style.display = 'block';
+      if (data.reg_id) document.getElementById('reg-id-display').textContent = data.reg_id;
+    } else {
+      alert(data.message || 'Registration failed. Please try again.');
+      btn.textContent = '🚀 Submit Registration & Claim Entry Pass →';
+      btn.disabled = false;
+    }
+  } catch(err) {
+    this.submit(); // Fallback to normal form submit
+  }
+});
+</script>
+
+    <!-- Main Content Details Grid -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
+
+      <!-- Left Column: Prizes & Rules -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        
+        <!-- Prizes Card -->
+        <div class="card p-4">
+          <h3 class="font-display" style="font-size:18px;font-weight:800;color:white;margin-bottom:16px;">🎁 Rewards & Prizes</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);padding:14px;border-radius:12px;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:24px;">🥇</span>
+              <div>
+                <div style="font-weight:700;color:white;">1st Place Winner</div>
+                <div style="font-size:13px;color:var(--text-2);">{{ comp.prize_1st }}</div>
+              </div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:14px;border-radius:12px;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:24px;">🥈</span>
+              <div>
+                <div style="font-weight:700;color:white;">2nd Place Runner-Up</div>
+                <div style="font-size:13px;color:var(--text-2);">{{ comp.prize_2nd }}</div>
+              </div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:14px;border-radius:12px;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:24px;">🥉</span>
+              <div>
+                <div style="font-weight:700;color:white;">3rd Place Rank</div>
+                <div style="font-size:13px;color:var(--text-2);">{{ comp.prize_3rd }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rules & Guidelines -->
+        <div class="card p-4">
+          <h3 class="font-display" style="font-size:18px;font-weight:800;color:white;margin-bottom:16px;">📜 Rules & Guidelines</h3>
+          <ul style="color:var(--text-2);font-size:14px;line-height:1.8;padding-left:20px;">
+            <li>Single attempt allowed per registered student.</li>
+            <li>Questions are strictly timed; automatic submission occurs when timer expires.</li>
+            <li>Anti-cheat monitoring is enabled (tab switches and fullscreen exits logged).</li>
+            <li>Rankings are computed based on highest score, with tie-breakers decided by fastest completion time.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Organizer & Info Sidebar -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <div class="card p-4">
+          <h4 class="font-display" style="font-size:14px;font-weight:700;color:white;margin-bottom:12px;">ORGANIZER INFO</h4>
+          <div style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;">{{ comp.organizer_name }}</div>
+          <div style="font-size:12px;color:var(--text-2);">Sponsor: {{ comp.sponsor_name }}</div>
+        </div>
+
+        <div class="card p-4">
+          <h4 class="font-display" style="font-size:14px;font-weight:700;color:white;margin-bottom:12px;">TIMELINE</h4>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:8px;">
+            <strong>Starts:</strong> {{ comp.start_date.strftime('%b %d, %Y - %H:%M UTC') }}
+          </div>
+          <div style="font-size:12px;color:var(--text-2);">
+            <strong>Ends:</strong> {{ comp.end_date.strftime('%b %d, %Y - %H:%M UTC') }}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

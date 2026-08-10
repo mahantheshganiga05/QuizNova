@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% set load_charts = false %}
+{% block title %}Global Leaderboard — QuizNova{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section style="background:var(--bg-1);border-bottom:1px solid var(--border);padding:var(--s8) 0;text-align:center;" aria-label="Leaderboard hero">
+  <div class="container">
+    <div class="section-eyebrow" style="display:inline-flex;margin-bottom:var(--s3);" data-aos="fade-down">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
+      Global Rankings
+    </div>
+    <h1 class="font-display" data-aos="fade-up" style="font-size:clamp(1.8rem,4vw,2.75rem);font-weight:800;margin-bottom:var(--s2);">
+      Global Leaderboard
+    </h1>
+    <p style="font-size:16px;color:var(--text-2);max-width:480px;margin-inline:auto;line-height:1.7;" data-aos="fade-up" data-aos-delay="60">
+      Top performers across all categories. Compete, earn certificates, and climb the ranks.
+    </p>
+  </div>
+</section>
+
+<!-- Podium (top 3) -->
+{% if global_entries | length >= 3 %}
+<section style="padding:var(--s8) 0;background:var(--bg-0);" aria-label="Top 3 podium">
+  <div class="container">
+    <div class="podium" data-aos="fade-up">
+
+      <!-- Rank 2 -->
+      <div class="podium-col rank-2">
+        <div class="podium-user">
+          <div class="avatar avatar-md" aria-label="{{ global_entries[1].user.username }}">
+            {% if global_entries[1].user.profile_photo_url %}
+            <img src="{{ global_entries[1].user.profile_photo_url }}" alt="{{ global_entries[1].user.username }}">
+            {% else %}
+            {{ global_entries[1].user.username[0].upper() }}
+            {% endif %}
+          </div>
+          <span class="podium-name">{{ global_entries[1].user.username }}</span>
+          <span class="podium-score" style="color:var(--success);">{{ global_entries[1].best_percentage }}%</span>
+        </div>
+        <div class="podium-stand">2</div>
+      </div>
+
+      <!-- Rank 1 (center, taller) -->
+      <div class="podium-col rank-1" style="order:-1;">
+        <div class="podium-user">
+          <div class="podium-crown" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#F59E0B" stroke="none" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="avatar avatar-lg" style="border:2px solid #F59E0B;" aria-label="{{ global_entries[0].user.username }}">
+            {% if global_entries[0].user.profile_photo_url %}
+            <img src="{{ global_entries[0].user.profile_photo_url }}" alt="{{ global_entries[0].user.username }}">
+            {% else %}
+            {{ global_entries[0].user.username[0].upper() }}
+            {% endif %}
+          </div>
+          <span class="podium-name" style="font-size:15px;">{{ global_entries[0].user.username }}</span>
+          <span class="podium-score" style="color:var(--success);font-size:13px;">{{ global_entries[0].best_percentage }}%</span>
+        </div>
+        <div class="podium-stand">1</div>
+      </div>
+
+      <!-- Rank 3 -->
+      <div class="podium-col rank-3">
+        <div class="podium-user">
+          <div class="avatar avatar-md" aria-label="{{ global_entries[2].user.username }}">
+            {% if global_entries[2].user.profile_photo_url %}
+            <img src="{{ global_entries[2].user.profile_photo_url }}" alt="{{ global_entries[2].user.username }}">
+            {% else %}
+            {{ global_entries[2].user.username[0].upper() }}
+            {% endif %}
+          </div>
+          <span class="podium-name">{{ global_entries[2].user.username }}</span>
+          <span class="podium-score" style="color:var(--success);">{{ global_entries[2].best_percentage }}%</span>
+        </div>
+        <div class="podium-stand">3</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Full Table -->
+<section class="section">
+  <div class="container">
+
+    <!-- Filter Bar -->
+    {% if subcategories %}
+    <div class="leaderboard-filter" data-aos="fade-up">
+      <span class="filter-label">Filter by topic:</span>
+      <button class="filter-btn active" data-filter="all" id="filter-all-btn">All Topics</button>
+      {% for sub in subcategories[:8] %}
+      <button class="filter-btn" data-filter="{{ sub.id }}" id="filter-{{ sub.id }}-btn">{{ sub.name }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="table-container card" data-aos="fade-up" data-aos-delay="80">
+      <table class="data-table" id="leaderboard-table" aria-label="Leaderboard rankings">
+        <thead>
+          <tr>
+            <th><button class="sort-btn" data-col="rank" aria-label="Sort by rank">Rank</button></th>
+            <th>Player</th>
+            <th><button class="sort-btn" data-col="quizzes" aria-label="Sort by quizzes">Quizzes</button></th>
+            <th><button class="sort-btn" data-col="best" aria-label="Sort by best score">Best Score</button></th>
+            <th><button class="sort-btn" data-col="points" aria-label="Sort by total points">Total Points</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in global_entries %}
+          <tr class="{{ 'lb-table-row-me' if current_user.is_authenticated and entry.user.id == current_user.id }}">
+            <td>
+              <span class="lb-rank {{ 'lb-rank-1' if entry.rank_position == 1 else ('lb-rank-2' if entry.rank_position == 2 else ('lb-rank-3' if entry.rank_position == 3 else '')) }}">
+                {% if entry.rank_position <= 3 %}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                {% endif %}
+                #{{ entry.rank_position }}
+              </span>
+            </td>
+            <td>
+              <div class="lb-player">
+                <div class="avatar avatar-sm" aria-hidden="true">
+                  {% if entry.user.profile_photo_url %}
+                  <img src="{{ entry.user.profile_photo_url }}" alt="">
+                  {% else %}
+                  {{ entry.user.username[0].upper() }}
+                  {% endif %}
+                </div>
+                <span style="font-weight:600;font-size:14px;">
+                  {{ entry.user.username }}
+                  {% if current_user.is_authenticated and entry.user.id == current_user.id %}
+                  <span class="badge badge-purple" style="margin-left:6px;">You</span>
+                  {% endif %}
+                </span>
+              </div>
+            </td>
+            <td style="color:var(--text-2);">{{ entry.quiz_count }}</td>
+            <td>
+              <span class="lb-score" style="color:var(--success);">{{ entry.best_percentage }}%</span>
+            </td>
+            <td>
+              <span class="lb-score" style="background:var(--g-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                {{ entry.total_score | int }}
+              </span>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="text-align:center;padding:var(--s8);color:var(--text-3);">
+              No entries yet. Be the first to complete a quiz!
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Current user prompt -->
+    {% if not current_user.is_authenticated %}
+    <div style="text-align:center;margin-top:var(--s6);" data-aos="fade-up">
+      <p style="color:var(--text-2);margin-bottom:var(--s3);">Sign in to see your rank and compete.</p>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary" id="leaderboard-signup-btn">Get Started Free</a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

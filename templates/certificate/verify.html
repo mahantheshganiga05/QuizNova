@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Certificate Verification — QuizNova{% endblock %}
+
+{% block content %}
+
+<section class="section" aria-label="Certificate verification">
+  <div class="container" style="max-width:var(--content-sm);">
+
+    {% if cert and cert.is_valid %}
+
+    <!-- Valid Certificate -->
+    <div style="text-align:center;margin-bottom:var(--s6);" data-aos="fade-down">
+      <div class="verify-valid-badge" aria-label="Certificate is valid">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Certificate Verified
+      </div>
+      <p style="font-size:14px;color:var(--text-2);margin-top:var(--s2);">
+        This certificate was issued by QuizNova on {{ cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A' }}
+      </p>
+    </div>
+
+    <!-- Certificate Display -->
+    <div class="cert-display" data-aos="fade-up">
+
+      <!-- Background decoration -->
+      <div style="position:absolute;top:24px;right:24px;opacity:0.06;" aria-hidden="true">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="var(--brand-purple)" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      </div>
+      <div style="position:absolute;bottom:24px;left:24px;opacity:0.05;" aria-hidden="true">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="var(--brand-blue)" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+
+      <div class="cert-content">
+        <!-- Logo -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:var(--s5);">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--g-brand);display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <circle cx="6.5" cy="9" r="5" fill="rgba(255,255,255,0.9)"/>
+              <circle cx="11.5" cy="9" r="5" fill="rgba(255,255,255,0.6)"/>
+            </svg>
+          </div>
+          <span style="font-family:var(--font-display);font-size:20px;font-weight:700;background:var(--g-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">QuizNova</span>
+        </div>
+
+        <!-- Title -->
+        <div class="label-caps" style="color:var(--text-3);margin-bottom:var(--s2);">Certificate of Achievement</div>
+
+        <!-- Divider line -->
+        <div style="width:80px;height:2px;background:var(--g-brand);margin-inline:auto;margin-bottom:var(--s5);border-radius:2px;" aria-hidden="true"></div>
+
+        <!-- This is to certify -->
+        <p style="font-size:15px;color:var(--text-2);margin-bottom:var(--s2);">This is to certify that</p>
+
+        <!-- Candidate Name -->
+        <h1 class="cert-candidate text-gradient" style="margin-bottom:var(--s2);">
+          {{ cert.user.display_name or cert.user.username }}
+        </h1>
+
+        <p style="font-size:15px;color:var(--text-2);margin-bottom:var(--s2);">has successfully completed</p>
+
+        <!-- Quiz Name -->
+        <h2 class="font-display" style="font-size:1.5rem;font-weight:700;margin-bottom:var(--s4);">
+          {{ cert.result.attempt.subcategory.name }}
+        </h2>
+
+        <!-- Score -->
+        <div style="display:inline-flex;align-items:center;gap:var(--s4);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:var(--r-lg);padding:var(--s3) var(--s5);margin-bottom:var(--s5);">
+          <div>
+            <div class="cert-score-display font-display" style="color:var(--success);">{{ cert.percentage | round }}%</div>
+            <div class="label-caps" style="color:var(--success);">Score</div>
+          </div>
+          <div style="width:1px;height:48px;background:rgba(16,185,129,0.2);" aria-hidden="true"></div>
+          <div>
+            <div class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--text-1);">
+              {% if cert.percentage >= 90 %}Distinction
+              {% elif cert.percentage >= 75 %}Merit
+              {% else %}Pass{% endif %}
+            </div>
+            <div class="label-caps">Grade</div>
+          </div>
+        </div>
+
+        <!-- Date + ID -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <p style="font-size:13px;color:var(--text-3);">Issued on {{ cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A' }}</p>
+          <p class="font-mono" style="font-size:11px;color:var(--text-3);">ID: {{ cert.verification_id }}</p>
+        </div>
+
+        <!-- Official badge -->
+        <div style="display:inline-flex;align-items:center;gap:6px;margin-top:var(--s4);padding:6px 14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:var(--r-full);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand-purple-light)" stroke-width="2.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <span style="font-size:11px;font-weight:600;color:var(--brand-purple-light);letter-spacing:0.05em;">Official QuizNova Certificate</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:var(--s2);justify-content:center;flex-wrap:wrap;margin-top:var(--s5);" data-aos="fade-up" data-aos-delay="80">
+      {% if cert.file_path %}
+      <a href="{{ url_for('api.download_certificate', cert_id=cert.id) }}" class="btn btn-primary btn-lg" id="verify-dl-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PDF
+      </a>
+      {% endif %}
+      <button class="btn btn-ghost btn-lg" type="button" onclick="window.QuizNova?.copyToClipboard(window.location.href, this)" id="share-cert-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Copy Verify Link
+      </button>
+    </div>
+
+    <!-- Metadata Table -->
+    <div class="card p-4" style="margin-top:var(--s5);" data-aos="fade-up" data-aos-delay="120">
+      <h3 class="font-display" style="font-size:15px;font-weight:600;margin-bottom:var(--s3);">Certificate Details</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        {% set rows = [
+          ('Issued To',       cert.user.display_name or cert.user.username),
+          ('Quiz Topic',      cert.result.attempt.subcategory.name),
+          ('Category',        cert.result.attempt.subcategory.category.name),
+          ('Score',           (cert.percentage | round) | string + '%'),
+          ('Date Issued',     cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A'),
+          ('Certificate ID',  cert.verification_id),
+          ('Status',          'Valid'),
+        ] %}
+        {% for label, value in rows %}
+        <tr>
+          <td style="padding:12px 0;font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.04);width:35%;">{{ label }}</td>
+          <td style="padding:12px 0;font-size:13px;color:var(--text-1);font-weight:500;border-bottom:1px solid rgba(255,255,255,0.04);">
+            {% if label == 'Status' %}
+            <span class="badge badge-success">{{ value }}</span>
+            {% elif label == 'Certificate ID' %}
+            <span class="font-mono" style="font-size:12px;">{{ value }}</span>
+            {% else %}
+            {{ value }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    {% else %}
+
+    <!-- Invalid / Not Found -->
+    <div style="text-align:center;padding:var(--s12) 0;" data-aos="fade-up">
+      <div class="verify-invalid-badge" aria-label="Certificate is invalid">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Certificate Not Found
+      </div>
+      <h1 class="font-display" style="font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin:var(--s4) 0 var(--s2);">
+        Invalid Certificate
+      </h1>
+      <p style="font-size:15px;color:var(--text-2);max-width:420px;margin-inline:auto;line-height:1.7;margin-bottom:var(--s5);">
+        The certificate ID you provided could not be found or has been revoked. Please check the ID and try again.
+      </p>
+      <a href="{{ url_for('public.home') }}" class="btn btn-ghost btn-lg" id="verify-home-btn">Back to Home</a>
+    </div>
+
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Achievements — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+
+{% block content %}
+{% set earned_ids = earned | map(attribute='achievement_id') | list %}
+<div class="dash-layout">
+  {% include 'partials/_sidebar.html' %}
+  <main class="dash-main" aria-label="Achievements">
+
+    <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <!-- Header -->
+    <div class="dash-topbar">
+      <div>
+        <h1 class="font-display" style="font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:800;">Achievements</h1>
+        <p style="font-size:14px;color:var(--text-2);">Complete quizzes and reach milestones to unlock achievements.</p>
+      </div>
+      <span class="badge badge-purple" style="font-size:14px;padding:8px 16px;">
+        {{ earned | length }} / {{ all_achievements | length }} Unlocked
+      </span>
+    </div>
+
+    <!-- Summary -->
+    <div class="achievements-summary card" data-aos="fade-up">
+      <div>
+        <div class="ach-summary-val font-display" style="background:var(--g-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ earned | length }}</div>
+        <div class="ach-summary-label">Earned</div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div>
+        <div class="ach-summary-val font-display">{{ all_achievements | length }}</div>
+        <div class="ach-summary-label">Total</div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div>
+        <div class="ach-summary-val font-display" style="color:var(--warning);">
+          {{ total_points }}
+        </div>
+        <div class="ach-summary-label">Points Earned</div>
+      </div>
+      <div style="flex:1;padding-left:var(--s4);">
+        <div class="label-caps" style="margin-bottom:8px;">Progress</div>
+        <div style="height:8px;background:var(--bg-3);border-radius:var(--r-full);overflow:hidden;">
+          <div style="height:100%;background:var(--g-brand);border-radius:var(--r-full);width:{{ ((earned | length / all_achievements | length) * 100) | round if all_achievements else 0 }}%;transition:width 1s ease;"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px;">{{ ((earned | length / all_achievements | length) * 100) | round if all_achievements else 0 }}% complete</div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="achievements-grid">
+      {% for ach in all_achievements %}
+      {% set is_earned = ach.id in earned_ids %}
+      <div class="card achievement-card {{ '' if is_earned else 'locked' }}"
+           data-aos="fade-up" data-aos-delay="{{ loop.index0 % 6 * 50 }}"
+           title="{{ ach.description if not is_earned else '' }}"
+           id="ach-{{ ach.id }}">
+        <div class="ach-icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            {% if ach.trigger_type == 'first_quiz' or ach.trigger_type == 'quiz_count' %}
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            {% elif ach.trigger_type == 'perfect_score' %}
+            <polyline points="20 6 9 17 4 12"/>
+            {% elif ach.trigger_type == 'streak' %}
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            {% elif ach.trigger_type == 'certificate' %}
+            <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            {% else %}
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            {% endif %}
+          </svg>
+        </div>
+        <div class="ach-name">{{ ach.name }}</div>
+        <div class="ach-desc">{{ ach.description }}</div>
+        <div class="ach-pts">+{{ ach.points }} pts</div>
+        {% if is_earned %}
+        <div class="ach-unlocked-date">
+          {% for e in earned if e.id == ach.id %}
+          Unlocked
+          {% endfor %}
+        </div>
+        {% else %}
+        <div style="font-size:10px;color:var(--text-3);">Locked</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+  </main>
+</div>
+{% endblock %}

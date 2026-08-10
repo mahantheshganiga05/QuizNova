@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+  .admin-page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+  .badge-blue{background:rgba(37,99,235,0.15);color:#60A5FA;border:1px solid rgba(60,130,246,0.3);}
+  .badge-warning{background:rgba(245,158,11,0.15);color:#FCD34D;border:1px solid rgba(245,158,11,0.3);}
+  .badge-neutral{background:rgba(255,255,255,0.06);color:var(--text-2);border:1px solid var(--border);}
+  .toggle-switch{position:relative;display:inline-block;width:44px;height:24px;}
+  .toggle-switch input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,0.1);border-radius:34px;transition:.3s;}
+  .toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:var(--text-2);border-radius:50%;transition:.3s;}
+  input:checked + .toggle-slider{background:var(--brand-purple);}
+  input:checked + .toggle-slider:before{transform:translateX(20px);background:white;}
+  .form-section{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;margin-bottom:24px;}
+  .form-section-title{font-size:14px;font-weight:700;color:var(--brand-purple-light);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+  @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr;}}
+  .form-group{margin-bottom:16px;}
+  .form-label{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px;}
+  .banner-upload-zone{border:2px dashed rgba(124,58,237,0.4);border-radius:var(--r-md);padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .banner-upload-zone:hover{border-color:var(--brand-purple-light);background:rgba(124,58,237,0.05);}
+</style>
+{% block extra_admin_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="admin-mobile-header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;">
+      <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="Q" style="width:30px;height:30px;object-fit:cover;">
+    </div>
+    <span class="font-display" style="font-weight:800;font-size:16px;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span> <span style="font-size:9px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 5px;border-radius:4px;">ADMIN</span></span>
+  </div>
+  <button id="sidebar-toggle" class="btn btn-ghost btn-sm" aria-label="Toggle Navigation" style="font-size:12px;padding:4px 10px;">
+    ☰ Menu
+  </button>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="dash-layout">
+
+  <!-- Admin Sidebar -->
+  <aside class="sidebar" id="main-sidebar" aria-label="Admin navigation">
+    <a href="{{ url_for('public.home') }}" class="sidebar-logo">
+      <div class="sidebar-logo-mark" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova Logo" style="width:34px;height:34px;object-fit:cover;border-radius:10px;">
+      </div>
+      <span class="sidebar-logo-text font-display" style="font-weight:800;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span> <span style="font-size:10px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;">ADMIN</span></span>
+    </a>
+    <nav class="sidebar-nav">
+      <p class="nav-section-label">MANAGEMENT</p>
+      <a href="{{ url_for('admin.dashboard') }}" class="sidebar-item {{ 'active' if active_item == 'dashboard' or request.endpoint == 'admin.dashboard' }}">📊 Dashboard</a>
+      <a href="{{ url_for('admin.categories') }}" class="sidebar-item {{ 'active' if active_item == 'categories' or request.endpoint == 'admin.categories' }}">📁 Categories</a>
+      <a href="{{ url_for('admin.subcategories') }}" class="sidebar-item {{ 'active' if active_item == 'subcategories' or request.endpoint == 'admin.subcategories' }}">📑 Subcategories</a>
+      <a href="{{ url_for('admin.questions') }}" class="sidebar-item {{ 'active' if active_item == 'questions' or request.endpoint == 'admin.questions' }}">❓ Question Bank</a>
+      <a href="{{ url_for('admin.competitions') }}" class="sidebar-item {{ 'active' if active_item in ('competitions', 'create_competition', 'edit_competition', 'competition_registrations') or 'competition' in (request.endpoint or '') }}">🏆 Competitions</a>
+      <a href="{{ url_for('admin.users') }}" class="sidebar-item {{ 'active' if active_item == 'users' or request.endpoint == 'admin.users' }}">👥 Users &amp; Roles</a>
+
+      <p class="nav-section-label">ANALYTICS &amp; EXPORTS</p>
+      <a href="{{ url_for('admin.analytics') }}" class="sidebar-item {{ 'active' if active_item == 'analytics' or request.endpoint == 'admin.analytics' }}">📈 Analytics</a>
+      <a href="{{ url_for('admin.certificates') }}" class="sidebar-item {{ 'active' if active_item == 'certificates' or request.endpoint == 'admin.certificates' }}">📜 Certificates</a>
+      <a href="{{ url_for('admin.export_data', resource='results') }}" class="sidebar-item">📥 Export Results</a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" style="background:linear-gradient(135deg,#6C5CE7,#3B82F6);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">
+        {{ current_user.display_name[0].upper() if current_user.display_name else 'A' }}
+      </div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">{{ current_user.display_name }}</div>
+        <div class="sidebar-user-role" style="color:var(--brand-cyan);font-size:11px;">Super Admin</div>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" style="color:var(--text-3);text-decoration:none;margin-left:auto;">➔</a>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for cat,msg in messages %}
+    <div class="alert alert-{{cat}}" style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span>{{msg}}</span>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;font-size:18px;">×</button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block admin_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% block extra_admin_js %}{% endblock %}{% endblock %}

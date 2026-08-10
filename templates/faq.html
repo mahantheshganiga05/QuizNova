@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}FAQ — QuizNova{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container-sm">
+    <div class="section-header" data-aos="fade-up">
+      <div class="section-eyebrow" style="display:inline-flex;margin-bottom:var(--s3);">FAQ</div>
+      <h1 class="font-display section-title">Frequently Asked Questions</h1>
+    </div>
+    {% set faqs = [
+      ('Is QuizNova free?', 'Yes! QuizNova is free to use. Create an account and start taking quizzes immediately with no credit card required.'),
+      ('How do I earn a certificate?', 'Complete any quiz with a score of 60% or higher. Your certificate is generated automatically and can be downloaded as a PDF.'),
+      ('How can employers verify my certificate?', 'Every certificate has a unique verification ID and QR code. Anyone can visit /verify/YOUR_ID to confirm its authenticity.'),
+      ('Are questions randomized?', 'Yes. Both the question order and answer option order are randomized each attempt to prevent pattern memorization.'),
+      ('What is the anti-cheat system?', 'Our engine detects tab switching, copy-paste actions, and enforces full-screen mode. Violations are logged and excessive violations auto-submit the quiz.'),
+      ('Can I retake a quiz?', 'Yes, you can retake any quiz as many times as you like. Only your best score is counted for the leaderboard.'),
+    ] %}
+    <div style="display:flex;flex-direction:column;gap:var(--s2);" data-aos="fade-up">
+      {% for q, a in faqs %}
+      <details class="card p-4" style="cursor:pointer;" id="faq-{{ loop.index }}">
+        <summary style="font-size:15px;font-weight:600;color:var(--text-1);list-style:none;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);">
+          {{ q }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;transition:transform 0.2s;" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin-top:var(--s2);padding-top:var(--s2);border-top:1px solid var(--border);">{{ a }}</p>
+      </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+{% block title %}Quiz Categories — QuizNova{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO SECTION (Redesigned 2-Column Futuristic SaaS UI)
+════════════════════════════════════════════════════════ -->
+<section class="cat-hero-section" aria-label="Categories Hero Banner">
+  
+  <!-- Subtle Neon Background Canvas & Wave Art -->
+  <div class="cat-hero-bg-glow"></div>
+  <svg class="cat-neon-waves" viewBox="0 0 600 300" fill="none" preserveAspectRatio="none">
+    <path d="M-100,280 C100,200 250,320 400,220 C500,150 550,260 700,200" stroke="url(#waveGrad)" stroke-width="2.5" opacity="0.45" />
+    <path d="M-100,290 C120,220 280,340 420,240 C520,170 580,280 720,220" stroke="url(#waveGrad)" stroke-width="1.5" opacity="0.25" />
+    <defs>
+      <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#7C3AED" />
+        <stop offset="50%" stop-color="#2563EB" />
+        <stop offset="100%" stop-color="#38BDF8" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="container relative-z10">
+    <div class="cat-hero-grid">
+      
+      <!-- LEFT COLUMN (45%) -->
+      <div class="cat-hero-left" data-aos="fade-right">
+        
+        <!-- Breadcrumb -->
+        <div class="cat-breadcrumb">
+          <a href="{{ url_for('public.home') }}">Home</a>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <span>Categories</span>
+        </div>
+
+        <!-- Glass Pill Badge -->
+        <div class="cat-hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          LEARN &bull; COMPETE &bull; ACHIEVE
+        </div>
+
+        <!-- Large Bold Heading -->
+        <h1 class="cat-hero-title">
+          Explore Quiz<br>
+          <span class="cat-title-gradient">Categories</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="cat-hero-subtitle">
+          Choose any category to test your knowledge and improve your skills across 12+ domains.
+        </p>
+
+        <!-- 4 PREMIUM FLOATING GLASS STAT CARDS -->
+        <div class="cat-stats-grid">
+          
+          <!-- Card 1: Purple (Domains) -->
+          <div class="stat-glass-card stat-purple">
+            <div class="stat-icon-wrap icon-purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="stat-value val-purple">12+</div>
+            <div class="stat-label">Domains</div>
+            <div class="stat-light-base base-purple"></div>
+          </div>
+
+          <!-- Card 2: Blue (Topics) -->
+          <div class="stat-glass-card stat-blue">
+            <div class="stat-icon-wrap icon-blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="stat-value val-blue">48+</div>
+            <div class="stat-label">Topics</div>
+            <div class="stat-light-base base-blue"></div>
+          </div>
+
+          <!-- Card 3: Orange (Questions) -->
+          <div class="stat-glass-card stat-orange">
+            <div class="stat-icon-wrap icon-orange">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="stat-value val-orange">1200+</div>
+            <div class="stat-label">Questions</div>
+            <div class="stat-light-base base-orange"></div>
+          </div>
+
+          <!-- Card 4: Green (Learners) -->
+          <div class="stat-glass-card stat-green">
+            <div class="stat-icon-wrap icon-green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-value val-green">50K+</div>
+            <div class="stat-label">Learners</div>
+            <div class="stat-light-base base-green"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: USER AI QUIZ COMMAND CENTER HERO -->
+      <div class="cat-hero-right" data-aos="fade-left">
+        <div class="user-globe-stage">
+          
+          <!-- Soft Ambient Glow Layers Behind Image Only -->
+          <div class="hero-purple-radial-glow"></div>
+          <div class="hero-blue-radial-glow"></div>
+
+          <!-- Small Glowing Particles & Faint Network Lines -->
+          <svg class="hero-faint-network-svg" viewBox="0 0 520 400" fill="none">
+            <circle cx="90" cy="80" r="1.5" fill="#C084FC" opacity="0.6" />
+            <circle cx="430" cy="60" r="2" fill="#60A5FA" opacity="0.7" />
+            <circle cx="470" cy="310" r="1.5" fill="#38BDF8" opacity="0.5" />
+            <circle cx="50" cy="330" r="2" fill="#A78BFA" opacity="0.6" opacity="0.6" />
+            <path d="M 70,100 Q 260,40 450,70" stroke="rgba(192,132,252,0.18)" stroke-width="1" stroke-dasharray="3 3" />
+            <path d="M 50,310 Q 260,370 470,310" stroke="rgba(96,165,250,0.18)" stroke-width="1" stroke-dasharray="3 3" />
+          </svg>
+
+          <!-- NEW 3D AI QUIZ COMMAND CENTER HERO ASSET -->
+          <img src="{{ url_for('static', filename='images/ai_quiz_cmd_transparent.png') }}"
+               alt="AI Quiz Command Center 3D Hero"
+               class="user-globe-hero-img">
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- STYLES FOR HERO SECTION ONLY -->
+<style>
+  /* HERO SECTION CONTAINER & FLEX ALIGNMENT */
+  .cat-hero-section {
+    background: #05050C;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+    padding-top: 60px;
+    padding-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cat-hero-bg-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 75% 45%, rgba(124, 58, 237, 0.22), rgba(37, 99, 235, 0.08) 40%, transparent 70%),
+                radial-gradient(circle at 20% 70%, rgba(124, 58, 237, 0.12), transparent 50%);
+    pointer-events: none;
+  }
+
+  .cat-neon-waves {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 600px;
+    height: 260px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .relative-z10 { position: relative; z-index: 10; }
+
+  /* 50px GAP FLEX CONTAINER (MAX-WIDTH 1280px MARGIN 0 AUTO) */
+  .cat-hero-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 50px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* LEFT SIDE STYLING & TYPOGRAPHY */
+  .cat-hero-left {
+    flex: 1;
+    max-width: 580px;
+  }
+
+  .cat-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-bottom: 14px;
+  }
+  .cat-breadcrumb a {
+    color: #9CA3AF;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .cat-breadcrumb a:hover { color: #C084FC; }
+
+  .cat-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    border-radius: 9999px;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #C084FC;
+    letter-spacing: 0.1em;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+    margin-bottom: 18px;
+  }
+
+  .cat-hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 4.2vw, 3.7rem);
+    line-height: 1.05;
+    color: #FFFFFF;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+
+  .cat-title-gradient {
+    background: linear-gradient(135deg, #9D5FFC 0%, #3B82F6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cat-hero-subtitle {
+    font-size: 15.5px;
+    color: #A1A1AA;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 500px;
+  }
+
+  /* 4 STATS GLASS CARDS */
+  .cat-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .stat-glass-card {
+    background: rgba(255, 255, 255, 0.025);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 16px 8px 14px 8px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .stat-glass-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: var(--accent-border);
+    box-shadow: 0 12px 30px var(--glow-color);
+  }
+
+  .stat-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px auto;
+  }
+
+  .icon-purple { background: rgba(192, 132, 252, 0.12); border: 1px solid rgba(192, 132, 252, 0.3); }
+  .icon-blue   { background: rgba(96, 165, 250, 0.12); border: 1px solid rgba(96, 165, 250, 0.3); }
+  .icon-orange { background: rgba(251, 146, 60, 0.12); border: 1px solid rgba(251, 146, 60, 0.3); }
+  .icon-green  { background: rgba(74, 222, 128, 0.12); border: 1px solid rgba(74, 222, 128, 0.3); }
+
+  .stat-value {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 23px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .val-purple { color: #C084FC; }
+  .val-blue   { color: #60A5FA; }
+  .val-orange { color: #FB923C; }
+  .val-green  { color: #4ADE80; }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #9CA3AF;
+  }
+
+  .stat-light-base {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65%;
+    height: 12px;
+    border-radius: 50%;
+    filter: blur(6px);
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
+  }
+  .stat-glass-card:hover .stat-light-base { opacity: 0.9; }
+
+  .base-purple { background: #C084FC; }
+  .base-blue   { background: #60A5FA; }
+  .base-orange { background: #FB923C; }
+  .base-green  { background: #4ADE80; }
+
+  .stat-purple { --accent-border: rgba(192,132,252,0.5); --glow-color: rgba(192,132,252,0.22); }
+  .stat-blue   { --accent-border: rgba(96,165,250,0.5); --glow-color: rgba(96,165,250,0.22); }
+  .stat-orange { --accent-border: rgba(251,146,60,0.5); --glow-color: rgba(251,146,60,0.22); }
+  .stat-green  { --accent-border: rgba(74,222,128,0.5); --glow-color: rgba(74,222,128,0.22); }
+
+  /* RIGHT SIDE CONTAINER: AI QUIZ COMMAND CENTER STAGE */
+  .cat-hero-right {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .user-globe-stage {
+    position: relative;
+    width: 540px;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* SOFT AMBIENT GLOW LAYERS BEHIND IMAGE ONLY */
+  .hero-purple-radial-glow {
+    position: absolute;
+    width: 440px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124, 92, 255, 0.24) 0%, transparent 70%);
+    filter: blur(55px);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-blue-radial-glow {
+    position: absolute;
+    width: 380px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .hero-faint-network-svg {
+    position: absolute;
+    inset: -20px;
+    width: calc(100% + 40px);
+    height: calc(100% + 40px);
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.5;
+  }
+
+  /* AI QUIZ COMMAND CENTER 3D STYLING & ANIMATION */
+  .user-globe-hero-img {
+    width: 540px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: relative;
+    z-index: 10;
+    filter: drop-shadow(0 0 25px rgba(124, 92, 255, 0.28)) 
+            drop-shadow(0 0 60px rgba(59, 130, 246, 0.20));
+    animation: floatAndScaleGlow 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatAndScaleGlow {
+    0% {
+      transform: translateY(0px) scale(1);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.02);
+    }
+    100% {
+      transform: translateY(0px) scale(1);
+    }
+  }
+
+  /* RESPONSIVE MEDIA QUERIES */
+  @media (max-width: 1024px) {
+    .cat-hero-grid {
+      flex-direction: column;
+      gap: 40px;
+      text-align: center;
+    }
+    .cat-hero-left {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cat-hero-subtitle {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cat-breadcrumb, .cat-hero-badge {
+      justify-content: center;
+    }
+    .user-globe-stage, .user-globe-hero-img {
+      width: 440px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cat-hero-section {
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+    .cat-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .user-globe-stage, .user-globe-hero-img {
+      width: 320px;
+    }
+  }
+</style>
+
+<!-- Filter Tabs & Search Bar -->
+<section class="section-sm" style="border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      
+      <!-- Search Input -->
+      <div style="position:relative;min-width:280px;" class="w-mobile-full">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="category-search" class="input" placeholder="Search categories..." style="padding-left:40px;width:100%;">
+      </div>
+
+      <!-- Filter Tabs -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="filter-tabs">
+        <button class="btn btn-primary btn-sm filter-tab active" data-filter="all">All</button>
+        <button class="btn btn-ghost btn-sm filter-tab" data-filter="popular">Popular</button>
+        <button class="btn btn-ghost btn-sm filter-tab" data-filter="new">New</button>
+        <button class="btn btn-ghost btn-sm filter-tab" data-filter="easy">Easy</button>
+        <button class="btn btn-ghost btn-sm filter-tab" data-filter="medium">Medium</button>
+        <button class="btn btn-ghost btn-sm filter-tab" data-filter="hard">Hard</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Grid of Category Cards -->
+<section class="section">
+  <div class="container">
+    <div class="grid-4" id="categories-grid" style="gap:20px;">
+      {% for cat in categories %}
+      <a href="{{ url_for('quiz.subcategories', category_slug=cat.slug) }}"
+         class="card category-card"
+         style="padding:0;text-decoration:none;display:flex;flex-direction:column;border:1px solid rgba(108,99,255,0.25);overflow:hidden;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative;"
+         data-name="{{ cat.name | lower }}"
+         data-aos="fade-up" data-aos-delay="{{ loop.index0 % 4 * 50 }}"
+         id="cat-{{ cat.slug }}">
+
+        <!-- Unique 16:9 Image Container with Hover Zoom -->
+        <div style="width:100%;height:160px;overflow:hidden;position:relative;background:var(--bg-2);">
+          <img src="{{ cat.banner_image_url }}"
+               alt="{{ cat.name }}"
+               style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;"
+               class="cat-card-img"
+               onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/categories/cat_programming.jpg') }}';">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg, transparent 40%, rgba(5,8,22,0.95) 100%);"></div>
+          
+          <!-- Category Badge -->
+          <div style="position:absolute;top:10px;left:10px;">
+            {% if loop.index in [1, 3, 5] %}
+            <span class="badge badge-purple" style="font-size:10px;">🔥 Popular</span>
+            {% elif loop.index in [2, 4] %}
+            <span class="badge badge-cyan" style="font-size:10px;">⭐ Trending</span>
+            {% else %}
+            <span class="badge badge-success" style="font-size:10px;">✨ Featured</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Info Body -->
+        <div style="padding:16px;display:flex;flex-direction:column;flex:1;gap:6px;">
+          <h3 class="font-display" style="font-size:16px;font-weight:800;color:white;margin-bottom:2px;">{{ cat.name }}</h3>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:8px;">
+            {{ cat.description or 'Master core concepts through interactive quizzes and hands-on questions.' | truncate(60) }}
+          </p>
+
+          <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);">
+            <span style="font-size:11px;color:var(--brand-cyan);font-weight:700;">{{ cat.active_subcategory_count }} Topics · 50+ Quizzes</span>
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);font-size:14px;transition:transform 0.2s;" class="cat-arrow">
+              →
+            </div>
+          </div>
+        </div>
+
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Footer Feature Highlights -->
+<section class="section-sm" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-1);">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">📋</div>
+        <div>
+          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Curated Questions</h4>
+          <p style="font-size:11px;color:var(--text-2);">Handpicked by experts</p>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(57,200,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-cyan);flex-shrink:0;">🤖</div>
+        <div>
+          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Adaptive Learning</h4>
+          <p style="font-size:11px;color:var(--text-2);">Adjusts to your level</p>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;color:var(--warning);flex-shrink:0;">📈</div>
+        <div>
+          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Track Progress</h4>
+          <p style="font-size:11px;color:var(--text-2);">Detailed analytics</p>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;color:var(--success);flex-shrink:0;">🏆</div>
+        <div>
+          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Earn Certificates</h4>
+          <p style="font-size:11px;color:var(--text-2);">Showcase achievements</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Stay Updated Newsletter Box -->
+<section class="section-sm">
+  <div class="container">
+    <div class="grid-2" style="gap:24px;">
+      
+      <div class="card p-4" style="background:linear-gradient(135deg, rgba(108,99,255,0.12), rgba(57,200,255,0.06));border:1px solid rgba(108,99,255,0.25);display:grid;grid-template-columns:1fr 100px;align-items:center;gap:16px;">
+        <div>
+          <h3 class="font-display" style="font-size:16px;font-weight:700;margin-bottom:4px;">Stay Updated!</h3>
+          <p style="font-size:12px;color:var(--text-2);margin-bottom:12px;">Subscribe for latest quizzes, offers and updates.</p>
+          <div style="display:flex;gap:6px;">
+            <input type="email" placeholder="Enter your email" class="input" style="font-size:12px;padding:6px 12px;flex:1;">
+            <button class="btn btn-primary btn-sm" onclick="alert('Subscribed successfully!')">Subscribe</button>
+          </div>
+        </div>
+        <div>
+          <img src="{{ url_for('static', filename='images/paper_airplane.jpg') }}" alt="Paper Airplane" style="width:100%;border-radius:10px;">
+        </div>
+      </div>
+
+      <div class="card p-4" style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <h3 class="font-display" style="font-size:16px;font-weight:700;margin-bottom:4px;">Need Help?</h3>
+          <p style="font-size:12px;color:var(--text-2);margin-bottom:12px;">We're here to help you in your learning journey.</p>
+          <a href="{{ url_for('public.contact') }}" class="btn btn-ghost btn-sm">Visit Help Center →</a>
+        </div>
+        <div style="width:60px;height:60px;border-radius:50%;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;font-size:24px;">
+          🎧
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const searchInput = document.getElementById('category-search');
+const cards = document.querySelectorAll('.category-card');
+const tabs = document.querySelectorAll('.filter-tab');
+
+searchInput?.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  cards.forEach(card => {
+    const name = card.dataset.name || '';
+    card.style.display = (!q || name.includes(q)) ? '' : 'none';
+  });
+});
+
+tabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => { t.classList.remove('btn-primary', 'active'); t.classList.add('btn-ghost'); });
+    tab.classList.remove('btn-ghost');
+    tab.classList.add('btn-primary', 'active');
+
+    const filter = tab.dataset.filter || 'all';
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    cards.forEach((card, idx) => {
+      const name = card.dataset.name || '';
+      const matchesSearch = !q || name.includes(q);
+      let matchesFilter = true;
+
+      if (filter === 'popular') {
+        matchesFilter = [0, 2, 4].includes(idx % 6);
+      } else if (filter === 'new') {
+        matchesFilter = [1, 3, 5].includes(idx % 6);
+      } else if (filter === 'easy' || filter === 'medium' || filter === 'hard') {
+        matchesFilter = (idx % 3 === (filter === 'easy' ? 0 : (filter === 'medium' ? 1 : 2)));
+      }
+
+      card.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+    });
+  });
+});
+</script>
+{% endblock %}

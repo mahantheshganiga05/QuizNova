@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Subcategory Management — QuizNova Admin{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="main-sidebar">
+    <a href="{{ url_for('public.home') }}" class="sidebar-logo">
+      <div class="sidebar-logo-mark" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova Logo" style="width:34px;height:34px;object-fit:cover;border-radius:10px;">
+      </div>
+      <span class="sidebar-logo-text font-display" style="font-weight:800;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span> <span style="font-size:10px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;">ADMIN</span></span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <p class="nav-section-label">MANAGEMENT</p>
+      <a href="{{ url_for('admin.dashboard') }}" class="sidebar-item">📊 Dashboard</a>
+      <a href="{{ url_for('admin.categories') }}" class="sidebar-item">📁 Categories</a>
+      <a href="{{ url_for('admin.subcategories') }}" class="sidebar-item active">📑 Subcategories</a>
+      <a href="{{ url_for('admin.questions') }}" class="sidebar-item">❓ Question Bank</a>
+      <a href="{{ url_for('admin.users') }}" class="sidebar-item">👥 Users & Roles</a>
+      
+      <p class="nav-section-label">ANALYTICS & EXPORTS</p>
+      <a href="{{ url_for('admin.analytics') }}" class="sidebar-item">📈 Analytics</a>
+      <a href="{{ url_for('admin.certificates') }}" class="sidebar-item">📜 Certificates</a>
+      <a href="{{ url_for('admin.export_data', resource='results') }}" class="sidebar-item">📥 Export Results</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dash-main">
+    <div class="dash-topbar" style="margin-bottom:24px;">
+      <div>
+        <h1 class="font-display" style="font-size:24px;font-weight:800;color:white;">Subcategory Management</h1>
+        <p style="font-size:13px;color:var(--text-2);">Manage all topic subdivisions and quiz configurations.</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="document.getElementById('add-sub-modal').style.display='flex'">+ New Subcategory</button>
+    </div>
+
+    <!-- Table -->
+    <div class="card p-4">
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Topic Name</th>
+              <th>Category</th>
+              <th>Qs / Quiz</th>
+              <th>Time Limit</th>
+              <th>Pass Threshold</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in subcategories %}
+            <tr>
+              <td style="color:var(--text-3);">{{ sub.id }}</td>
+              <td style="font-weight:700;color:white;">{{ sub.name }}</td>
+              <td><span class="badge badge-purple">{{ sub.category.name if sub.category else '' }}</span></td>
+              <td>{{ sub.questions_per_quiz }} Qs</td>
+              <td>{{ sub.time_limit_minutes }} mins</td>
+              <td><span class="badge badge-success">{{ sub.pass_threshold }}%</span></td>
+              <td>
+                <a href="{{ url_for('admin.questions', subcategory_id=sub.id) }}" class="btn btn-ghost btn-sm">Questions →</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="add-sub-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div class="card p-5" style="max-width:440px;width:100%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h2 class="font-display" style="font-size:18px;font-weight:800;color:white;">Add Subcategory</h2>
+      <button onclick="document.getElementById('add-sub-modal').style.display='none'" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:20px;">✕</button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.subcategories') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label" style="font-size:12px;color:var(--text-2);">PARENT CATEGORY</label>
+        <select name="category_id" class="input select" required style="width:100%;">
+          {% for cat in categories %}
+          <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label" style="font-size:12px;color:var(--text-2);">SUBCATEGORY NAME</label>
+        <input type="text" name="name" class="input" required placeholder="e.g. React.js" style="width:100%;">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div>
+          <label class="form-label" style="font-size:11px;color:var(--text-2);">QS / QUIZ</label>
+          <input type="number" name="questions_per_quiz" class="input" value="20" required style="width:100%;">
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;color:var(--text-2);">TIME (MINS)</label>
+          <input type="number" name="time_limit_minutes" class="input" value="30" required style="width:100%;">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;">Create Subcategory</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

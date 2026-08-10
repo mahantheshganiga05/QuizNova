@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+{% set load_charts = true %}
+{% block title %}Enterprise Admin Console — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+  .admin-stat-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(108, 99, 255, 0.25);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    backdrop-filter: blur(16px);
+  }
+  .admin-stat-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set comp_stats = comp_stats or {'total': 0, 'upcoming': 0, 'live': 0, 'completed': 0} %}
+{% set recent_competitions = recent_competitions or [] %}
+<div class="dash-layout">
+
+  <!-- Admin Sidebar -->
+  <aside class="sidebar" id="main-sidebar" aria-label="Admin navigation">
+    <a href="{{ url_for('public.home') }}" class="sidebar-logo">
+      <div class="sidebar-logo-mark" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova Logo" style="width:34px;height:34px;object-fit:cover;border-radius:10px;">
+      </div>
+      <span class="sidebar-logo-text font-display" style="font-weight:800;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span> <span style="font-size:10px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;">ADMIN</span></span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <p class="nav-section-label">MANAGEMENT</p>
+      <a href="{{ url_for('admin.dashboard') }}" class="sidebar-item active">📊 Dashboard</a>
+      <a href="{{ url_for('admin.categories') }}" class="sidebar-item">📁 Categories</a>
+      <a href="{{ url_for('admin.subcategories') }}" class="sidebar-item">📑 Subcategories</a>
+      <a href="{{ url_for('admin.questions') }}" class="sidebar-item">❓ Question Bank</a>
+      <a href="{{ url_for('admin.competitions') }}" class="sidebar-item">🏆 Competitions</a>
+      <a href="{{ url_for('admin.users') }}" class="sidebar-item">👥 Users &amp; Roles</a>
+      
+      <p class="nav-section-label">ANALYTICS &amp; EXPORTS</p>
+      <a href="{{ url_for('admin.analytics') }}" class="sidebar-item">📈 Analytics</a>
+      <a href="{{ url_for('admin.certificates') }}" class="sidebar-item">📜 Certificates</a>
+      <a href="{{ url_for('admin.export_data', resource='results') }}" class="sidebar-item">📥 Export Results</a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" style="background:linear-gradient(135deg,#6C5CE7,#3B82F6);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">{{ current_user.display_name }}</div>
+        <div class="sidebar-user-role" style="color:var(--brand-cyan);font-size:11px;">Super Admin</div>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" style="color:var(--text-3);text-decoration:none;margin-left:auto;">➔</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dash-main" aria-label="Admin Dashboard">
+
+    <!-- Top Bar -->
+    <div class="dash-topbar" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h1 class="font-display" style="font-size:24px;font-weight:800;color:white;display:flex;align-items:center;gap:10px;">
+          Enterprise Admin Dashboard
+          <span class="badge badge-purple" style="font-size:11px;">v2.0 Enterprise</span>
+        </h1>
+        <p style="font-size:13px;color:var(--text-2);">Real-time metrics, competition management, user administration &amp; platform security.</p>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="{{ url_for('admin.questions') }}" class="btn btn-primary btn-sm">+ Add Question</a>
+        <a href="{{ url_for('admin.categories') }}" class="btn btn-ghost btn-sm">+ New Category</a>
+        <a href="{{ url_for('admin.create_competition') }}" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg,#7C3AED 0%,#2563EB 100%);border:none;box-shadow:0 4px 14px rgba(124,58,237,0.35);">🏆 Create Competition</a>
+      </div>
+    </div>
+
+    <!-- Top Statistics Cards -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background:rgba(108,99,255,0.15);color:var(--brand-purple-light);">👥</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ stats.total_users }}</div>
+          <div style="font-size:12px;color:var(--text-2);">Total Users</div>
+        </div>
+      </div>
+
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background:rgba(57,200,255,0.15);color:var(--brand-cyan);">❓</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ stats.total_questions }}</div>
+          <div style="font-size:12px;color:var(--text-2);">Questions Bank</div>
+        </div>
+      </div>
+
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);">📝</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ stats.total_quizzes }}</div>
+          <div style="font-size:12px;color:var(--text-2);">Quiz Attempts</div>
+        </div>
+      </div>
+
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15);color:var(--warning);">📜</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ stats.total_certs }}</div>
+          <div style="font-size:12px;color:var(--text-2);">Certificates Issued</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Analytics Charts Grid -->
+    <div class="dash-grid" style="margin-bottom:24px;">
+      
+      <div class="card chart-card p-4">
+        <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span>Category Performance & Quizzes</span>
+          <span class="badge badge-neutral">Live Metrics</span>
+        </div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="adminCatChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card chart-card p-4">
+        <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span>Attempt Volume & Activity</span>
+          <span class="badge badge-purple">Daily Trend</span>
+        </div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="adminTrendChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Competitions Summary Section -->
+    <div style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="font-display" style="font-size:18px;font-weight:800;color:white;display:flex;align-items:center;gap:8px;">
+          🏆 Competitions Overview
+        </h2>
+        <a href="{{ url_for('admin.competitions') }}" class="btn btn-ghost btn-sm" style="font-size:12px;">View All Competitions →</a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(124,58,237,0.15);color:#C084FC;">🏆</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ comp_stats.total }}</div>
+            <div style="font-size:12px;color:var(--text-2);">Total Competitions</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(59,130,246,0.15);color:#60A5FA;">📅</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ comp_stats.upcoming }}</div>
+            <div style="font-size:12px;color:var(--text-2);">Upcoming</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15);color:#34D399;">🔴</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ comp_stats.live }}</div>
+            <div style="font-size:12px;color:var(--text-2);">Live Now</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(107,114,128,0.15);color:#9CA3AF;">🏁</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white;">{{ comp_stats.completed }}</div>
+            <div style="font-size:12px;color:var(--text-2);">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Competitions Table Card -->
+    <div class="card p-4" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 class="font-display" style="font-size:16px;font-weight:700;color:white;display:flex;align-items:center;gap:8px;">
+          🏆 Recent Competitions
+        </h3>
+        <a href="{{ url_for('admin.create_competition') }}" class="btn btn-primary btn-sm" style="font-size:12px;background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;">+ Create New</a>
+      </div>
+
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Competition</th>
+              <th>Category</th>
+              <th>Registration Deadline</th>
+              <th>Start Date</th>
+              <th>Participants</th>
+              <th>Status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for comp in recent_competitions %}
+            <tr>
+              <td>
+                <div style="font-weight:700;color:white;">{{ comp.title }}</div>
+                <div style="font-size:11px;color:var(--text-3);">{{ comp.prize_pool_text or 'Prize Pool Available' }}</div>
+              </td>
+              <td>
+                <span class="badge badge-neutral">{{ comp.category.name if comp.category else 'General' }}</span>
+              </td>
+              <td style="font-size:12px;color:var(--text-2);">
+                {{ comp.reg_end_date.strftime('%d %b %Y, %I:%M %p') if comp.reg_end_date else 'N/A' }}
+              </td>
+              <td style="font-size:12px;color:var(--text-2);">
+                {{ comp.start_date.strftime('%d %b %Y, %I:%M %p') if comp.start_date else 'N/A' }}
+              </td>
+              <td>
+                <span class="badge badge-purple">{{ comp.registered_count }} / {{ comp.max_participants or '∞' }}</span>
+              </td>
+              <td>
+                {% set st = comp.current_status %}
+                {% if st == 'live' %}
+                  <span class="badge badge-success">🔴 Live</span>
+                {% elif st == 'upcoming' %}
+                  <span class="badge badge-warning">📅 Upcoming</span>
+                {% elif st == 'completed' %}
+                  <span class="badge badge-neutral">🏁 Completed</span>
+                {% else %}
+                  <span class="badge badge-neutral">{{ st | capitalize }}</span>
+                {% endif %}
+              </td>
+              <td style="text-align:right;">
+                <div style="display:inline-flex;gap:6px;">
+                  <a href="{{ url_for('competitions.detail', slug=comp.slug) }}" target="_blank" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;" title="View Public Page">👁 View</a>
+                  <a href="{{ url_for('admin.edit_competition', comp_id=comp.id) }}" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;" title="Edit">✏ Edit</a>
+                  <a href="{{ url_for('admin.competition_registrations', comp_id=comp.id) }}" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;" title="Manage Participants">👥 Manage</a>
+                  <form method="POST" action="{{ url_for('admin.delete_competition', comp_id=comp.id) }}" style="display:inline;" onsubmit="return confirm('Delete competition {{ comp.title }}?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;color:var(--error);" title="Delete">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">
+                No competitions found. <a href="{{ url_for('admin.create_competition') }}" style="color:var(--brand-purple-light);">Create your first competition →</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Tables Row -->
+    <div class="dash-grid">
+      
+      <!-- Recent Users -->
+      <div class="card p-4">
+        <h3 class="font-display" style="font-size:15px;font-weight:700;color:white;margin-bottom:16px;">Recent User Registrations</h3>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in recent_users %}
+              <tr>
+                <td style="font-weight:600;color:white;">{{ u.username }}</td>
+                <td><span class="badge {{ 'badge-purple' if u.is_admin else 'badge-neutral' }}">{{ u.role }}</span></td>
+                <td style="font-size:12px;color:var(--text-2);">{{ u.created_at | time_ago if u.created_at else '' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Quiz Attempts -->
+      <div class="card p-4">
+        <h3 class="font-display" style="font-size:15px;font-weight:700;color:white;margin-bottom:16px;">Recent Submissions</h3>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Topic</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in recent_attempts %}
+              <tr>
+                <td style="font-weight:600;color:white;">{{ a.user.username if a.user else 'Student' }}</td>
+                <td style="font-size:12px;color:var(--text-2);">{{ a.subcategory.name if a.subcategory else '' }}</td>
+                {% set pct = (a.result.percentage if a.result and a.result.percentage is not none else 0) %}
+                <td><span class="badge {{ 'badge-success' if pct >= 60 else 'badge-error' }}">{{ pct | round | int }}%</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  function renderCharts() {
+    if (typeof Chart === 'undefined') return;
+
+    // 1. Category Bar Chart (Matching User Screenshot)
+    const catCanvas = document.getElementById('adminCatChart');
+    if (catCanvas) {
+      const catCtx = catCanvas.getContext('2d');
+      
+      const g1 = catCtx.createLinearGradient(0, 0, 0, 260);
+      g1.addColorStop(0, '#A78BFA'); g1.addColorStop(1, '#7C3AED'); // Programming: Purple
+
+      const g2 = catCtx.createLinearGradient(0, 0, 0, 260);
+      g2.addColorStop(0, '#60A5FA'); g2.addColorStop(1, '#2563EB'); // Databases: Blue
+
+      const g3 = catCtx.createLinearGradient(0, 0, 0, 260);
+      g3.addColorStop(0, '#22D3EE'); g3.addColorStop(1, '#0891B2'); // AI: Cyan
+
+      const g4 = catCtx.createLinearGradient(0, 0, 0, 260);
+      g4.addColorStop(0, '#F472B6'); g4.addColorStop(1, '#DB2777'); // Web Dev: Pink/Magenta
+
+      const g5 = catCtx.createLinearGradient(0, 0, 0, 260);
+      g5.addColorStop(0, '#F87171'); g5.addColorStop(1, '#DC2626'); // Cybersecurity: Coral/Red
+
+      const g6 = catCtx.createLinearGradient(0, 0, 0, 260);
+      g6.addColorStop(0, '#FBBF24'); g6.addColorStop(1, '#D97706'); // Cloud: Amber/Gold
+
+      const barGradients = [g1, g2, g3, g4, g5, g6];
+
+      new Chart(catCtx, {
+        type: 'bar',
+        data: {
+          labels: {{ (charts.category_labels if charts and charts.category_labels else ['Programming', 'Databases', 'AI', 'Web Dev', 'Cybersecurity', 'Cloud']) | tojson }},
+          datasets: [{
+            label: 'Quizzes Taken',
+            data: {{ (charts.category_data if charts and charts.category_data else [126, 98, 80, 112, 65, 84]) | tojson }},
+            backgroundColor: barGradients,
+            borderRadius: 12,
+            borderSkipped: false,
+            maxBarThickness: 48
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#9898B0', font: { family: 'Inter', size: 12, weight: 500 } } },
+            y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#9898B0', font: { family: 'Inter', size: 12 } }, beginAtZero: true, max: 140 }
+          }
+        }
+      });
+    }
+
+    // 2. Attempt Volume Line Chart (Matching User Screenshot)
+    const trendCanvas = document.getElementById('adminTrendChart');
+    if (trendCanvas) {
+      const trendCtx = trendCanvas.getContext('2d');
+      const fillGradient = trendCtx.createLinearGradient(0, 0, 0, 260);
+      fillGradient.addColorStop(0, 'rgba(168, 85, 247, 0.45)');
+      fillGradient.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
+
+      new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: {{ (charts.trend_labels if charts and charts.trend_labels else ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) | tojson }},
+          datasets: [{
+            label: 'Quiz Attempts',
+            data: {{ (charts.trend_data if charts and charts.trend_data else [45, 60, 76, 52, 93, 113, 134]) | tojson }},
+            borderColor: '#A855F7',
+            borderWidth: 3,
+            pointBackgroundColor: '#FFFFFF',
+            pointBorderColor: '#A855F7',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            backgroundColor: fillGradient,
+            fill: true,
+            tension: 0.45
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#9898B0', font: { family: 'Inter', size: 12, weight: 500 } } },
+            y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#9898B0', font: { family: 'Inter', size: 12 } }, min: 40, max: 140 }
+          }
+        }
+      });
+    }
+  }
+
+  renderCharts();
+});
+</script>
+{% endblock %}

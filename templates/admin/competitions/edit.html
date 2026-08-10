@@ -1,0 +1,213 @@
+{% extends "admin/base.html" %}
+{% block title %}Edit Competition — QuizNova Admin{% endblock %}
+
+{% block extra_admin_css %}
+<style>
+  .form-section { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:var(--r-lg); padding:24px; margin-bottom:24px; }
+  .form-section-title { font-size:14px; font-weight:700; color:var(--brand-purple-light); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
+  @media(max-width:768px) { .form-row,.form-row-3 { grid-template-columns:1fr; } }
+  .form-group { margin-bottom:16px; }
+  .form-label { font-size:11px; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:6px; }
+  .toggle-switch { position:relative; display:inline-block; width:44px; height:24px; }
+  .toggle-switch input { opacity:0; width:0; height:0; }
+  .toggle-slider { position:absolute; cursor:pointer; inset:0; background:rgba(255,255,255,0.1); border-radius:34px; transition:.3s; }
+  .toggle-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:var(--text-2); border-radius:50%; transition:.3s; }
+  input:checked + .toggle-slider { background:var(--brand-purple); }
+  input:checked + .toggle-slider:before { transform:translateX(20px); background:white; }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1 class="admin-page-title">✏️ Edit Competition</h1>
+    <p class="admin-page-sub">{{ comp.title }}</p>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <a href="{{ url_for('admin.competition_registrations', comp_id=comp.id) }}" class="btn btn-ghost">👥 Registrations ({{ comp.registered_count }})</a>
+    <a href="{{ url_for('admin.competitions') }}" class="btn btn-ghost">← Back</a>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('admin.edit_competition', comp_id=comp.id) }}" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start;">
+    <div>
+
+      <div class="form-section">
+        <div class="form-section-title">📝 Basic Information</div>
+        <div class="form-group">
+          <label class="form-label">Competition Title *</label>
+          <input type="text" name="title" class="input" value="{{ comp.title }}" required style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subtitle / Tagline</label>
+          <input type="text" name="short_description" class="input" value="{{ comp.short_description or '' }}" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Description</label>
+          <textarea name="full_description" class="input" rows="5" style="width:100%;resize:vertical;">{{ comp.full_description or '' }}</textarea>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Category</label>
+            <select name="category_id" class="input" style="width:100%;">
+              <option value="">— Select —</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {{ 'selected' if comp.category_id == cat.id }}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Sponsor / Organizer</label>
+            <input type="text" name="sponsor_name" class="input" value="{{ comp.sponsor_name or '' }}" style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">📅 Dates & Duration</div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Registration Start</label>
+            <input type="datetime-local" name="reg_start_date" class="input" style="width:100%;"
+              value="{{ comp.reg_start_date.strftime('%Y-%m-%dT%H:%M') if comp.reg_start_date else '' }}">
+          </div>
+          <div>
+            <label class="form-label">Registration End</label>
+            <input type="datetime-local" name="reg_end_date" class="input" style="width:100%;"
+              value="{{ comp.reg_end_date.strftime('%Y-%m-%dT%H:%M') if comp.reg_end_date else '' }}">
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Competition Start *</label>
+            <input type="datetime-local" name="start_date" class="input" style="width:100%;" required
+              value="{{ comp.start_date.strftime('%Y-%m-%dT%H:%M') if comp.start_date else '' }}">
+          </div>
+          <div>
+            <label class="form-label">Competition End *</label>
+            <input type="datetime-local" name="end_date" class="input" style="width:100%;" required
+              value="{{ comp.end_date.strftime('%Y-%m-%dT%H:%M') if comp.end_date else '' }}">
+          </div>
+        </div>
+        <div class="form-row-3">
+          <div>
+            <label class="form-label">Duration (min)</label>
+            <input type="number" name="duration_minutes" class="input" value="{{ comp.duration_minutes }}" style="width:100%;">
+          </div>
+          <div>
+            <label class="form-label">Total Questions</label>
+            <input type="number" name="total_questions" class="input" value="{{ comp.total_questions }}" style="width:100%;">
+          </div>
+          <div>
+            <label class="form-label">Max Participants</label>
+            <input type="number" name="max_participants" class="input" value="{{ comp.max_participants or 1000 }}" style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">🎁 Prize Pool</div>
+        <div class="form-group">
+          <label class="form-label">Prize Pool Summary</label>
+          <input type="text" name="prize_pool_text" class="input" value="{{ comp.prize_pool_text or '' }}" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🥇 First Prize</label>
+          <input type="text" name="prize_1st" class="input" value="{{ comp.prize_1st or '' }}" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🥈 Second Prize</label>
+          <input type="text" name="prize_2nd" class="input" value="{{ comp.prize_2nd or '' }}" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🥉 Third Prize</label>
+          <input type="text" name="prize_3rd" class="input" value="{{ comp.prize_3rd or '' }}" style="width:100%;">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">📋 Rules & Eligibility</div>
+        <div class="form-group">
+          <label class="form-label">Competition Rules</label>
+          <textarea name="rules_text" class="input" rows="5" style="width:100%;resize:vertical;">{{ comp.rules_text or '' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Eligibility Criteria</label>
+          <textarea name="eligibility_text" class="input" rows="3" style="width:100%;resize:vertical;">{{ comp.eligibility_text or '' }}</textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+
+      <div class="form-section">
+        <div class="form-section-title">⚙️ Status & Settings</div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select name="status" class="input" style="width:100%;">
+            <option value="draft" {{ 'selected' if comp.status=='draft' }}>📝 Draft</option>
+            <option value="published" {{ 'selected' if comp.status=='published' }}>📢 Published</option>
+            <option value="live" {{ 'selected' if comp.status=='live' }}>🟢 Live</option>
+            <option value="completed" {{ 'selected' if comp.status=='completed' }}>✅ Completed</option>
+          </select>
+        </div>
+
+        {% for name, label, desc, val in [
+          ('is_featured','⭐ Featured','Show on homepage',comp.is_featured),
+          ('is_trending','🔥 Trending','Show trending badge',comp.is_trending),
+          ('cert_enabled','📜 Certificate','Issue certificates',comp.cert_enabled),
+          ('leaderboard_enabled','📊 Leaderboard','Show live leaderboard',comp.leaderboard_enabled)
+        ] %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:white;">{{ label }}</div>
+            <div style="font-size:11px;color:var(--text-3);">{{ desc }}</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" name="{{ name }}" {{ 'checked' if val }}>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">🖼 Banner Image</div>
+        {% if comp.banner_url %}
+        <img src="{{ comp.banner_url }}" style="width:100%;border-radius:var(--r-md);margin-bottom:12px;">
+        {% endif %}
+        <div class="form-group">
+          <label class="form-label">Banner URL</label>
+          <input type="url" name="banner_url" class="input" value="{{ comp.banner_url or '' }}" placeholder="https://..." style="width:100%;">
+        </div>
+      </div>
+
+      <div class="form-section" style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(37,99,235,0.1));border-color:rgba(124,58,237,0.3);">
+        <div class="form-section-title">🚀 Save Changes</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button type="submit" class="btn btn-primary" style="width:100%;">💾 Save &amp; Update Competition</button>
+          <form method="POST" action="{{ url_for('admin.publish_competition', comp_id=comp.id) }}" style="margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-ghost" style="width:100%;">
+              {{ '📤 Unpublish' if comp.status == 'published' else '📢 Publish Now' }}
+            </button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.delete_competition', comp_id=comp.id) }}" onsubmit="return confirm('Delete this competition permanently?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm" style="width:100%;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--error);">🗑 Delete Competition</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</form>
+{% endblock %}

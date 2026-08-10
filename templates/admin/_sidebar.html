@@ -1,0 +1,34 @@
+{% macro admin_sidebar(active_item='') %}
+<aside class="sidebar" id="main-sidebar" aria-label="Admin navigation">
+  <a href="{{ url_for('public.home') }}" class="sidebar-logo">
+    <div class="sidebar-logo-mark" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova Logo" style="width:34px;height:34px;object-fit:cover;border-radius:10px;">
+      </div>
+      <span class="sidebar-logo-text font-display" style="font-weight:800;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span> <span style="font-size:10px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;">ADMIN</span></span> <span style="font-size:10px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;">ADMIN</span></span>
+  </a>
+
+  <nav class="sidebar-nav">
+    <p class="nav-section-label">MANAGEMENT</p>
+    <a href="{{ url_for('admin.dashboard') }}" class="sidebar-item {{ 'active' if active_item == 'dashboard' }}">📊 Dashboard</a>
+    <a href="{{ url_for('admin.categories') }}" class="sidebar-item {{ 'active' if active_item == 'categories' }}">📁 Categories</a>
+    <a href="{{ url_for('admin.subcategories') }}" class="sidebar-item {{ 'active' if active_item == 'subcategories' }}">📑 Subcategories</a>
+    <a href="{{ url_for('admin.questions') }}" class="sidebar-item {{ 'active' if active_item == 'questions' }}">❓ Question Bank</a>
+    <a href="{{ url_for('admin.competitions') }}" class="sidebar-item {{ 'active' if active_item in ('competitions', 'create_competition', 'edit_competition', 'competition_registrations') }}">🏆 Competitions</a>
+    <a href="{{ url_for('admin.users') }}" class="sidebar-item {{ 'active' if active_item == 'users' }}">👥 Users &amp; Roles</a>
+
+    <p class="nav-section-label">ANALYTICS &amp; EXPORTS</p>
+    <a href="{{ url_for('admin.analytics') }}" class="sidebar-item {{ 'active' if active_item == 'analytics' }}">📈 Analytics</a>
+    <a href="{{ url_for('admin.certificates') }}" class="sidebar-item {{ 'active' if active_item == 'certificates' }}">📜 Certificates</a>
+    <a href="{{ url_for('admin.export_data', resource='results') }}" class="sidebar-item">📥 Export Results</a>
+  </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" style="background:linear-gradient(135deg,#6C5CE7,#3B82F6);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Admin</div>
+        <div class="sidebar-user-role" style="color:var(--brand-cyan);font-size:11px;">Super Admin</div>
+      </div>
+      <a href="/auth/logout" style="color:var(--text-3);text-decoration:none;margin-left:auto;" title="Logout">➔</a>
+    </div>
+</aside>
+{% endmacro %}

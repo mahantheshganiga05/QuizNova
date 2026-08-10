@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% from "admin/_sidebar.html" import admin_sidebar %}
+{% block title %}Competition Management — QuizNova Admin{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+  .admin-page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+  .badge-blue{background:rgba(37,99,235,0.15);color:#60A5FA;border:1px solid rgba(60,130,246,0.3);}
+  .badge-warning{background:rgba(245,158,11,0.15);color:#FCD34D;border:1px solid rgba(245,158,11,0.3);}
+  .badge-neutral{background:rgba(255,255,255,0.06);color:var(--text-2);border:1px solid var(--border);}
+</style>{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+
+  {{ admin_sidebar('competitions') }}
+
+  <main class="dash-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+    {% for cat,msg in messages %}<div class="alert alert-{{cat}}" style="margin-bottom:12px;display:flex;justify-content:space-between;"><span>{{msg}}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;">×</button></div>{% endfor %}
+    {% endif %}{% endwith %}
+
+    <!-- Page Header -->
+    <div class="admin-page-header">
+      <div>
+        <h1 class="font-display" style="font-size:22px;font-weight:800;color:white;margin-bottom:4px;">🏆 Competition Management</h1>
+        <p style="font-size:13px;color:var(--text-2);">Create, manage, publish and monitor all competitions.</p>
+      </div>
+      <a href="{{ url_for('admin.create_competition') }}" class="btn btn-primary">+ Create Competition</a>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+      {% set all_c = competitions|length %}
+      {% set live_c = competitions|selectattr('status','equalto','live')|list|length %}
+      {% set pub_c = competitions|selectattr('status','equalto','published')|list|length %}
+      {% set draft_c = competitions|selectattr('status','equalto','draft')|list|length %}
+      <div class="card p-3 text-center"><div class="font-display" style="font-size:28px;font-weight:800;color:var(--brand-purple-light);">{{all_c}}</div><div style="font-size:11px;color:var(--text-2);">Total</div></div>
+      <div class="card p-3 text-center"><div class="font-display" style="font-size:28px;font-weight:800;color:var(--success);">{{live_c}}</div><div style="font-size:11px;color:var(--text-2);">Live Now</div></div>
+      <div class="card p-3 text-center"><div class="font-display" style="font-size:28px;font-weight:800;color:#60A5FA;">{{pub_c}}</div><div style="font-size:11px;color:var(--text-2);">Published</div></div>
+      <div class="card p-3 text-center"><div class="font-display" style="font-size:28px;font-weight:800;color:var(--warning);">{{draft_c}}</div><div style="font-size:11px;color:var(--text-2);">Drafts</div></div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      {% for f,label in [('all','All'),('published','Published'),('live','Live'),('draft','Draft'),('completed','Completed')] %}
+      <a href="{{ url_for('admin.competitions', status=f) }}" class="btn btn-sm {{ 'btn-primary' if status_filter==f else 'btn-ghost' }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- Competition Cards -->
+    {% if competitions %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+      {% for comp in competitions %}
+      <div class="card" style="overflow:hidden;border:1px solid rgba(124,58,237,0.2);">
+        <div style="height:100px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(37,99,235,0.3));position:relative;display:flex;align-items:center;justify-content:center;">
+          {% if comp.banner_url %}<img src="{{ comp.banner_url }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">{% endif %}
+          <div style="position:absolute;top:8px;left:8px;display:flex;gap:4px;flex-wrap:wrap;">
+            {% if comp.is_featured %}<span class="badge badge-warning" style="font-size:9px;">⭐ Featured</span>{% endif %}
+            <span class="badge {{ 'badge-success' if comp.status=='live' else ('badge-blue' if comp.status=='published' else ('badge-warning' if comp.status=='draft' else 'badge-neutral')) }}" style="font-size:9px;text-transform:uppercase;">{{comp.status}}</span>
+          </div>
+          <div style="position:absolute;bottom:6px;right:8px;font-size:10px;font-weight:700;color:white;background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:20px;">🎁 {{comp.prize_pool_text}}</div>
+        </div>
+        <div style="padding:14px;">
+          <h3 style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;line-height:1.3;">{{ comp.title }}</h3>
+          <p style="font-size:11px;color:var(--text-2);margin-bottom:10px;">{{ (comp.short_description or 'No description.')[:70] }}...</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:11px;color:var(--text-3);">
+            <div>👥 {{ comp.registered_count }} / {{ comp.max_participants or '∞' }}</div>
+            <div>⏱ {{ comp.duration_minutes }}min · {{ comp.total_questions }}Qs</div>
+            <div>📅 {{ comp.start_date.strftime('%d %b %Y') if comp.start_date else 'TBD' }}</div>
+            <div>🏷 {{ comp.category.name if comp.category else 'Uncategorized' }}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:10px;">
+            <a href="{{ url_for('admin.edit_competition', comp_id=comp.id) }}" class="btn btn-ghost btn-sm" style="flex:1;">✏️ Edit</a>
+            <a href="{{ url_for('admin.competition_registrations', comp_id=comp.id) }}" class="btn btn-ghost btn-sm" style="flex:1;">👥 Regs</a>
+            <form method="POST" action="{{ url_for('admin.publish_competition', comp_id=comp.id) }}" style="flex:1;margin:0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm w-full {{ 'btn-ghost' if comp.status!='draft' else 'btn-primary' }}" style="width:100%;">
+                {{ '📤 Unpublish' if comp.status=='published' else ('📢 Publish' if comp.status=='draft' else '🔄 Toggle') }}
+              </button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.delete_competition', comp_id=comp.id) }}" onsubmit="return confirm('Delete this competition?');" style="margin:0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--error);">🗑</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-6" style="text-align:center;">
+      <div style="font-size:48px;margin-bottom:16px;">🏆</div>
+      <h3 style="font-weight:700;color:white;margin-bottom:8px;">No Competitions Yet</h3>
+      <p style="color:var(--text-2);margin-bottom:20px;">Create your first competition to get started.</p>
+      <a href="{{ url_for('admin.create_competition') }}" class="btn btn-primary">+ Create Competition</a>
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}

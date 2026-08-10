@@ -1,0 +1,1 @@
+"""QuizNova — Utils package."""

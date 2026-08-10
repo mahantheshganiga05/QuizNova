@@ -1,0 +1,106 @@
+<aside class="sidebar" id="main-sidebar" aria-label="Navigation sidebar">
+
+  <!-- Logo -->
+  <a href="{{ url_for('public.home') }}" class="sidebar-logo" aria-label="QuizNova home">
+    <div class="sidebar-logo-mark" aria-hidden="true" style="width:36px;height:36px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7c3aed,#2563eb);">
+      <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova" style="width:36px;height:36px;object-fit:cover;border-radius:10px;">
+    </div>
+    <span class="sidebar-logo-text" style="font-family:'Poppins',sans-serif;font-weight:800;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></span>
+  </a>
+
+
+  <!-- Nav -->
+  <nav class="sidebar-nav" aria-label="Sidebar navigation">
+    <p class="nav-section-label">MAIN</p>
+
+    <a href="{{ url_for('dashboard.index') }}"
+       class="sidebar-item {{ 'active' if request.endpoint == 'dashboard.index' }}"
+       id="sidebar-dashboard-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+
+    <a href="{{ url_for('quiz.categories') }}"
+       class="sidebar-item {{ 'active' if 'quiz' in (request.endpoint or '') and 'dashboard' not in (request.endpoint or '') }}"
+       id="sidebar-browse-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      Browse Quizzes
+    </a>
+
+    <a href="{{ url_for('competitions.index') }}"
+       class="sidebar-item {{ 'active' if 'competitions' in (request.endpoint or '') }}"
+       id="sidebar-competitions-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Competitions
+    </a>
+
+    <a href="{{ url_for('quiz.leaderboard') }}"
+       class="sidebar-item {{ 'active' if request.endpoint == 'quiz.leaderboard' }}"
+       id="sidebar-leaderboard-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Leaderboard
+    </a>
+
+    <p class="nav-section-label">ACHIEVEMENTS</p>
+
+    <a href="{{ url_for('dashboard.certificates') }}"
+       class="sidebar-item {{ 'active' if request.endpoint == 'dashboard.certificates' }}"
+       id="sidebar-certs-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 12 12 15 16 10"/></svg>
+      Certificates
+    </a>
+
+    <a href="{{ url_for('dashboard.achievements') }}"
+       class="sidebar-item {{ 'active' if request.endpoint == 'dashboard.achievements' }}"
+       id="sidebar-achievements-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      Achievements
+    </a>
+
+    <p class="nav-section-label">ACCOUNT</p>
+
+    <a href="{{ url_for('dashboard.settings') }}"
+       class="sidebar-item {{ 'active' if request.endpoint == 'dashboard.settings' }}"
+       id="sidebar-settings-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+
+    <a href="{{ url_for('auth.logout') }}" class="sidebar-item" style="color:var(--error);">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </a>
+
+    {% if current_user.is_admin %}
+    <p class="nav-section-label">ADMIN</p>
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="sidebar-item {{ 'active' if 'admin' in (request.endpoint or '') }}"
+       id="sidebar-admin-link">
+      <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Admin Console
+    </a>
+    {% endif %}
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;font-weight:700;display:flex;align-items:center;justify-content:center;">
+      {{ current_user.display_name[0].upper() if current_user.display_name else 'U' }}
+    </div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name">{{ current_user.display_name }}</div>
+      <div class="sidebar-user-role" style="font-size:10px;color:var(--brand-purple-light);">Student</div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="sidebar-logout" title="Sign out" id="sidebar-logout-btn">➔</a>
+  </div>
+
+</aside>
+
+
+</aside>
+
+
+</aside>
+
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>

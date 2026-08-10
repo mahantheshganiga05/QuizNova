@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}About — QuizNova{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container-xs" style="text-align:center;">
+    <div class="section-eyebrow" style="display:inline-flex;margin-bottom:var(--s3);">About Us</div>
+    <h1 class="font-display" style="font-size:clamp(2rem,5vw,3rem);font-weight:800;margin-bottom:var(--s3);">
+      Built for Learners,<br>by Learners.
+    </h1>
+    <p style="font-size:17px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s6);">
+      QuizNova is a modern AI-ready quiz platform designed for college students, placement preparation,
+      competitive exams, and programming practice. Our mission is to make quality assessment accessible,
+      fair, and motivating for everyone.
+    </p>
+    <div class="grid-3" style="gap:20px;text-align:left;margin-top:var(--s6);">
+      {% for item in [('Our Mission','To democratize quality education through engaging, fair, and verifiable assessments.'),('Our Vision','A world where every learner can prove their skills with confidence and earn recognition.'),('Our Values','Fairness, transparency, and continuous improvement are at the core of everything we build.')] %}
+      <div class="card p-4">
+        <h3 class="font-display" style="font-size:15px;font-weight:700;margin-bottom:8px;">{{ item[0] }}</h3>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.65;">{{ item[1] }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

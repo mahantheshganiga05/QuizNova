@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Review — {{ attempt.subcategory.name }} — QuizNova{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<section style="background:var(--bg-1);border-bottom:1px solid var(--border);padding:var(--s5) 0;" aria-label="Review header">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="{{ url_for('quiz.categories') }}">Categories</a>
+      <svg class="breadcrumb-sep" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <a href="{{ url_for('quiz.result', attempt_id=attempt.id) if attempt else '#' }}">Result</a>
+      <svg class="breadcrumb-sep" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <span style="color:var(--text-1);">Review</span>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s2);">
+      <div>
+        <h1 class="font-display" style="font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-bottom:4px;">
+          Review: {{ attempt.subcategory.name }}
+        </h1>
+        <p style="font-size:14px;color:var(--text-2);">{{ attempt.subcategory.category.name }}</p>
+      </div>
+
+      <!-- Summary badges -->
+      {% set total = questions_review | length %}
+      {% set correct_count = questions_review | selectattr('is_correct', 'equalto', True) | list | length %}
+      {% set wrong_count = questions_review | selectattr('is_correct', 'equalto', False) | selectattr('selected_index', 'ne', -1) | list | length %}
+      {% set skipped_count = questions_review | selectattr('selected_index', 'equalto', -1) | list | length %}
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span class="badge badge-success" style="font-size:13px;padding:6px 14px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ correct_count }} Correct
+        </span>
+        <span class="badge badge-error" style="font-size:13px;padding:6px 14px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          {{ wrong_count }} Wrong
+        </span>
+        <span class="badge badge-neutral" style="font-size:13px;padding:6px 14px;">
+          {{ skipped_count }} Skipped
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Questions Review -->
+<section class="section">
+  <div class="container" style="max-width:var(--content-sm);">
+
+    {% set option_keys = ['A','B','C','D'] %}
+
+    {% for q in questions_review %}
+    <div class="card review-item" style="margin-bottom:var(--s3);padding:var(--s4);position:relative;overflow:hidden;"
+         data-aos="fade-up" data-aos-delay="{{ [loop.index0 * 40, 300] | min }}">
+
+      <!-- Status bar -->
+      <div class="review-status-bar {{ 'correct' if q.is_correct else ('wrong' if q.selected_index != -1 else 'skipped') }}" aria-hidden="true"></div>
+
+      <div style="padding-left:var(--s2);">
+        <!-- Number + Status -->
+        <div style="display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3);">
+          <span class="q-number-badge">Q{{ loop.index }}</span>
+          {% if q.is_correct %}
+          <span class="badge badge-success">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Correct
+          </span>
+          {% elif q.selected_index == -1 %}
+          <span class="badge badge-neutral">Skipped</span>
+          {% else %}
+          <span class="badge badge-error">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Wrong
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Question Text -->
+        <p style="font-size:16px;font-weight:500;line-height:1.7;color:var(--text-1);margin-bottom:var(--s3);">
+          {{ q.question_text }}
+        </p>
+
+        <!-- Options -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          {% for i in range(4) %}
+          {% if i < q.options | length %}
+          <div class="review-option {% if i == q.correct_index %}correct-ans{% elif i == q.selected_index and not q.is_correct %}wrong-ans{% else %}neutral{% endif %}"
+               aria-label="Option {{ option_keys[i] }}: {{ q.options[i] }} {% if i == q.correct_index %}(Correct answer){% elif i == q.selected_index and not q.is_correct %}(Your answer - wrong){% endif %}">
+            <span class="review-key {% if i == q.correct_index %}correct-ans{% elif i == q.selected_index and not q.is_correct %}wrong-ans{% else %}neutral{% endif %}">
+              {{ option_keys[i] }}
+            </span>
+            <span style="font-size:14px;flex:1;line-height:1.5;">{{ q.options[i] }}</span>
+            {% if i == q.correct_index %}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" flex-shrink="0" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            {% elif i == q.selected_index and not q.is_correct %}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2.5" flex-shrink="0" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- Explanation -->
+        {% if q.explanation %}
+        <div class="explanation-box" style="margin-top:var(--s3);">
+          <div class="explanation-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:5px;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Explanation
+          </div>
+          <p>{{ q.explanation }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Bottom Nav -->
+    <div style="text-align:center;margin-top:var(--s5);">
+      <a href="{{ url_for('quiz.result', attempt_id=attempt.id) }}" class="btn btn-ghost btn-lg" id="back-to-result-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to Result
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

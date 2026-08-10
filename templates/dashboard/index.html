@@ -1,0 +1,512 @@
+{% extends "base.html" %}
+{% set load_charts = true %}
+{% block title %}Student Dashboard — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+  /* Premium Dark Glassmorphism Styling */
+  .dash-topbar-header {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .header-left-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: white;
+    font-family: var(--font-display);
+    margin-bottom: 8px;
+  }
+  .header-meta-pills {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .header-meta-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .header-meta-pill strong {
+    color: white;
+  }
+
+  /* 6 Stat Cards Grid */
+  .stats-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 1280px) { .stats-grid-6 { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px)  { .stats-grid-6 { grid-template-columns: repeat(2, 1fr); } }
+
+  .stat-card-glass {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card-glass:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 58, 237, 0.45);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.2);
+  }
+  .stat-card-glass::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #7C3AED, #2563EB);
+    opacity: 0.6;
+  }
+  .stat-icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .ic-purple { background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); color: var(--brand-purple-light); }
+  .ic-blue   { background: rgba(37,99,235,0.15);   border: 1px solid rgba(37,99,235,0.35);   color: #60A5FA; }
+  .ic-teal   { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); color: #34D399; }
+  .ic-gold   { background: rgba(245,158,11,0.15);  border: 1px solid rgba(245,158,11,0.35);  color: #FBBF24; }
+  .ic-pink   { background: rgba(236,72,153,0.15);  border: 1px solid rgba(236,72,153,0.35);  color: #F472B6; }
+  .ic-orange { background: rgba(249,115,22,0.15);  border: 1px solid rgba(249,115,22,0.35);  color: #FB923C; }
+
+  .stat-val-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+    font-family: var(--font-display);
+    line-height: 1.1;
+  }
+  .stat-lbl-txt {
+    font-size: 11px;
+    color: var(--text-2);
+    margin-top: 2px;
+  }
+
+  /* 2-Column Main Section */
+  .dash-main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 1100px) { .dash-main-grid { grid-template-columns: 1fr; } }
+
+  /* Category Progress Bar */
+  .cat-progress-item {
+    margin-bottom: 16px;
+  }
+  .cat-progress-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .cat-progress-bar-wrap {
+    height: 7px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cat-progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+  }
+
+  /* Recommended Cards Grid */
+  .rec-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .rec-cards-grid { grid-template-columns: 1fr; } }
+
+  .rec-card-glass {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s;
+  }
+  .rec-card-glass:hover {
+    border-color: rgba(124, 58, 237, 0.4);
+    background: rgba(124, 58, 237, 0.05);
+  }
+
+  /* Real Notifications Pill list */
+  .notif-item {
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────── -->
+  {% include 'partials/_sidebar.html' %}
+
+  <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+  <main class="dash-main" aria-label="Student Dashboard">
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar" style="margin-bottom:16px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <!-- ── TOP HEADER ─────────────────────────────────────── -->
+    <div class="dash-topbar-header">
+      <div>
+        <h1 class="header-left-title">
+          {% set hour = now.hour %}
+          {% if hour < 12 %}Good Morning{% elif hour < 17 %}Good Afternoon{% else %}Good Evening{% endif %}, {{ current_user.display_name.split()[0] }}! 👋
+        </h1>
+        <div class="header-meta-pills">
+          <div class="header-meta-pill">🏆 Overall Rank: <strong>#{{ stats.global_rank }}</strong></div>
+          <div class="header-meta-pill">🛡️ Current Level: <strong>Level {{ stats.current_level }}</strong></div>
+          <div class="header-meta-pill">⭐ XP Points: <strong>{{ stats.xp_points }} XP</strong></div>
+          <div class="header-meta-pill">💎 Total Points: <strong>{{ stats.total_points }} Pts</strong></div>
+          <div class="header-meta-pill">🔥 Streak: <strong>{{ stats.current_streak_days }} Days</strong></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary" style="box-shadow:0 0 20px rgba(124,58,237,0.4);">
+          ⚡ Start Quiz
+        </a>
+        <a href="{{ url_for('competitions.index') }}" class="btn btn-ghost">
+          🏆 View Competitions
+        </a>
+      </div>
+    </div>
+
+    <!-- ── 6 STATISTICS CARDS (FIRST ROW) ─────────────────── -->
+    <div class="stats-grid-6">
+      <div class="stat-card-glass">
+        <div class="stat-icon-wrap ic-purple">📖</div>
+        <div>
+          <div class="stat-val-num">{{ stats.total_quizzes }}</div>
+          <div class="stat-lbl-txt">Total Quizzes</div>
+        </div>
+      </div>
+
+      <div class="stat-card-glass">
+        <div class="stat-icon-wrap ic-blue">🎯</div>
+        <div>
+          <div class="stat-val-num">{{ stats.avg_score }}%</div>
+          <div class="stat-lbl-txt">Average Score</div>
+        </div>
+      </div>
+
+      <div class="stat-card-glass">
+        <div class="stat-icon-wrap ic-teal">🏆</div>
+        <div>
+          <div class="stat-val-num">#{{ stats.global_rank }}</div>
+          <div class="stat-lbl-txt">Global Rank</div>
+        </div>
+      </div>
+
+      <div class="stat-card-glass">
+        <div class="stat-icon-wrap ic-gold">⚔️</div>
+        <div>
+          <div class="stat-val-num">{{ stats.competitions_joined }}</div>
+          <div class="stat-lbl-txt">Competitions Joined</div>
+        </div>
+      </div>
+
+      <div class="stat-card-glass">
+        <div class="stat-icon-wrap ic-pink">📜</div>
+        <div>
+          <div class="stat-val-num">{{ stats.certificates_earned }}</div>
+          <div class="stat-lbl-txt">Certificates Earned</div>
+        </div>
+      </div>
+
+      <div class="stat-card-glass">
+        <div class="stat-icon-wrap ic-orange">🔥</div>
+        <div>
+          <div class="stat-val-num">{{ stats.current_streak_days }}d</div>
+          <div class="stat-lbl-txt">Current Streak</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN 2-COLUMN SECTION ───────────────────────────── -->
+    <div class="dash-main-grid">
+
+      <!-- LEFT COLUMN: Charts & Categories & Activity -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+
+        <!-- Performance Analytics Chart -->
+        <div class="card p-4">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);">Performance Analytics</h3>
+              <p style="font-size:12px;color:var(--text-2);">Real quiz score trend and performance metrics from database.</p>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;">Score Trend</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;">Weekly</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;">Monthly</button>
+            </div>
+          </div>
+
+          <div style="height:240px;">
+            <canvas id="performanceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category Performance -->
+        <div class="card p-4">
+          <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);margin-bottom:16px;">
+            Category Performance
+          </h3>
+
+          <div>
+            {% for cat in cat_performance %}
+            <div class="cat-progress-item">
+              <div class="cat-progress-head">
+                <span style="font-weight:600;color:white;">{{ cat.name }}</span>
+                <span style="color:var(--brand-purple-light);font-weight:700;">{{ cat.avg_score }}% <span style="font-size:10px;color:var(--text-3);">({{ cat.count }} quizzes)</span></span>
+              </div>
+              <div class="cat-progress-bar-wrap">
+                <div class="cat-progress-bar-fill" style="width:{{ cat.avg_score }}%;background:{{ cat.color }};"></div>
+              </div>
+            </div>
+            {% else %}
+            <p style="font-size:13px;color:var(--text-3);">No category data available yet. Start your first quiz!</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Recommended Quizzes -->
+        <div class="card p-4">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);">Recommended Quizzes</h3>
+            <a href="{{ url_for('quiz.categories') }}" style="font-size:12px;color:var(--brand-purple-light);text-decoration:none;">View All Categories →</a>
+          </div>
+
+          <div class="rec-cards-grid">
+            {% for sub in recommended_subs[:3] %}
+            <div class="rec-card-glass">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--brand-purple-light);text-transform:uppercase;margin-bottom:4px;">{{ sub.category.name if sub.category else 'Quiz' }}</div>
+                <h4 style="font-size:14px;font-weight:700;color:white;margin-bottom:8px;">{{ sub.name }}</h4>
+                <div style="font-size:11px;color:var(--text-2);margin-bottom:12px;display:flex;gap:10px;">
+                  <span>⏱ {{ sub.time_limit_minutes }}m</span>
+                  <span>❓ {{ sub.questions_per_quiz }} Qs</span>
+                  <span>📊 {{ sub.difficulty_default | capitalize }}</span>
+                </div>
+              </div>
+              <form method="POST" action="{{ url_for('quiz.start', subcategory_id=sub.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary btn-sm w-full" style="width:100%;">Start Quiz →</button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Activity, Upcoming Competitions, Leaderboard & Certificates -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+
+        <!-- Real System Notifications -->
+        {% if real_notifications %}
+        <div class="card p-4">
+          <h3 style="font-size:14px;font-weight:800;color:white;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+            🔔 Live Notifications
+          </h3>
+          {% for notif in real_notifications %}
+          <div class="notif-item">
+            <span style="font-size:16px;">
+              {% if notif.type == 'competition' %}🏆{% elif notif.type == 'certificate' %}📜{% else %}🎯{% endif %}
+            </span>
+            <div style="overflow:hidden;">
+              <div style="font-size:12px;font-weight:600;color:white;line-height:1.2;">{{ notif.title }}</div>
+              <div style="font-size:10px;color:var(--text-3);margin-top:2px;">{{ notif.time }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Recent Activity Timeline -->
+        <div class="card p-4">
+          <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);margin-bottom:16px;">Recent Activity</h3>
+
+          <div class="activity-feed">
+            {% for act in recent_activity %}
+            <div class="activity-item" style="padding-bottom:14px;">
+              <div class="activity-dot" style="width:32px;height:32px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">
+                📌
+              </div>
+              <div class="activity-info">
+                <div class="activity-text" style="font-size:12px;font-weight:600;color:white;">{{ act.description or act.event_type | replace('_',' ') | capitalize }}</div>
+                <div class="activity-time" style="font-size:10px;color:var(--text-3);">{{ act.created_at.strftime('%b %d, %H:%M') if act.created_at else '' }}</div>
+              </div>
+            </div>
+            {% else %}
+            <p style="font-size:12px;color:var(--text-3);text-align:center;">No recent activity logged yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Upcoming Competitions -->
+        <div class="card p-4">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);">Upcoming Competitions</h3>
+            <a href="{{ url_for('competitions.index') }}" style="font-size:11px;color:var(--brand-purple-light);text-decoration:none;">View All →</a>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            {% for comp in upcoming_competitions %}
+            <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:white;">{{ comp.title }}</div>
+                <div style="font-size:10px;color:var(--text-3);">🎁 {{ comp.prize_pool_text }} • 👥 {{ comp.registered_count }} Registered</div>
+              </div>
+              <a href="{{ url_for('competitions.detail', slug=comp.slug) }}" class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 10px;">Register</a>
+            </div>
+            {% else %}
+            <p style="font-size:12px;color:var(--text-3);text-align:center;">No upcoming competitions currently listed.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Recent Earned Certificates -->
+        {% if user_certificates %}
+        <div class="card p-4">
+          <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);margin-bottom:16px;">Earned Certificates</h3>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            {% for cert in user_certificates %}
+            <div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:white;">📜 {{ cert.subcategory.name if cert.subcategory else 'Quiz Certificate' }}</div>
+                <div style="font-size:10px;color:var(--text-3);">Score: {{ cert.score_percentage }}% • {{ cert.created_at.strftime('%d %b %Y') if cert.created_at else '' }}</div>
+              </div>
+              <a href="{{ url_for('api.download_certificate', cert_id=cert.id) }}" class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;">📥 Download</a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+
+    <!-- ── BOTTOM LEADERBOARD PREVIEW (TOP 5 STUDENTS) ─────── -->
+    <div class="card p-4">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;color:white;font-family:var(--font-display);">Leaderboard Preview</h3>
+          <p style="font-size:12px;color:var(--text-2);">Top performing students on QuizNova</p>
+        </div>
+        <a href="{{ url_for('quiz.leaderboard') }}" class="btn btn-primary btn-sm">
+          🏆 View Full Leaderboard →
+        </a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:12px;">
+        {% for u, user_xp, user_avg in top_leaderboard_users %}
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:{% if loop.index==1 %}#F59E0B{% elif loop.index==2 %}#94A3B8{% elif loop.index==3 %}#B45309{% else %}rgba(255,255,255,0.1){% endif %};color:white;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            {{ loop.index }}
+          </div>
+          <div style="overflow:hidden;">
+            <div style="font-size:13px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.display_name }}</div>
+            <div style="font-size:10px;color:var(--brand-purple-light);">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Chart === 'undefined') return;
+
+  const ctx = document.getElementById('performanceChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ chart_labels | tojson }},
+        datasets: [{
+          label: 'Quiz Score (%)',
+          data: {{ chart_scores | tojson }},
+          borderColor: '#7C3AED',
+          backgroundColor: 'rgba(124, 58, 237, 0.15)',
+          pointBackgroundColor: '#9D5FFC',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.35,
+          fill: true,
+          borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#9898B0', font: { size: 11 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#9898B0', font: { size: 11 }, callback: v => v + '%' }, min: 0, max: 100 }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

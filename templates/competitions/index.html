@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Quiz & Coding Competitions — QuizNova{% endblock %}
+
+{% block content %}
+<div class="section" style="padding-top:40px;padding-bottom:80px;">
+  <div class="container">
+
+    <!-- Hero Header -->
+    <div style="text-align:center;max-w:800px;margin:0 auto 48px auto;" data-aos="fade-up">
+      <span class="badge badge-purple" style="font-size:12px;padding:6px 16px;margin-bottom:12px;">🏆 National & Global Contests</span>
+      <h1 class="font-display" style="font-size:clamp(2rem,4vw,3rem);font-weight:800;color:white;margin-bottom:12px;">
+        QuizNova <span class="text-gradient">Competitions</span>
+      </h1>
+      <p style="font-size:16px;color:var(--text-2);line-height:1.7;">
+        Compete in high-stakes quiz & coding tournaments. Win cash prizes, certificates of excellence, and secure top ranks on the global leaderboard.
+      </p>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:40px;flex-wrap:wrap;" data-aos="fade-up">
+      <a href="{{ url_for('competitions.index', tab='all') }}" class="btn {{ 'btn-primary' if active_tab == 'all' else 'btn-ghost' }} btn-sm">All Contests</a>
+      <a href="{{ url_for('competitions.index', tab='live') }}" class="btn {{ 'btn-primary' if active_tab == 'live' else 'btn-ghost' }} btn-sm">🔴 Live Now ({{ live_comps | length }})</a>
+      <a href="{{ url_for('competitions.index', tab='upcoming') }}" class="btn {{ 'btn-primary' if active_tab == 'upcoming' else 'btn-ghost' }} btn-sm">📅 Upcoming</a>
+      <a href="{{ url_for('competitions.index', tab='featured') }}" class="btn {{ 'btn-primary' if active_tab == 'featured' else 'btn-ghost' }} btn-sm">⭐ Featured</a>
+      <a href="{{ url_for('competitions.index', tab='completed') }}" class="btn {{ 'btn-primary' if active_tab == 'completed' else 'btn-ghost' }} btn-sm">🏁 Completed</a>
+    </div>
+
+    <!-- Competitions Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:24px;">
+      {% for comp in competitions %}
+      <div class="card p-0" style="overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(108,99,255,0.25);" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 50 }}">
+        
+        <!-- Banner/Thumbnail header -->
+        <div style="height:160px;background:linear-gradient(135deg,rgba(108,99,255,0.3),rgba(59,130,246,0.2));position:relative;display:flex;align-items:center;justify-content:center;">
+          <div style="position:absolute;top:12px;left:12px;display:flex;gap:6px;">
+            {% if comp.current_status == 'live' %}
+            <span class="badge badge-error" style="animation:pulseGlow 2s infinite;">🔴 LIVE NOW</span>
+            {% elif comp.current_status == 'upcoming' %}
+            <span class="badge badge-warning">📅 UPCOMING</span>
+            {% else %}
+            <span class="badge badge-neutral">🏁 COMPLETED</span>
+            {% endif %}
+            
+            {% if comp.is_featured %}
+            <span class="badge badge-purple">⭐ Featured</span>
+            {% endif %}
+          </div>
+
+          <div style="font-family:var(--font-display);font-size:36px;font-weight:900;color:white;opacity:0.3;user-select:none;">🏆 CONTEST</div>
+        </div>
+
+        <!-- Body -->
+        <div style="padding:24px;display:flex;flex-direction:column;flex:1;">
+          <div style="font-size:11px;color:var(--brand-cyan);font-weight:700;text-transform:uppercase;margin-bottom:6px;">
+            {{ comp.category.name if comp.category else 'General Knowledge' }}
+          </div>
+          
+          <h3 class="font-display" style="font-size:18px;font-weight:800;color:white;margin-bottom:8px;">
+            {{ comp.title }}
+          </h3>
+          
+          <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:16px;flex:1;">
+            {{ comp.short_description or 'High-stakes competitive tournament testing technical depth and speed.' }}
+          </p>
+
+          <!-- Prize & Details summary -->
+          <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;">Prize Pool</div>
+              <div style="font-size:13px;font-weight:700;color:var(--warning);">{{ comp.prize_pool_text }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;">Duration</div>
+              <div style="font-size:13px;font-weight:700;color:white;">{{ comp.duration_minutes }} mins</div>
+            </div>
+          </div>
+
+          <!-- Footer Actions -->
+          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;">
+            <span style="font-size:12px;color:var(--text-2);">👥 {{ comp.registered_count }} Registered</span>
+            <a href="{{ url_for('competitions.detail', slug=comp.slug) }}" class="btn btn-primary btn-sm">View Contest →</a>
+          </div>
+
+        </div>
+
+      </div>
+      {% else %}
+      <div style="grid-column:1/-1;text-align:center;padding:64px 20px;color:var(--text-3);" class="card">
+        <h3>No competitions found in this category.</h3>
+        <p style="font-size:14px;margin-top:8px;">Check back soon for new tournaments & coding challenges!</p>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

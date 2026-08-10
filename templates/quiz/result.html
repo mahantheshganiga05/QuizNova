@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+{% set load_charts = true %}
+{% block title %}Result — {{ attempt.subcategory.name }} — QuizNova{% endblock %}
+
+{% block content %}
+
+<!-- Header Hero -->
+<section class="result-hero-section">
+  <div class="container">
+    <div class="result-hero-inner">
+      <div class="result-hero-meta">
+        <div class="breadcrumb">
+          <a href="{{ url_for('quiz.categories') }}">Categories</a>
+          <svg class="breadcrumb-sep" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <a href="{{ url_for('quiz.subcategories', category_slug=attempt.subcategory.category.slug) }}">{{ attempt.subcategory.category.name }}</a>
+          <svg class="breadcrumb-sep" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="breadcrumb-current">Result</span>
+        </div>
+
+        <h1 class="result-hero-title">
+          Quiz Complete 🎉
+        </h1>
+        <p class="result-hero-sub">
+          {{ attempt.subcategory.name }} • Submitted on {{ (attempt.submitted_at or attempt.ended_at).strftime('%d %b %Y, %I:%M %p') if (attempt.submitted_at or attempt.ended_at) else 'Just now' }}
+        </p>
+      </div>
+
+      <a href="{{ url_for('dashboard.index') }}" class="result-back-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>Back to Dashboard</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Main Result Content -->
+<section class="section-sm" style="padding-top: 24px; padding-bottom: 64px;">
+  <div class="container">
+    <div class="result-main-grid">
+
+      <!-- LEFT COLUMN: SCORE CARD -->
+      <div class="result-score-card">
+        <div class="score-card-top">
+          <!-- Circular Score Ring -->
+          <div class="score-ring-container">
+            <svg width="190" height="190" viewBox="0 0 190 190" aria-label="Score: {{ result.percentage | round(1) }}%">
+              <circle cx="95" cy="95" r="80" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+              <circle id="score-ring-fill" cx="95" cy="95" r="80" fill="none"
+                      stroke="{{ 'url(#scoreGradPassed)' if result.is_passed else 'url(#scoreGradFailed)' }}" stroke-width="12"
+                      stroke-linecap="round"
+                      stroke-dasharray="502.6" stroke-dashoffset="502.6"
+                      style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);"/>
+              <defs>
+                <linearGradient id="scoreGradPassed" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#10B981"/>
+                  <stop offset="100%" stop-color="#3B82F6"/>
+                </linearGradient>
+                <linearGradient id="scoreGradFailed" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#7C3AED"/>
+                  <stop offset="100%" stop-color="#3B82F6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="score-ring-center">
+              <span id="score-pct-display" class="score-num">0</span>
+              <span class="score-percent-sign">%</span>
+              <span class="score-label-sub">SCORE</span>
+            </div>
+          </div>
+
+          <!-- Score Right Details -->
+          <div class="score-details-right">
+            <div class="result-status-badge {{ 'passed' if result.is_passed else 'failed' }}">
+              {% if result.is_passed %}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Passed</span>
+              {% else %}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <span>Not Passed</span>
+              {% endif %}
+            </div>
+
+            <div class="score-metric-group">
+              <div class="score-metric-val">{{ result.correct_count }} / {{ result.total_questions }}</div>
+              <div class="score-metric-lbl">Correct Answers</div>
+            </div>
+
+            <div class="score-metric-group">
+              <div class="score-metric-val">{{ attempt.violation_count }} / 11</div>
+              <div class="score-metric-lbl">Violations</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stacked Full-Width Action Buttons -->
+        <div class="score-actions-stack">
+          <a href="{{ url_for('quiz.review', attempt_id=attempt.id) }}" class="result-action-btn" id="review-answers-btn">
+            <div class="action-btn-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Review Answers</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <form method="POST" action="{{ url_for('quiz.start', subcategory_id=attempt.subcategory.id) }}" style="width:100%;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="result-action-btn" id="retry-quiz-btn" style="width:100%;">
+              <div class="action-btn-left">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                <span>Try Again</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </form>
+
+          {% if result.is_passed and result.certificate %}
+          <a href="{{ url_for('api.download_certificate', cert_id=result.certificate.id) }}" class="result-action-btn cert-action-btn" id="download-cert-btn">
+            <div class="action-btn-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download Certificate</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          {% endif %}
+
+          <a href="{{ url_for('dashboard.index') }}" class="result-action-btn" id="go-dashboard-btn">
+            <div class="action-btn-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Dashboard</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: PERFORMANCE SUMMARY & ANSWER BREAKDOWN -->
+      <div class="result-right-stack">
+
+        <!-- Performance Summary Card -->
+        <div class="result-panel-card">
+          <h3 class="panel-card-title">Performance Summary</h3>
+
+          {% set total_q = result.total_questions if result.total_questions > 0 else 1 %}
+          {% set pct_correct = ((result.correct_count / total_q) * 100) | round | int %}
+          {% set pct_wrong   = ((result.wrong_count / total_q) * 100) | round | int %}
+          {% set pct_skipped = ((result.skipped_count / total_q) * 100) | round | int %}
+
+          <div class="perf-stats-grid">
+            <!-- Correct Card -->
+            <div class="perf-stat-box perf-correct">
+              <div class="perf-stat-top">
+                <div class="perf-icon-circle icon-correct">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="perf-stat-label">Correct</div>
+              </div>
+              <div class="perf-stat-bottom">
+                <div class="perf-stat-val">{{ result.correct_count }}</div>
+                <div class="perf-stat-pct">{{ pct_correct }}%</div>
+              </div>
+            </div>
+
+            <!-- Wrong Card -->
+            <div class="perf-stat-box perf-wrong">
+              <div class="perf-stat-top">
+                <div class="perf-icon-circle icon-wrong">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <div class="perf-stat-label">Wrong</div>
+              </div>
+              <div class="perf-stat-bottom">
+                <div class="perf-stat-val">{{ result.wrong_count }}</div>
+                <div class="perf-stat-pct">{{ pct_wrong }}%</div>
+              </div>
+            </div>
+
+            <!-- Skipped Card -->
+            <div class="perf-stat-box perf-skipped">
+              <div class="perf-stat-top">
+                <div class="perf-icon-circle icon-skipped">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                </div>
+                <div class="perf-stat-label">Skipped</div>
+              </div>
+              <div class="perf-stat-bottom">
+                <div class="perf-stat-val">{{ result.skipped_count }}</div>
+                <div class="perf-stat-pct">{{ pct_skipped }}%</div>
+              </div>
+            </div>
+
+            <!-- Time Taken Card -->
+            <div class="perf-stat-box perf-time">
+              <div class="perf-stat-top">
+                <div class="perf-icon-circle icon-time">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="perf-stat-label">Time Taken</div>
+              </div>
+              <div class="perf-stat-bottom">
+                {% set mins = (attempt.time_taken_seconds // 60) if attempt.time_taken_seconds else 0 %}
+                {% set secs = (attempt.time_taken_seconds % 60) if attempt.time_taken_seconds else 0 %}
+                <div class="perf-stat-val">{{ '%02d:%02d' | format(mins, secs) }}</div>
+                <div class="perf-stat-sub">mm : ss</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Answer Breakdown Card -->
+        <div class="result-panel-card">
+          <h3 class="panel-card-title">Answer Breakdown</h3>
+
+          <div class="breakdown-chart-wrap">
+            <div class="breakdown-canvas-box">
+              <canvas id="donutChart" aria-label="Answer breakdown chart"></canvas>
+            </div>
+
+            <div class="breakdown-legend-list">
+              <div class="breakdown-legend-item">
+                <div class="legend-dot-label">
+                  <span class="legend-color-dot dot-correct"></span>
+                  <span class="legend-text">Correct</span>
+                </div>
+                <span class="legend-val"><strong>{{ result.correct_count }}</strong> ({{ pct_correct }}%)</span>
+              </div>
+
+              <div class="breakdown-legend-item">
+                <div class="legend-dot-label">
+                  <span class="legend-color-dot dot-wrong"></span>
+                  <span class="legend-text">Wrong</span>
+                </div>
+                <span class="legend-val"><strong>{{ result.wrong_count }}</strong> ({{ pct_wrong }}%)</span>
+              </div>
+
+              <div class="breakdown-legend-item">
+                <div class="legend-dot-label">
+                  <span class="legend-color-dot dot-skipped"></span>
+                  <span class="legend-text">Skipped</span>
+                </div>
+                <span class="legend-val"><strong>{{ result.skipped_count }}</strong> ({{ pct_skipped }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FULL-WIDTH QUIZ DETAILS CARD -->
+    <div class="quiz-details-card" style="margin-top: 24px;">
+      <h3 class="panel-card-title" style="margin-bottom: 20px;">Quiz Details</h3>
+
+      <div class="quiz-details-grid">
+        <div class="quiz-detail-item">
+          <div class="detail-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <div class="detail-text-wrap">
+            <span class="detail-label">Category</span>
+            <span class="detail-value">{{ attempt.subcategory.category.name }}</span>
+          </div>
+        </div>
+
+        <div class="quiz-detail-item">
+          <div class="detail-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div class="detail-text-wrap">
+            <span class="detail-label">Topic</span>
+            <span class="detail-value">{{ attempt.subcategory.name }}</span>
+          </div>
+        </div>
+
+        <div class="quiz-detail-item">
+          <div class="detail-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="detail-text-wrap">
+            <span class="detail-label">Total Questions</span>
+            <span class="detail-value">{{ result.total_questions }}</span>
+          </div>
+        </div>
+
+        <div class="quiz-detail-item">
+          <div class="detail-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="detail-text-wrap">
+            <span class="detail-label">Status</span>
+            <span class="detail-value">{{ 'Auto-submitted (Time Up)' if attempt.auto_submitted else 'Manually Submitted' }}</span>
+          </div>
+        </div>
+
+        <div class="quiz-detail-item">
+          <div class="detail-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="detail-text-wrap">
+            <span class="detail-label">Violations</span>
+            <span class="detail-value" style="color: #EF4444;">{{ attempt.violation_count }} / 11</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEWSLETTER SECTION -->
+    <div class="result-newsletter-card" style="margin-top: 32px;">
+      <div class="newsletter-card-inner">
+        <div class="newsletter-left">
+          <div class="newsletter-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="newsletter-text-wrap">
+            <h4 class="newsletter-title">Stay Updated!</h4>
+            <p class="newsletter-sub">Subscribe to our newsletter for latest quizzes, offers and updates.</p>
+          </div>
+        </div>
+
+        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to QuizNova updates!');">
+          <input type="email" placeholder="Enter your email" class="newsletter-input" required>
+          <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const pct = {{ result.percentage | float }};
+  const circumference = 502.6;
+  const ring = document.getElementById('score-ring-fill');
+  const display = document.getElementById('score-pct-display');
+
+  // Animate ring
+  setTimeout(() => {
+    const offset = circumference - (pct / 100) * circumference;
+    if (ring) ring.style.strokeDashoffset = offset;
+  }, 300);
+
+  // Animate score number
+  let start = 0;
+  const dur = 1400;
+  const t0 = performance.now();
+  function tick(now) {
+    const progress = Math.min((now - t0) / dur, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const val = Math.round(start + (pct - start) * eased);
+    if (display) display.textContent = val;
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  setTimeout(() => requestAnimationFrame(tick), 150);
+
+  // Chart.js Donut Chart
+  const canvas = document.getElementById('donutChart');
+  if (canvas && typeof Chart !== 'undefined') {
+    new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Correct', 'Wrong', 'Skipped'],
+        datasets: [{
+          data: [{{ result.correct_count }}, {{ result.wrong_count }}, {{ result.skipped_count }}],
+          backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
+          borderColor: ['rgba(16,185,129,0.3)', 'rgba(239,68,68,0.3)', 'rgba(245,158,11,0.3)'],
+          borderWidth: 2, hoverOffset: 4,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '76%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

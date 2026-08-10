@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% block title %}{{ attempt.subcategory.name }} — Quiz — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- JS Config -->
+<script>
+  window.QUIZ_ATTEMPT_ID        = {{ attempt.id }};
+  window.QUIZ_TOTAL_QUESTIONS   = {{ questions | length }};
+  window.QUIZ_TIME_LIMIT_SECS   = {{ time_limit_seconds }};
+  window.QUIZ_MAX_VIOLATIONS    = {{ max_violations }};
+  window.QUIZ_VIOLATIONS        = {{ attempt.violation_count }};
+  window.QUIZ_SECONDS_REMAINING = {{ time_limit_seconds }};
+  window.CSRF_TOKEN             = "{{ csrf_token() }}";
+  window.EXISTING_ANSWERS       = {{ existing_answers | tojson }};
+</script>
+
+<div class="quiz-layout">
+
+  <!-- ── TOP BAR ────────────────────────────────────────── -->
+  <header class="quiz-topbar" role="banner" aria-label="Quiz controls">
+
+    <!-- Logo + Subcategory Title -->
+    <div class="quiz-topbar-brand">
+      <a href="{{ url_for('public.home') }}" class="quiz-topbar-logo" aria-label="QuizNova Home">
+        <div class="logo-mark" aria-hidden="true">
+          <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova Logo" class="quiz-topbar-img">
+        </div>
+        <span class="quiz-logo-text">Quiz<span class="quiz-logo-accent">Nova</span></span>
+      </a>
+
+      <div class="quiz-topbar-divider" aria-hidden="true"></div>
+
+      <!-- Subcategory Badge & Name -->
+      <div class="quiz-sub-badge">
+        {% set s_name = attempt.subcategory.name | lower %}
+        {% if 'python' in s_name %}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2c-5.5 0-5 2.4-5 2.4v2.5h5.1v.7H5.2S2 7.1 2 12.5c0 5.4 2.8 5.2 2.8 5.2h1.7v-2.4c0-2.7 2.4-2.7 2.4-2.7h5.1s2.4.1 2.4-2.3V4.4C16.4 2 12 2 12 2z" fill="#387eb8"/><path d="M12 22c5.5 0 5-2.4 5-2.4v-2.5h-5.1v-.7h6.9s3.2.5 3.2-4.9c0-5.4-2.8-5.2-2.8-5.2h-1.7v2.4c0 2.7-2.4 2.7-2.4 2.7h-5.1s-2.4-.1-2.4 2.3v5.9C7.6 22 12 22 12 22z" fill="#ffe052"/></svg>
+        {% else %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        {% endif %}
+        <span>{{ attempt.subcategory.name }}</span>
+      </div>
+    </div>
+
+    <!-- Center Progress Section -->
+    <div class="quiz-progress-wrap" aria-label="Quiz progress">
+      <div class="quiz-progress-meta">
+        <span class="quiz-progress-label" id="quiz-progress-text" aria-live="polite">Question 1 of {{ questions | length }}</span>
+        <span class="quiz-progress-pct" id="quiz-progress-pct">5% Completed</span>
+      </div>
+      <div class="quiz-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ questions | length }}" aria-valuenow="1">
+        <div class="quiz-progress-fill" id="quiz-progress-fill" style="width:{{ (1 / questions | length * 100) | round }}%;"></div>
+      </div>
+    </div>
+
+    <!-- Right Controls: Theme + Timer + Exit -->
+    <div class="quiz-topbar-right">
+      <button type="button" class="quiz-icon-btn" title="Toggle Dark Theme" aria-label="Toggle Theme">
+        🌙
+      </button>
+
+      <div class="quiz-top-timer-badge" id="quiz-timer-wrap" aria-label="Time remaining">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="quiz-top-timer-text" id="quiz-timer-text" aria-live="polite">--:--</span>
+      </div>
+
+      <button class="quiz-exit-btn" id="quiz-exit-btn" type="button"
+              onclick="if(confirm('Exit quiz? Your progress will be lost.'))window.location.href='{{ url_for('quiz.categories') }}'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Exit Quiz</span>
+      </button>
+    </div>
+
+  </header>
+
+  <!-- ── MAIN BODY ──────────────────────────────────────────── -->
+  <div class="quiz-body">
+
+    <!-- Left Column: Question Area -->
+    <div class="question-area" id="question-area">
+
+      {% for aq in questions %}
+      <div class="question-slide {{ 'active' if loop.first }}"
+           id="slide-{{ loop.index0 }}"
+           data-order="{{ loop.index0 }}"
+           data-aq-id="{{ aq.id }}"
+           data-selected="{{ existing_answers.get(aq.id | string, -1) }}"
+           data-bookmarked="{{ '1' if aq.is_bookmarked else '0' }}"
+           role="group" aria-label="Question {{ loop.index }} of {{ questions | length }}">
+
+        <!-- Question Header Meta (Badges + Bookmark) -->
+        <div class="question-card-meta">
+          <div class="q-meta-badges">
+            <span class="q-number-badge">
+              Q{{ loop.index }} / {{ questions | length }}
+            </span>
+            <span class="q-type-badge">
+              Single Choice
+            </span>
+          </div>
+
+          <button class="bookmark-btn {{ 'bookmarked' if aq.is_bookmarked }}"
+                  id="bookmark-btn-{{ loop.index0 }}"
+                  type="button" aria-label="{{ 'Remove bookmark' if aq.is_bookmarked else 'Bookmark question' }}"
+                  data-order="{{ loop.index0 }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="{{ 'currentColor' if aq.is_bookmarked else 'none' }}" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+            <span>Bookmark</span>
+          </button>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+          <h2 class="question-text">{{ aq.question.question_text }}</h2>
+
+          <!-- 4 Horizontal Option Cards -->
+          <div class="options-list" role="radiogroup" aria-label="Answer options">
+            {% set option_keys = ['A', 'B', 'C', 'D'] %}
+            {% set options = aq.options if aq.options else [aq.question.option_a, aq.question.option_b, aq.question.option_c, aq.question.option_d] %}
+            {% set q_idx = loop.index0 %}
+            {% for i in range(4) %}
+            <button class="option {{ 'selected' if existing_answers.get(aq.id | string, -1) | int == i }}"
+                    type="button" role="radio"
+                    aria-checked="{{ 'true' if existing_answers.get(aq.id | string, -1) | int == i else 'false' }}"
+                    data-option-index="{{ i }}"
+                    id="opt-{{ q_idx }}-{{ i }}">
+              <div class="option-key-avatar" aria-hidden="true">{{ option_keys[i] }}</div>
+              <span class="option-text">{{ options[i] if options | length > i else '' }}</span>
+              <div class="option-radio-indicator" aria-hidden="true">
+                <div class="radio-inner-dot"></div>
+              </div>
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Card Bottom Navigation -->
+        <div class="q-nav">
+          <button class="btn btn-ghost {{ 'btn-disabled' if loop.first }}"
+                  type="button" id="prev-btn-{{ loop.index0 }}"
+                  data-action="prev" data-current="{{ loop.index0 }}"
+                  {{ 'disabled' if loop.first }} aria-label="Previous question">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Previous</span>
+          </button>
+
+          {% if loop.last %}
+          <button class="btn btn-primary"
+                  type="button" id="final-submit-btn"
+                  data-action="confirm-submit" aria-label="Submit quiz">
+            <span>Submit Quiz</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          {% else %}
+          <button class="btn btn-primary"
+                  type="button" id="next-btn-{{ loop.index0 }}"
+                  data-action="next" data-current="{{ loop.index0 }}" aria-label="Next question">
+            <span>Next</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- Right Column: Exam Control Sidebar -->
+    <aside class="sidebar-panel" aria-label="Exam control sidebar">
+
+      <!-- Section 1: Time Remaining Card -->
+      <div class="panel-card time-panel-card" id="desktop-timer-card">
+        <div class="time-panel-left">
+          <div class="panel-header-row">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="panel-title">Time Remaining</span>
+          </div>
+          <div class="timer-large-value" id="timer-large-text" aria-live="polite">--:--</div>
+          <span class="timer-total-sub">Total Time: {{ attempt.subcategory.time_limit_minutes }}:00</span>
+        </div>
+
+        <div class="time-panel-right">
+          <div class="timer-ring-large" style="position:relative;">
+            <svg width="84" height="84" viewBox="0 0 90 90" aria-hidden="true">
+              <circle class="timer-ring-bg" cx="45" cy="45" r="38" stroke-width="5" fill="none"/>
+              <circle class="timer-ring-fill" id="timer-ring-large" cx="45" cy="45" r="38"
+                      stroke-dasharray="238.8" stroke-dashoffset="0" stroke-width="5"
+                      fill="none" stroke="var(--brand-purple)"/>
+            </svg>
+            <div class="timer-ring-inside">
+              <span class="ring-rem-label">Remaining</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Question Palette Card -->
+      <div class="panel-card" aria-label="Question palette">
+        <div class="panel-header-flex">
+          <div class="panel-header-row">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span class="panel-title">Question Palette</span>
+          </div>
+          <span class="palette-counter-badge" id="palette-counter-text">1 / {{ questions | length }}</span>
+        </div>
+
+        <div class="palette-grid" id="palette-grid" role="list">
+          {% for aq in questions %}
+          <button class="palette-btn {{ 'current' if loop.first }} {{ 'answered' if existing_answers.get(aq.id | string) is not none }} {{ 'bookmarked' if aq.is_bookmarked }}"
+                  type="button" data-order="{{ loop.index0 }}" role="listitem"
+                  id="palette-{{ loop.index0 }}" aria-label="Go to question {{ loop.index }}">
+            {{ loop.index }}
+          </button>
+          {% endfor %}
+        </div>
+
+        <div class="palette-legend" aria-label="Palette legend">
+          <div class="legend-item">
+            <span class="legend-dot dot-current" aria-hidden="true"></span>
+            <span>Current</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-answered" aria-hidden="true"></span>
+            <span>Answered</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-bookmarked" aria-hidden="true"></span>
+            <span>Bookmarked</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-unanswered" aria-hidden="true"></span>
+            <span>Unanswered</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Submit Quiz Button & Violation Badge -->
+      <div class="panel-card submit-card-box">
+        <button class="btn-submit-action" type="button" id="submit-quiz-btn" data-action="confirm-submit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span>Submit Quiz</span>
+        </button>
+
+        <div class="violations-badge" id="violation-badge" aria-live="polite">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span><strong id="violation-count">{{ attempt.violation_count }}</strong>/{{ max_violations }} violations</span>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+</div>
+
+<!-- ── CONFIRM DIALOG ────────────────────────────────────── -->
+<div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+  <div class="confirm-dialog">
+    <div style="width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto var(--s3);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand-purple-light)" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 class="confirm-title" id="confirm-title">Submit Quiz?</h2>
+    <p class="confirm-sub">You're about to submit. This action cannot be undone.</p>
+    <div class="confirm-stats" id="confirm-stats">
+      <div>
+        <div class="confirm-stat-value" id="cs-answered" style="color:var(--success);">0</div>
+        <div class="confirm-stat-label">Answered</div>
+      </div>
+      <div>
+        <div class="confirm-stat-value" id="cs-unanswered" style="color:var(--error);">0</div>
+        <div class="confirm-stat-label">Unanswered</div>
+      </div>
+      <div>
+        <div class="confirm-stat-value" id="cs-bookmarked" style="color:var(--warning);">0</div>
+        <div class="confirm-stat-label">Bookmarked</div>
+      </div>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" type="button" id="cancel-submit-btn" onclick="document.getElementById('confirm-overlay').classList.remove('active')">
+        Cancel
+      </button>
+      <form method="POST" action="{{ url_for('quiz.submit', attempt_id=attempt.id) }}" id="final-submit-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-primary" id="confirm-submit-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirm Submit
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── ANTI-CHEAT OVERLAY ─────────────────────────────────── -->
+<div class="anticheat-overlay" id="anticheat-overlay" role="alertdialog" aria-modal="true" aria-labelledby="anticheat-title">
+  <div class="anticheat-dialog">
+    <div class="anticheat-icon" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <h2 class="anticheat-title" id="anticheat-title">Integrity Warning</h2>
+    <p style="color:var(--text-2);font-size:14px;line-height:1.65;margin-bottom:var(--s3);" id="anticheat-message">
+      A suspicious action was detected. Please return to the quiz immediately.
+    </p>
+    <div class="anticheat-remaining" id="anticheat-remaining">
+      Violations: <strong id="anticheat-violation-num">1</strong> / {{ max_violations }}
+    </div>
+    <button class="btn btn-primary" type="button" id="anticheat-dismiss-btn"
+            style="margin-top:var(--s4);width:100%;">
+      Return to Quiz
+    </button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/quiz-engine.js') }}"></script>
+<script src="{{ url_for('static', filename='js/anti-cheat.js') }}"></script>
+{% endblock %}

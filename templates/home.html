@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% set load_charts = false %}
+
+{% block title %}QuizNova — Challenge Your Mind. Unlock Your Potential.{% endblock %}
+{% block meta_description %}AI-powered production-ready quiz platform for college students, placement prep, competitive exams, and programming practice. 1200+ questions, anti-cheat engine, verifiable certificates.{% endblock %}
+
+{% block content %}
+
+<!-- Top Continuous Marquee Announcement Bar (Full Width) -->
+{% if announcement_competitions %}
+<div class="marquee-container" aria-label="Live Competition Announcements">
+  <div class="marquee-track">
+    {% for i in range(4) %}
+      {% for comp in announcement_competitions %}
+      <a href="{{ url_for('competitions.detail', slug=comp.slug) }}" class="marquee-item">
+        <span class="badge badge-error" style="animation:pulseGlow 2s infinite;">🏆 CONTEST</span>
+        <span>{{ comp.title }} — Registration Open (Prize: {{ comp.prize_pool_text | replace('$', '₹') }})</span>
+        <span style="color:var(--brand-cyan);">View Details →</span>
+      </a>
+      <span style="color:rgba(255,255,255,0.2);">•</span>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     1. HERO SECTION
+════════════════════════════════════════════════════════ -->
+<section class="hero-section" aria-label="Hero">
+  <canvas id="particles-canvas" aria-hidden="true" style="position:absolute;inset:0;z-index:0;pointer-events:none;"></canvas>
+
+  <div class="hero-glow-1" aria-hidden="true"></div>
+  <div class="hero-glow-2" aria-hidden="true"></div>
+
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="hero-grid">
+
+      <!-- LEFT COLUMN (55%) -->
+      <div class="hero-left">
+
+        <div class="section-eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          AI-Powered Learning Platform
+        </div>
+
+        <h1 class="hero-title">
+          Challenge Your Mind.<br>Unlock Your <span class="text-gradient">Potential.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Explore 1200+ quizzes across 12+ domains. Learn. Compete. Grow. Achieve.
+        </p>
+
+        <div class="hero-cta">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary btn-lg" id="hero-start-quiz-btn">
+              Start Your Quiz →
+            </a>
+            <a href="{{ url_for('quiz.categories') }}" class="btn btn-ghost btn-lg" id="hero-explore-cats-btn">
+              Explore Categories
+            </a>
+          {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg" id="hero-start-quiz-btn">
+              Start Your Quiz →
+            </a>
+            <a href="{{ url_for('quiz.categories') }}" class="btn btn-ghost btn-lg" id="hero-explore-cats-btn">
+              Explore Categories
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Trusted Learners Stack -->
+        <div style="display:flex;align-items:center;gap:12px;margin-top:var(--s2);">
+          <div style="display:flex;align-items:center;">
+            <img src="{{ url_for('static', filename='images/security_badge.jpg') }}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-0);" alt="User 1">
+            <img src="{{ url_for('static', filename='images/hero_hologram.jpg') }}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-0);margin-left:-8px;" alt="User 2">
+            <img src="{{ url_for('static', filename='images/rocket_launch.jpg') }}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-0);margin-left:-8px;" alt="User 3">
+          </div>
+          <span style="font-size:12px;color:var(--text-2);font-weight:500;">Trusted by learners worldwide · <strong style="color:var(--text-1);">10K+</strong></span>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN (45%) -->
+      <div class="hero-right">
+        <div class="hero-globe-card">
+          <img src="{{ url_for('static', filename='images/hero_hologram.jpg') }}"
+               alt="3D Holographic Quiz Sphere" class="hero-globe-img">
+          <div class="hero-badge-pip pip-top-left">🏆 10K+ Certs</div>
+          <div class="hero-badge-pip pip-mid-right">🤖 AI-Ready</div>
+          <div class="hero-badge-pip pip-bottom-left">⚡ 1200+ Qs</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     2. FIVE-CARD STATS ROW
+════════════════════════════════════════════════════════ -->
+<section class="section-sm" aria-label="Platform Stats">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;" data-aos="fade-up">
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--text-1);">50K+</div>
+          <div style="font-size:11px;color:var(--text-2);">Active Learners</div>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(138,99,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--brand-purple-light);">25K+</div>
+          <div style="font-size:11px;color:var(--text-2);">Quizzes Completed</div>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(57,200,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-cyan);flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--brand-cyan);">10K+</div>
+          <div style="font-size:11px;color:var(--text-2);">Certificates Issued</div>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;color:var(--warning);flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--warning);">1200+</div>
+          <div style="font-size:11px;color:var(--text-2);">Quiz Questions</div>
+        </div>
+      </div>
+
+      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;color:var(--success);flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--success);">99.5%</div>
+          <div style="font-size:11px;color:var(--text-2);">Satisfaction Rate</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     3. TOP CATEGORIES
+════════════════════════════════════════════════════════ -->
+<section class="section" id="categories" aria-label="Top Categories">
+  <div class="container">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s5);" data-aos="fade-up">
+      <div>
+        <h2 class="font-display" style="font-size:1.6rem;font-weight:800;color:white;">
+          Top Categories
+        </h2>
+      </div>
+      <a href="{{ url_for('quiz.categories') }}" style="font-size:13px;font-weight:600;color:var(--brand-purple-light);text-decoration:none;" id="view-all-cats-link">
+        View All Categories →
+      </a>
+    </div>
+
+    <!-- Perfectly Aligned Responsive Grid -->
+    <div class="top-cats-grid">
+      {% set featured_cats = [
+        ('Programming', 'programming', '960+ Quizzes', 'cat_programming.jpg'),
+        ('Data Science', 'dsa', '850+ Quizzes', 'cat_dsa.jpg'),
+        ('Web Development', 'web-development', '750+ Quizzes', 'cat_webdev.jpg'),
+        ('AI & Machine Learning', 'artificial-intelligence', '620+ Quizzes', 'cat_ai.jpg'),
+        ('Databases', 'databases', '580+ Quizzes', 'cat_databases.jpg')
+      ] %}
+
+      {% for name, slug, qcount, img in featured_cats %}
+      <a href="{{ url_for('quiz.subcategories', category_slug=slug) }}"
+         class="top-cat-card"
+         data-aos="fade-up" data-aos-delay="{{ loop.index0 * 60 }}">
+
+        <!-- Image Container (Flush to top, no top spacing) -->
+        <div class="top-cat-img-wrap">
+          <img src="{{ url_for('static', filename='images/categories/' + img) }}" alt="{{ name }}" class="top-cat-img">
+        </div>
+
+        <!-- Text Body (18-20px padding) -->
+        <div class="top-cat-body">
+          <h3 class="font-display top-cat-title">{{ name }}</h3>
+          <span class="top-cat-count">{{ qcount }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .top-cats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+  @media (max-width: 1100px) {
+    .top-cats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 768px) {
+    .top-cats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .top-cats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .top-cat-card {
+    background: var(--g-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 18px;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .top-cat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 58, 237, 0.5);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+  }
+
+  .top-cat-img-wrap {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-2);
+    border-radius: 17px 17px 0 0;
+  }
+  .top-cat-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 17px 17px 0 0;
+    transition: transform 0.35s ease;
+  }
+  .top-cat-card:hover .top-cat-img {
+    transform: scale(1.05);
+  }
+
+  .top-cat-body {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    gap: 8px;
+  }
+
+  .top-cat-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .top-cat-count {
+    font-size: 12px;
+    color: var(--text-2);
+    font-weight: 500;
+  }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════
+     4. AI RECOMMENDATION BANNER
+════════════════════════════════════════════════════════ -->
+<section class="section-sm" aria-label="AI Recommendation">
+  <div class="container">
+    <div class="card p-5" style="background:linear-gradient(135deg, rgba(15,21,53,0.9), rgba(108,99,255,0.12));border:1px solid rgba(108,99,255,0.3);display:grid;grid-template-columns:1fr 340px;align-items:center;gap:30px;" data-aos="fade-up">
+      <div>
+        <h2 class="font-display" style="font-size:clamp(1.5rem,3.5vw,2.25rem);font-weight:800;margin-bottom:10px;">
+          AI Recommends. You Learn. You Win.
+        </h2>
+        <p style="font-size:15px;color:var(--text-2);line-height:1.6;margin-bottom:20px;max-width:480px;">
+          Personalized quizzes, smart analytics, and real-time performance tracking tailored to your learning goals.
+        </p>
+        <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary btn-md" id="ai-learn-more-btn">Learn More</a>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='images/ai_recommend_robot.jpg') }}" alt="AI Robot Assistant" style="width:100%;max-width:300px;border-radius:16px;box-shadow:0 0 30px rgba(108,99,255,0.3);">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     5. LEADERBOARD & PLATFORM HIGHLIGHTS
+════════════════════════════════════════════════════════ -->
+<section class="section" aria-label="Leaderboard and Highlights">
+  <div class="container">
+    <div class="grid-2" style="gap:24px;">
+
+      <!-- Leaderboard Preview Card -->
+      <div class="card p-4" data-aos="fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h3 class="font-display" style="font-size:16px;font-weight:700;">Leaderboard <span style="font-size:12px;color:var(--text-2);font-weight:400;">(This Week)</span></h3>
+          <a href="{{ url_for('quiz.leaderboard') }}" style="font-size:12px;color:var(--brand-purple-light);text-decoration:none;" id="view-full-lb-link">View Full Leaderboard →</a>
+        </div>
+
+        {% set top_performers = [
+          (1, 'Arjun Verma', '12,450 XP', '🥇'),
+          (2, 'Priya Sharma', '9,870 XP', '🥈'),
+          (3, 'Rohit Singh', '8,210 XP', '🥉'),
+          (4, 'Neha Gupta', '6,980 XP', '⭐'),
+          (5, 'Karan Patel', '5,430 XP', '⭐')
+        ] %}
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          {% for r, name, xp, badge in top_performers %}
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-2);border-radius:var(--r-md);font-size:13px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:16px;">{{ badge }}</span>
+              <span style="font-weight:600;color:var(--text-1);">{{ name }}</span>
+            </div>
+            <span style="color:var(--brand-cyan);font-weight:700;">{{ xp }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Platform Highlights Card -->
+      <div class="card p-4" style="display:grid;grid-template-columns:1fr 140px;align-items:center;gap:20px;" data-aos="fade-up" data-aos-delay="60">
+        <div>
+          <h3 class="font-display" style="font-size:16px;font-weight:700;margin-bottom:16px;">Platform Highlights</h3>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--text-2);">
+            <li style="display:flex;align-items:center;gap:8px;"><span class="badge badge-purple" style="font-size:10px;">✓</span> 1200+ Unique Quizzes</li>
+            <li style="display:flex;align-items:center;gap:8px;"><span class="badge badge-purple" style="font-size:10px;">✓</span> 12+ Knowledge Domains</li>
+            <li style="display:flex;align-items:center;gap:8px;"><span class="badge badge-purple" style="font-size:10px;">✓</span> Detailed Performance Analytics</li>
+            <li style="display:flex;align-items:center;gap:8px;"><span class="badge badge-purple" style="font-size:10px;">✓</span> Verified Certificates</li>
+            <li style="display:flex;align-items:center;gap:8px;"><span class="badge badge-purple" style="font-size:10px;">✓</span> Real-time Leaderboard</li>
+          </ul>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;">
+          <img src="{{ url_for('static', filename='images/golden_trophy.jpg') }}" alt="Golden Trophy" style="width:100%;max-width:130px;border-radius:12px;box-shadow:0 0 24px rgba(245,158,11,0.25);">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     6. BOTTOM CTA BANNER
+════════════════════════════════════════════════════════ -->
+<section class="section-sm" aria-label="Bottom CTA">
+  <div class="container">
+    <div class="card p-5" style="background:linear-gradient(135deg, rgba(108,99,255,0.18), rgba(57,200,255,0.1));border:1px solid rgba(108,99,255,0.3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;" data-aos="fade-up">
+      <div>
+        <h2 class="font-display" style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin-bottom:6px;">
+          Join Thousands Of Learners Today!
+        </h2>
+        <p style="font-size:14px;color:var(--text-2);">Start your learning journey and become the best version of yourself.</p>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:16px;">
+        {% if not current_user.is_authenticated %}
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg" id="bottom-cta-register-btn">Create Free Account</a>
+        {% else %}
+          <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary btn-lg" id="bottom-cta-start-btn">Start Quiz Now</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

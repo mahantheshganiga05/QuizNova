@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Settings — QuizNova{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+  {% include 'partials/_sidebar.html' %}
+
+  <main class="dash-main" aria-label="Account settings">
+
+    <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <!-- Header -->
+    <div class="dash-topbar" style="margin-bottom:var(--s2);">
+      <div>
+        <h1 class="font-display" style="font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:800;">Settings</h1>
+        <p style="font-size:14px;color:var(--text-2);">Manage your account information and security.</p>
+      </div>
+    </div>
+
+    <div class="settings-layout">
+
+      <!-- ── Profile Section ─────────────────────────────── -->
+      <div class="card settings-section p-5" data-aos="fade-up">
+        <div class="settings-section-header">
+          <h2 class="settings-section-title">Profile</h2>
+          <p class="settings-section-desc">Update your public profile information.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('dashboard.settings') }}" enctype="multipart/form-data" novalidate class="settings-form" id="profile-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="update_profile">
+
+          <!-- Avatar Upload -->
+          <div class="avatar-upload">
+            <div class="avatar-preview" id="avatar-preview" aria-label="Current profile photo">
+              <img src="{{ current_user.profile_photo_url }}" alt="{{ current_user.display_name }}"
+                   id="avatar-img" onerror="this.style.display='none'">
+            </div>
+            <div class="avatar-upload-actions">
+              <label class="btn btn-ghost btn-sm" for="photo-input" style="cursor:pointer;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Photo
+              </label>
+              <input type="file" id="photo-input" name="profile_photo" accept="image/jpeg,image/png,image/webp"
+                     class="avatar-file-input" aria-label="Upload profile photo">
+              <p style="font-size:11px;color:var(--text-3);">JPG, PNG, WebP · max 2MB</p>
+            </div>
+          </div>
+
+          <!-- Display Name -->
+          <div class="form-group">
+            <label class="form-label" for="display_name">Display Name</label>
+            <input type="text" id="display_name" name="display_name" class="input"
+                   value="{{ current_user.display_name or '' }}" placeholder="Your full name">
+          </div>
+
+          <!-- Username (read-only) -->
+          <div class="form-group">
+            <label class="form-label" for="username_display">Username</label>
+            <input type="text" id="username_display" class="input" value="{{ current_user.username }}"
+                   readonly style="opacity:0.6;cursor:not-allowed;" aria-readonly="true">
+            <span class="form-hint">Username cannot be changed after registration.</span>
+          </div>
+
+          <!-- Email (read-only) -->
+          <div class="form-group">
+            <label class="form-label" for="email_display">Email Address</label>
+            <input type="text" id="email_display" class="input" value="{{ current_user.email }}"
+                   readonly style="opacity:0.6;cursor:not-allowed;" aria-readonly="true">
+          </div>
+
+          <div>
+            <button type="submit" class="btn btn-primary" id="save-profile-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── Security Section ────────────────────────────── -->
+      <div class="card settings-section p-5" data-aos="fade-up" data-aos-delay="60">
+        <div class="settings-section-header">
+          <h2 class="settings-section-title">Security</h2>
+          <p class="settings-section-desc">Update your password to keep your account secure.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('dashboard.settings') }}" novalidate class="settings-form" id="password-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="change_password">
+
+          <div class="form-group">
+            <label class="form-label" for="current_password">Current Password</label>
+            <div class="input-wrap">
+              <input type="password" id="current_password" name="current_password" class="input"
+                     placeholder="Enter current password" autocomplete="current-password">
+              <button type="button" class="input-icon" onclick="togglePw('current_password', this)" aria-label="Toggle password visibility">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new_password">New Password</label>
+            <div class="input-wrap">
+              <input type="password" id="new_password" name="new_password" class="input"
+                     placeholder="Min 8 characters" autocomplete="new-password">
+              <button type="button" class="input-icon" onclick="togglePw('new_password', this)" aria-label="Toggle password visibility">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm_new_password">Confirm New Password</label>
+            <input type="password" id="confirm_new_password" name="confirm_new_password" class="input"
+                   placeholder="Repeat new password" autocomplete="new-password">
+          </div>
+
+          <div>
+            <button type="submit" class="btn btn-ghost" id="change-password-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── Danger Zone ─────────────────────────────────── -->
+      <div class="card settings-section danger-section p-5" data-aos="fade-up" data-aos-delay="120">
+        <div class="settings-section-header">
+          <h2 class="settings-section-title" style="color:var(--error);">Danger Zone</h2>
+          <p class="settings-section-desc">Irreversible actions. Proceed with extreme caution.</p>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--s3);padding:var(--s3);background:rgba(239,68,68,0.04);border-radius:var(--r-md);border:1px solid rgba(239,68,68,0.15);">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:4px;">Delete Account</div>
+            <div style="font-size:13px;color:var(--text-3);">Permanently delete your account, all quizzes, and certificates. Cannot be undone.</div>
+          </div>
+          <button type="button" class="btn btn-danger btn-sm" id="delete-account-btn"
+                  onclick="if(confirm('Are you absolutely sure? This will permanently delete your account and ALL data. Type DELETE to confirm.') && prompt('Type DELETE to confirm:') === 'DELETE') { document.getElementById('delete-account-form').submit(); }">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            Delete Account
+          </button>
+          <form id="delete-account-form" method="POST" action="{{ url_for('dashboard.settings') }}" style="display:none;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="delete_account">
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Avatar preview
+const photoInput = document.getElementById('photo-input');
+const avatarImg  = document.getElementById('avatar-img');
+if (photoInput && avatarImg) {
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      avatarImg.src = e.target.result;
+      avatarImg.style.display = '';
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Password toggle helper
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+</script>
+{% endblock %}

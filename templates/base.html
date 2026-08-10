@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050816">
+  <meta name="description" content="{% block meta_description %}QuizNova — AI-Ready Quiz Platform for Students, Developers & Competitive Exam Aspirants.{% endblock %}">
+  <meta property="og:title"       content="{% block og_title %}QuizNova{% endblock %}">
+  <meta property="og:description" content="{% block og_desc %}Test your knowledge. Ignite your potential.{% endblock %}">
+  <meta property="og:type"        content="website">
+  <title>{% block title %}QuizNova — Test Your Knowledge{% endblock %}</title>
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+  <!-- Core Design System (Loaded First) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- AOS -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+
+  {% block extra_css %}{% endblock %}
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="loader-logo-wrap" style="display:flex;align-items:center;gap:12px;">
+      <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova" style="width:48px;height:48px;border-radius:14px;object-fit:cover;box-shadow:0 0 25px rgba(124,58,237,0.5);">
+      <span class="loader-logo-text" style="font-family:'Poppins',sans-serif;font-weight:800;font-size:24px;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></span>
+    </div>
+    <div class="loader-ring"></div>
+  </div>
+
+  <!-- Flash Messages -->
+  <div class="flash-container" role="alert" aria-live="polite">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}" role="alert">
+          {% if category == 'success' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          {% elif category == 'error' or category == 'danger' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          {% elif category == 'warning' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {% endif %}
+          <span class="flash-text">{{ message }}</span>
+          <button class="flash-close" aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <!-- Navbar -->
+  {% block navbar %}
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar-inner">
+
+      <!-- Logo -->
+      <a href="{{ url_for('public.home') }}" class="nav-logo" aria-label="QuizNova Home">
+        <div class="nav-logo-mark" aria-hidden="true" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+          <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="Q" style="width:34px;height:34px;object-fit:cover;">
+        </div>
+        <span class="nav-logo-text" style="font-family:var(--font-display);font-weight:800;font-size:20px;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></span>
+      </a>
+
+      <!-- Links -->
+      <ul class="nav-links" role="list">
+        <li><a href="{{ url_for('public.home') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'public.home' }}">Home</a></li>
+        <li><a href="{{ url_for('quiz.categories') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'quiz.categories' }}">Categories</a></li>
+        <li><a href="{{ url_for('competitions.index') }}"
+               class="nav-link {{ 'active' if 'competitions' in (request.endpoint or '') }}">🏆 Competitions</a></li>
+        <li><a href="{{ url_for('quiz.leaderboard') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'quiz.leaderboard' }}">Leaderboard</a></li>
+        <li><a href="{{ url_for('public.pricing') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'public.pricing' }}">Pricing</a></li>
+        <li><a href="{{ url_for('public.about') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'public.about' }}">About</a></li>
+        <li><a href="{{ url_for('public.contact') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'public.contact' }}">Contact</a></li>
+        {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('dashboard.index') }}"
+               class="nav-link {{ 'active' if 'dashboard' in (request.endpoint or '') }}">Dashboard</a></li>
+        {% endif %}
+      </ul>
+
+      <!-- Quick Search + Dark Toggle + Actions -->
+      <div class="nav-actions">
+
+        <div style="position:relative;display:flex;align-items:center;" class="hidden-mobile">
+          <input type="text" placeholder="Search quizzes..." id="global-nav-search"
+                 style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-full);padding:6px 14px 6px 32px;font-size:12px;color:var(--text-1);outline:none;width:160px;transition:all var(--t-fast);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" style="position:absolute;left:10px;" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+
+        <button type="button" class="btn-icon-sm btn-ghost" title="Toggle Theme" aria-label="Toggle Theme" style="border-radius:50%;">
+          🌙
+        </button>
+
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('dashboard.index') }}" class="nav-avatar" title="{{ current_user.display_name }}">
+            <img src="{{ current_user.profile_photo_url }}"
+                 alt="{{ current_user.display_name }}"
+                 onerror="this.style.display='none'">
+          </a>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm" id="nav-logout-btn">Log Out</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}"    class="btn btn-ghost btn-sm"    id="nav-login-btn">Log In</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm"  id="nav-register-btn">Sign Up</a>
+        {% endif %}
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </nav>
+  {% endblock %}
+
+  <!-- Main Content -->
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  {% block footer %}
+  <footer class="footer" aria-label="Site footer">
+    <div class="container">
+
+      <!-- Top Newsletter / Stay Updated Bar -->
+      <div class="card p-5" style="background:linear-gradient(135deg, rgba(108,99,255,0.12), rgba(57,200,255,0.06));border-color:rgba(108,99,255,0.25);margin-bottom:var(--s8);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--g-brand);display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <h3 class="font-display" style="font-size:16px;font-weight:700;">Stay Updated!</h3>
+            <p style="font-size:12px;color:var(--text-2);">Subscribe to our newsletter for latest quizzes, offers and updates.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;" class="w-mobile-full">
+          <input type="email" placeholder="Enter your email" style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-full);padding:10px 16px;font-size:13px;color:var(--text-1);outline:none;min-width:240px;">
+          <button class="btn btn-primary btn-sm" type="button" onclick="alert('Subscribed successfully!')">Subscribe</button>
+        </div>
+      </div>
+
+      <div class="footer-grid">
+
+        <!-- Brand -->
+        <div>
+          <a href="{{ url_for('public.home') }}" class="nav-logo" style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+            <div class="nav-logo-mark" aria-hidden="true" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+              <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="Q" style="width:34px;height:34px;object-fit:cover;">
+            </div>
+            <span class="nav-logo-text" style="font-family:'Poppins',sans-serif;font-weight:800;font-size:20px;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></span>
+          </a>
+          <p class="footer-brand-desc" style="margin-top:12px;font-size:13px;color:var(--text-2);">
+            Empowering learners to achieve more every day.
+          </p>
+        </div>
+
+        <!-- Platform -->
+        <div>
+          <p class="footer-col-title">Platform</p>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('public.home') }}"       class="footer-link">Home</a></li>
+            <li><a href="{{ url_for('quiz.categories') }}"   class="footer-link">Categories</a></li>
+            <li><a href="{{ url_for('quiz.categories') }}"   class="footer-link">Quizzes</a></li>
+            <li><a href="{{ url_for('quiz.leaderboard') }}"  class="footer-link">Leaderboard</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div>
+          <p class="footer-col-title">Resources</p>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('public.about') }}"   class="footer-link">Blog</a></li>
+            <li><a href="{{ url_for('public.about') }}"   class="footer-link">Guides</a></li>
+            <li><a href="{{ url_for('public.contact') }}" class="footer-link">Help Center</a></li>
+            <li><a href="{{ url_for('public.faq') }}"     class="footer-link">FAQ</a></li>
+          </ul>
+        </div>
+
+        <!-- Company & Legal -->
+        <div>
+          <p class="footer-col-title">Company & Legal</p>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('public.about') }}"   class="footer-link">About Us</a></li>
+            <li><a href="{{ url_for('public.contact') }}" class="footer-link">Contact Us</a></li>
+            <li><a href="#" class="footer-link">Terms of Service</a></li>
+            <li><a href="#" class="footer-link">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom" style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);margin-top:var(--s6);padding-top:var(--s4);">
+        <p class="footer-copy" style="font-size:12px;color:var(--text-3);">&copy; {{ now.year }} QuizNova. All rights reserved.</p>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="{{ url_for('static', filename='images/security_badge.jpg') }}" alt="Security Shield" style="width:28px;height:28px;border-radius:50%;">
+          <span style="font-size:11px;color:var(--text-3);">Safe. Secure. Trusted by Thousands.</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+  {% endblock %}
+
+  <!-- Scripts -->
+  <script>
+    window.CSRF_TOKEN = "{{ csrf_token() }}";
+    {% if current_user.is_authenticated %}
+    window.CURRENT_USER_ID = {{ current_user.id }};
+    window.IS_ADMIN = {{ current_user.is_admin | tojson }};
+    {% endif %}
+  </script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+
+  <!-- AOS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
+
+  {% if load_charts is defined and load_charts %}
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  {% endif %}
+
+  <!-- App JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

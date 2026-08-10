@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}User Management — QuizNova Admin{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+
+{% block content %}
+<div class="dash-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="main-sidebar">
+    <a href="{{ url_for('public.home') }}" class="sidebar-logo">
+      <div class="sidebar-logo-mark" style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova Logo" style="width:34px;height:34px;object-fit:cover;border-radius:10px;">
+      </div>
+      <span class="sidebar-logo-text font-display" style="font-weight:800;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span> <span style="font-size:10px;color:var(--brand-purple-light);background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px;">ADMIN</span></span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <p class="nav-section-label">MANAGEMENT</p>
+      <a href="{{ url_for('admin.dashboard') }}" class="sidebar-item">📊 Dashboard</a>
+      <a href="{{ url_for('admin.categories') }}" class="sidebar-item">📁 Categories</a>
+      <a href="{{ url_for('admin.subcategories') }}" class="sidebar-item">📑 Subcategories</a>
+      <a href="{{ url_for('admin.questions') }}" class="sidebar-item">❓ Question Bank</a>
+      <a href="{{ url_for('admin.users') }}" class="sidebar-item active">👥 Users & Roles</a>
+      
+      <p class="nav-section-label">ANALYTICS & EXPORTS</p>
+      <a href="{{ url_for('admin.analytics') }}" class="sidebar-item">📈 Analytics</a>
+      <a href="{{ url_for('admin.certificates') }}" class="sidebar-item">📜 Certificates</a>
+      <a href="{{ url_for('admin.export_data', resource='results') }}" class="sidebar-item">📥 Export Results</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dash-main">
+    <div class="dash-topbar" style="margin-bottom:24px;">
+      <div>
+        <h1 class="font-display" style="font-size:24px;font-weight:800;color:white;">User & Role Management</h1>
+        <p style="font-size:13px;color:var(--text-2);">Manage platform accounts, permissions, and status.</p>
+      </div>
+      <a href="{{ url_for('admin.export_data', resource='users') }}" class="btn btn-ghost btn-sm">📥 Export Users CSV</a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card p-3" style="margin-bottom:20px;">
+      <form method="GET" action="{{ url_for('admin.users') }}" style="display:flex;gap:12px;align-items:center;">
+        <input type="text" name="search" class="input" placeholder="Search by username or email..." value="{{ search or '' }}" style="flex:1;">
+        <select name="role" class="input select" style="width:160px;" onchange="this.form.submit()">
+          <option value="">All Roles</option>
+          <option value="student" {{ 'selected' if role_filter == 'student' else '' }}>Student</option>
+          <option value="admin" {{ 'selected' if role_filter == 'admin' else '' }}>Admin</option>
+        </select>
+        <button type="submit" class="btn btn-ghost btn-sm">Filter</button>
+      </form>
+    </div>
+
+    <!-- User Table -->
+    <div class="card p-4">
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in pagination.items %}
+            <tr>
+              <td style="font-weight:700;color:white;">{{ u.username }}</td>
+              <td style="font-size:12px;color:var(--text-2);">{{ u.email }}</td>
+              <td><span class="badge {{ 'badge-purple' if u.is_admin else 'badge-neutral' }}">{{ u.role }}</span></td>
+              <td><span class="badge {{ 'badge-success' if u.is_active else 'badge-error' }}">{{ 'Active' if u.is_active else 'Banned' }}</span></td>
+              <td style="font-size:12px;color:var(--text-3);">{{ u.created_at | time_ago if u.created_at else '' }}</td>
+              <td>
+                {% if not u.is_admin %}
+                <form method="POST" action="{{ url_for('admin.toggle_ban', user_id=u.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-ghost btn-sm" style="color:{{ 'var(--error)' if u.is_active else 'var(--success)' }};">
+                    {{ 'Ban' if u.is_active else 'Unban' }}
+                  </button>
+                </form>
+                {% else %}
+                <span style="font-size:11px;color:var(--text-3);">Protected</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if pagination.pages > 1 %}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <span style="font-size:12px;color:var(--text-2);">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+        <div style="display:flex;gap:6px;">
+          {% if pagination.has_prev %}
+          <a href="{{ url_for('admin.users', page=pagination.prev_num, search=search, role=role_filter) }}" class="btn btn-ghost btn-sm">← Previous</a>
+          {% endif %}
+          {% if pagination.has_next %}
+          <a href="{{ url_for('admin.users', page=pagination.next_num, search=search, role=role_filter) }}" class="btn btn-ghost btn-sm">Next →</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,313 @@
+{% extends "admin/base.html" %}
+{% block title %}Create Competition — QuizNova Admin{% endblock %}
+
+{% block extra_admin_css %}
+<style>
+  .form-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .form-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brand-purple-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 768px) {
+    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px; }
+  .banner-upload-zone {
+    border: 2px dashed rgba(124,58,237,0.4);
+    border-radius: var(--r-md);
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .banner-upload-zone:hover { border-color: var(--brand-purple-light); background: rgba(124,58,237,0.05); }
+  .toggle-switch { position:relative; display:inline-block; width:44px; height:24px; }
+  .toggle-switch input { opacity:0; width:0; height:0; }
+  .toggle-slider { position:absolute; cursor:pointer; inset:0; background:rgba(255,255,255,0.1); border-radius:34px; transition:.3s; }
+  .toggle-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:var(--text-2); border-radius:50%; transition:.3s; }
+  input:checked + .toggle-slider { background:var(--brand-purple); }
+  input:checked + .toggle-slider:before { transform:translateX(20px); background:white; }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1 class="admin-page-title">🏆 Create Competition</h1>
+    <p class="admin-page-sub">Fill in all the details to create a new competition event.</p>
+  </div>
+  <a href="{{ url_for('admin.competitions') }}" class="btn btn-ghost">← Back to Competitions</a>
+</div>
+
+<form method="POST" action="{{ url_for('admin.create_competition') }}" enctype="multipart/form-data" id="comp-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start;">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+      <!-- Basic Info -->
+      <div class="form-section">
+        <div class="form-section-title">📝 Basic Information</div>
+
+        <div class="form-group">
+          <label class="form-label">Competition Title *</label>
+          <input type="text" name="title" class="input" placeholder="e.g. National Python & AI Championship 2026" required style="width:100%;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Subtitle / Tagline</label>
+          <input type="text" name="short_description" class="input" placeholder="e.g. Test your AI skills against the best coders in India" style="width:100%;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Description</label>
+          <textarea name="full_description" class="input" rows="5" placeholder="Detailed description of the competition, what participants will gain, topics covered..." style="width:100%;resize:vertical;"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">Category</label>
+            <select name="category_id" class="input" style="width:100%;">
+              <option value="">— Select Category —</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Competition Type</label>
+            <select name="comp_type" class="input" style="width:100%;">
+              <option value="quiz">📝 Quiz Competition</option>
+              <option value="coding">💻 Coding Challenge</option>
+              <option value="aptitude">🧮 Aptitude Test</option>
+              <option value="technical">⚙️ Technical Contest</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">Difficulty</label>
+            <select name="difficulty" class="input" style="width:100%;">
+              <option value="beginner">🟢 Beginner</option>
+              <option value="intermediate" selected>🟡 Intermediate</option>
+              <option value="advanced">🔴 Advanced</option>
+              <option value="expert">⚡ Expert</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Sponsor / Organizer</label>
+            <input type="text" name="sponsor_name" class="input" placeholder="QuizNova AI" style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="form-section">
+        <div class="form-section-title">📅 Dates & Duration</div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Registration Start *</label>
+            <input type="datetime-local" name="reg_start_date" class="input" style="width:100%;" required>
+          </div>
+          <div>
+            <label class="form-label">Registration End *</label>
+            <input type="datetime-local" name="reg_end_date" class="input" style="width:100%;" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Competition Start *</label>
+            <input type="datetime-local" name="start_date" class="input" style="width:100%;" required>
+          </div>
+          <div>
+            <label class="form-label">Competition End *</label>
+            <input type="datetime-local" name="end_date" class="input" style="width:100%;" required>
+          </div>
+        </div>
+        <div class="form-row-3">
+          <div>
+            <label class="form-label">Duration (minutes)</label>
+            <input type="number" name="duration_minutes" class="input" value="45" min="5" max="480" style="width:100%;">
+          </div>
+          <div>
+            <label class="form-label">Total Questions</label>
+            <input type="number" name="total_questions" class="input" value="20" min="1" max="200" style="width:100%;">
+          </div>
+          <div>
+            <label class="form-label">Max Participants</label>
+            <input type="number" name="max_participants" class="input" value="1000" min="1" style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Prize Pool -->
+      <div class="form-section">
+        <div class="form-section-title">🎁 Prize Pool</div>
+        <div class="form-group">
+          <label class="form-label">Prize Pool Summary (shown on card)</label>
+          <input type="text" name="prize_pool_text" class="input" placeholder="e.g. ₹1,00,000 Prize Pool" value="₹1,00,000 Prize Pool" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🥇 First Prize</label>
+          <input type="text" name="prize_1st" class="input" placeholder="Gold Trophy + ₹50,000 + Certificate" value="🥇 Gold Trophy + ₹50,000 Amazon Gift Card + Certificate" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🥈 Second Prize</label>
+          <input type="text" name="prize_2nd" class="input" placeholder="Silver Medal + ₹30,000 + Certificate" value="🥈 Silver Medal + ₹30,000 Gift Card + Certificate" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">🥉 Third Prize</label>
+          <input type="text" name="prize_3rd" class="input" placeholder="Bronze Medal + ₹20,000 + Certificate" value="🥉 Bronze Medal + ₹20,000 Gift Card + Certificate" style="width:100%;">
+        </div>
+      </div>
+
+      <!-- Rules & Eligibility -->
+      <div class="form-section">
+        <div class="form-section-title">📋 Rules & Eligibility</div>
+        <div class="form-group">
+          <label class="form-label">Competition Rules</label>
+          <textarea name="rules_text" class="input" rows="5" placeholder="• Each question carries 1 mark&#10;• No negative marking&#10;• Internet search is not allowed&#10;• Results are final and binding" style="width:100%;resize:vertical;"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Eligibility Criteria</label>
+          <textarea name="eligibility_text" class="input" rows="3" placeholder="• Open to all engineering and science students&#10;• Must be a registered QuizNova student" style="width:100%;resize:vertical;"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN (Sidebar) -->
+    <div>
+
+      <!-- Status & Settings -->
+      <div class="form-section">
+        <div class="form-section-title">⚙️ Status & Settings</div>
+
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select name="status" class="input" style="width:100%;">
+            <option value="draft">📝 Draft</option>
+            <option value="published" selected>📢 Published (Visible to Students)</option>
+            <option value="live">🟢 Live (Active Now)</option>
+            <option value="completed">✅ Completed</option>
+          </select>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:white;">⭐ Featured Competition</div>
+            <div style="font-size:11px;color:var(--text-3);">Show on homepage featured section</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" name="is_featured">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:white;">🔥 Trending</div>
+            <div style="font-size:11px;color:var(--text-3);">Show trending badge on card</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" name="is_trending">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:white;">📜 Certificate</div>
+            <div style="font-size:11px;color:var(--text-3);">Issue certificate to participants</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" name="cert_enabled" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:white;">📊 Leaderboard</div>
+            <div style="font-size:11px;color:var(--text-3);">Show live leaderboard</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" name="leaderboard_enabled" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Banner Upload -->
+      <div class="form-section">
+        <div class="form-section-title">🖼 Banner Image</div>
+        <div class="banner-upload-zone" onclick="document.getElementById('banner-file').click();">
+          <div style="font-size:32px;margin-bottom:8px;">📸</div>
+          <div style="font-weight:600;color:white;margin-bottom:4px;">Upload Banner Image</div>
+          <div style="font-size:11px;color:var(--text-3);">PNG, JPG, WebP • Max 5MB • 1280×400px recommended</div>
+          <div style="margin-top:10px;">
+            <span class="btn btn-ghost btn-sm">Choose File</span>
+          </div>
+        </div>
+        <input type="file" id="banner-file" name="banner_image" accept="image/*" style="display:none;" onchange="previewBanner(this)">
+        <img id="banner-preview" style="display:none;width:100%;border-radius:var(--r-md);margin-top:12px;">
+        <div class="form-group" style="margin-top:12px;">
+          <label class="form-label">Or enter Banner URL</label>
+          <input type="url" name="banner_url" class="input" placeholder="https://..." style="width:100%;">
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="form-section" style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(37,99,235,0.1));border-color:rgba(124,58,237,0.3);">
+        <div class="form-section-title">🚀 Quick Actions</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button type="submit" name="status" value="published" class="btn btn-primary" style="width:100%;">
+            📢 Save &amp; Publish Now
+          </button>
+          <button type="submit" name="status" value="draft" class="btn btn-ghost" style="width:100%;">
+            💾 Save as Draft
+          </button>
+        </div>
+        <p style="font-size:11px;color:var(--text-3);margin-top:10px;text-align:center;">Published competitions are immediately visible to students.</p>
+      </div>
+
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewBanner(input) {
+  const preview = document.getElementById('banner-preview');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+</script>
+{% endblock %}
