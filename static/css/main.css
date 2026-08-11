@@ -1897,7 +1897,7 @@ img, video, canvas, svg {
   }
   .hero-grid {
     display: grid !important;
-    grid-template-columns: 58% 42% !important;
+    grid-template-columns: 62% 38% !important;
     align-items: center !important;
     gap: 6px !important;
     width: 100% !important;
@@ -1927,12 +1927,13 @@ img, video, canvas, svg {
     height: 9px !important;
   }
   .hero-title {
-    font-size: clamp(0.95rem, 4.2vw, 1.35rem) !important;
-    line-height: 1.15 !important;
-    margin-bottom: 5px !important;
+    font-size: clamp(1.25rem, 5.4vw, 1.45rem) !important;
+    line-height: 1.18 !important;
+    margin-bottom: 6px !important;
     text-align: left !important;
     width: 100% !important;
     font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
   }
   .hero-subtitle {
     font-size: 10px !important;
