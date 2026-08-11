@@ -2057,13 +2057,30 @@ img, video, canvas, svg {
     margin: 6px auto 0 auto !important;
   }
 
-  /* 7. BOTTOM CTA */
+  /* 7. BOTTOM CTA & STAY UPDATED */
   section[aria-label="Bottom CTA"] .card {
     flex-direction: column !important;
     text-align: center !important;
     gap: 10px !important;
     align-items: center !important;
     padding: 14px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .w-mobile-full {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .w-mobile-full input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .w-mobile-full button {
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
 
