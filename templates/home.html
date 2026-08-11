@@ -71,8 +71,8 @@
         </div>
 
         <!-- Trusted Learners Stack -->
-        <div style="display:flex;align-items:center;gap:12px;margin-top:var(--s2);">
-          <div style="display:flex;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;margin-top:var(--s2);" class="hero-trusted-row">
+          <div style="display:flex;align-items:center;" class="hero-trusted-icons">
             <img src="{{ url_for('static', filename='images/security_badge.jpg') }}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-0);" alt="User 1">
             <img src="{{ url_for('static', filename='images/hero_hologram.jpg') }}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-0);margin-left:-8px;" alt="User 2">
             <img src="{{ url_for('static', filename='images/rocket_launch.jpg') }}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-0);margin-left:-8px;" alt="User 3">
@@ -164,13 +164,13 @@
 <section class="section" id="categories" aria-label="Top Categories">
   <div class="container">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s5);" data-aos="fade-up">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s5);" data-aos="fade-up" class="top-cat-header-wrap">
       <div>
-        <h2 class="font-display" style="font-size:1.6rem;font-weight:800;color:white;">
+        <h2 class="font-display top-cat-heading" style="font-size:1.6rem;font-weight:800;color:white;">
           Top Categories
         </h2>
       </div>
-      <a href="{{ url_for('quiz.categories') }}" style="font-size:13px;font-weight:600;color:var(--brand-purple-light);text-decoration:none;" id="view-all-cats-link">
+      <a href="{{ url_for('quiz.categories') }}" style="font-size:13px;font-weight:600;color:var(--brand-purple-light);text-decoration:none;" id="view-all-cats-link" class="top-cat-view-all">
         View All Categories →
       </a>
     </div>
@@ -344,9 +344,9 @@
 
       <!-- Leaderboard Preview Card -->
       <div class="card p-4" data-aos="fade-up">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <h3 class="font-display" style="font-size:16px;font-weight:700;">Leaderboard <span style="font-size:12px;color:var(--text-2);font-weight:400;">(This Week)</span></h3>
-          <a href="{{ url_for('quiz.leaderboard') }}" style="font-size:12px;color:var(--brand-purple-light);text-decoration:none;" id="view-full-lb-link">View Full Leaderboard →</a>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;" class="lb-header-wrap">
+          <h3 class="font-display lb-heading" style="font-size:16px;font-weight:700;">Leaderboard <span style="font-size:12px;color:var(--text-2);font-weight:400;">(This Week)</span></h3>
+          <a href="{{ url_for('quiz.leaderboard') }}" style="font-size:12px;color:var(--brand-purple-light);text-decoration:none;" id="view-full-lb-link" class="lb-view-full">View Full Leaderboard →</a>
         </div>
 
         {% set top_performers = [
