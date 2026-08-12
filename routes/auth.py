@@ -5,7 +5,11 @@ Handles user registration, login, logout, and profile management.
 """
 
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
+import secrets
+import json
+import urllib.parse
+import urllib.request
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 
@@ -185,3 +189,286 @@ def profile():
         return redirect(url_for('auth.profile'))
 
     return render_template('auth/profile.html')
+
+
+# =============================================================================
+# Google OAuth 2.0
+# =============================================================================
+
+@auth_bp.route('/google/login')
+def google_login():
+    """Initiate Google OAuth 2.0 authentication."""
+    client_id = os.environ.get('GOOGLE_CLIENT_ID') or current_app.config.get('GOOGLE_CLIENT_ID')
+    if not client_id:
+        flash('Google Login is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.', 'error')
+        return redirect(url_for('auth.login'))
+
+    state = secrets.token_urlsafe(32)
+    session['oauth_state'] = state
+    session['oauth_provider'] = 'google'
+
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI') or url_for('auth.google_callback', _external=True)
+
+    params = {
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'state': state,
+        'prompt': 'select_account'
+    }
+    auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urllib.parse.urlencode(params)
+    return redirect(auth_url)
+
+
+@auth_bp.route('/google/callback')
+def google_callback():
+    """Handle Google OAuth 2.0 authorization callback."""
+    client_id = os.environ.get('GOOGLE_CLIENT_ID') or current_app.config.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET') or current_app.config.get('GOOGLE_CLIENT_SECRET')
+
+    if not client_id or not client_secret:
+        flash('Google Login is missing client credentials.', 'error')
+        return redirect(url_for('auth.login'))
+
+    state = request.args.get('state')
+    expected_state = session.pop('oauth_state', None)
+    if not state or state != expected_state:
+        flash('OAuth security state validation failed. Please try logging in again.', 'error')
+        return redirect(url_for('auth.login'))
+
+    if request.args.get('error'):
+        flash('Google sign-in was cancelled or failed.', 'info')
+        return redirect(url_for('auth.login'))
+
+    code = request.args.get('code')
+    if not code:
+        flash('Missing authorization code from Google.', 'error')
+        return redirect(url_for('auth.login'))
+
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI') or url_for('auth.google_callback', _external=True)
+
+    try:
+        token_url = 'https://oauth2.googleapis.com/token'
+        token_data = urllib.parse.urlencode({
+            'code': code,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'redirect_uri': redirect_uri,
+            'grant_type': 'authorization_code'
+        }).encode('utf-8')
+
+        req = urllib.request.Request(token_url, data=token_data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            tokens = json.loads(resp.read().decode('utf-8'))
+
+        access_token = tokens.get('access_token')
+        if not access_token:
+            flash('Failed to obtain access token from Google.', 'error')
+            return redirect(url_for('auth.login'))
+
+        userinfo_req = urllib.request.Request('https://www.googleapis.com/oauth2/v2/userinfo', headers={'Authorization': f'Bearer {access_token}'})
+        with urllib.request.urlopen(userinfo_req, timeout=10) as userinfo_resp:
+            google_user = json.loads(userinfo_resp.read().decode('utf-8'))
+
+        email = google_user.get('email', '').strip().lower()
+        google_id = str(google_user.get('id', ''))
+        name = google_user.get('name') or email.split('@')[0]
+        picture = google_user.get('picture')
+
+        if not email:
+            flash('Google account does not have a public email address.', 'error')
+            return redirect(url_for('auth.login'))
+
+        user = User.query.filter_by(email=email).first()
+        if not user and google_id:
+            user = User.query.filter_by(oauth_provider='google', oauth_id=google_id).first()
+
+        if user:
+            if not user.oauth_provider:
+                user.oauth_provider = 'google'
+                user.oauth_id = google_id
+            if picture and not user.avatar_url:
+                user.avatar_url = picture
+            user.email_verified = True
+        else:
+            base_username = email.split('@')[0].replace('.', '_')[:20]
+            username = base_username
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user = User(
+                username=username,
+                email=email,
+                full_name=name,
+                oauth_provider='google',
+                oauth_id=google_id,
+                avatar_url=picture,
+                email_verified=True
+            )
+            user.set_password(secrets.token_urlsafe(16))
+            db.session.add(user)
+            db.session.flush()
+
+            log = ActivityLog(user_id=user.id, event_type='oauth_registration', description=f'Registered via Google OAuth: {email}')
+            db.session.add(log)
+
+        login_user(user, remember=True)
+        user.record_login()
+        db.session.commit()
+
+        flash(f'Welcome, {user.display_name}! Successfully logged in with Google.', 'success')
+        return redirect(url_for('dashboard.index'))
+
+    except Exception as e:
+        current_app.logger.error(f'Google OAuth error: {e}')
+        flash('An error occurred while authenticating with Google. Please try again.', 'error')
+        return redirect(url_for('auth.login'))
+
+
+# =============================================================================
+# GitHub OAuth 2.0
+# =============================================================================
+
+@auth_bp.route('/github/login')
+def github_login():
+    """Initiate GitHub OAuth 2.0 authentication."""
+    client_id = os.environ.get('GITHUB_CLIENT_ID') or current_app.config.get('GITHUB_CLIENT_ID')
+    if not client_id:
+        flash('GitHub Login is not configured. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.', 'error')
+        return redirect(url_for('auth.login'))
+
+    state = secrets.token_urlsafe(32)
+    session['oauth_state'] = state
+    session['oauth_provider'] = 'github'
+
+    redirect_uri = os.environ.get('GITHUB_REDIRECT_URI') or url_for('auth.github_callback', _external=True)
+
+    params = {
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'scope': 'user:email read:user',
+        'state': state
+    }
+    auth_url = 'https://github.com/login/oauth/authorize?' + urllib.parse.urlencode(params)
+    return redirect(auth_url)
+
+
+@auth_bp.route('/github/callback')
+def github_callback():
+    """Handle GitHub OAuth 2.0 authorization callback."""
+    client_id = os.environ.get('GITHUB_CLIENT_ID') or current_app.config.get('GITHUB_CLIENT_ID')
+    client_secret = os.environ.get('GITHUB_CLIENT_SECRET') or current_app.config.get('GITHUB_CLIENT_SECRET')
+
+    if not client_id or not client_secret:
+        flash('GitHub Login is missing client credentials.', 'error')
+        return redirect(url_for('auth.login'))
+
+    state = request.args.get('state')
+    expected_state = session.pop('oauth_state', None)
+    if not state or state != expected_state:
+        flash('OAuth security state validation failed. Please try logging in again.', 'error')
+        return redirect(url_for('auth.login'))
+
+    if request.args.get('error'):
+        flash('GitHub sign-in was cancelled or failed.', 'info')
+        return redirect(url_for('auth.login'))
+
+    code = request.args.get('code')
+    if not code:
+        flash('Missing authorization code from GitHub.', 'error')
+        return redirect(url_for('auth.login'))
+
+    redirect_uri = os.environ.get('GITHUB_REDIRECT_URI') or url_for('auth.github_callback', _external=True)
+
+    try:
+        token_url = 'https://github.com/login/oauth/access_token'
+        token_data = urllib.parse.urlencode({
+            'code': code,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'redirect_uri': redirect_uri
+        }).encode('utf-8')
+
+        req = urllib.request.Request(token_url, data=token_data, headers={'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            tokens = json.loads(resp.read().decode('utf-8'))
+
+        access_token = tokens.get('access_token')
+        if not access_token:
+            flash('Failed to obtain access token from GitHub.', 'error')
+            return redirect(url_for('auth.login'))
+
+        user_req = urllib.request.Request('https://api.github.com/user', headers={'Authorization': f'token {access_token}', 'User-Agent': 'QuizNova-OAuth'})
+        with urllib.request.urlopen(user_req, timeout=10) as user_resp:
+            gh_user = json.loads(user_resp.read().decode('utf-8'))
+
+        github_id = str(gh_user.get('id', ''))
+        email = gh_user.get('email')
+        name = gh_user.get('name') or gh_user.get('login') or 'GitHub User'
+        avatar_url = gh_user.get('avatar_url')
+
+        if not email:
+            emails_req = urllib.request.Request('https://api.github.com/user/emails', headers={'Authorization': f'token {access_token}', 'User-Agent': 'QuizNova-OAuth'})
+            with urllib.request.urlopen(emails_req, timeout=10) as emails_resp:
+                emails_list = json.loads(emails_resp.read().decode('utf-8'))
+                for em in emails_list:
+                    if em.get('primary') and em.get('verified'):
+                        email = em.get('email')
+                        break
+                if not email and emails_list:
+                    email = emails_list[0].get('email')
+
+        if not email:
+            email = f"github_{github_id}@quiznova.local"
+
+        email = email.strip().lower()
+
+        user = User.query.filter_by(email=email).first()
+        if not user and github_id:
+            user = User.query.filter_by(oauth_provider='github', oauth_id=github_id).first()
+
+        if user:
+            if not user.oauth_provider:
+                user.oauth_provider = 'github'
+                user.oauth_id = github_id
+            if avatar_url and not user.avatar_url:
+                user.avatar_url = avatar_url
+            user.email_verified = True
+        else:
+            base_username = (gh_user.get('login') or email.split('@')[0])[:20]
+            username = base_username
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user = User(
+                username=username,
+                email=email,
+                full_name=name,
+                oauth_provider='github',
+                oauth_id=github_id,
+                avatar_url=avatar_url,
+                email_verified=True
+            )
+            user.set_password(secrets.token_urlsafe(16))
+            db.session.add(user)
+            db.session.flush()
+
+            log = ActivityLog(user_id=user.id, event_type='oauth_registration', description=f'Registered via GitHub OAuth: {email}')
+            db.session.add(log)
+
+        login_user(user, remember=True)
+        user.record_login()
+        db.session.commit()
+
+        flash(f'Welcome, {user.display_name}! Successfully logged in with GitHub.', 'success')
+        return redirect(url_for('dashboard.index'))
+
+    except Exception as e:
+        current_app.logger.error(f'GitHub OAuth error: {e}')
+        flash('An error occurred while authenticating with GitHub. Please try again.', 'error')
+        return redirect(url_for('auth.login'))

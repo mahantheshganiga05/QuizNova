@@ -32,6 +32,9 @@ class User(UserMixin, db.Model):
     role          = db.Column(db.Enum('student', 'admin', name='user_role_enum'), nullable=False, default='student')
     is_active     = db.Column(db.Boolean, nullable=False, default=True)
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
+    oauth_provider = db.Column(db.String(50), nullable=True)
+    oauth_id      = db.Column(db.String(255), nullable=True)
+    avatar_url    = db.Column(db.String(500), nullable=True)
     last_login_at = db.Column(db.DateTime, nullable=True)
     login_count   = db.Column(db.Integer, nullable=False, default=0)
     created_at    = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -115,9 +118,13 @@ class User(UserMixin, db.Model):
 
     @property
     def profile_photo_url(self) -> str:
-        """Returns the URL path for the profile photo or a default avatar."""
+        """Returns the URL path for the profile photo, OAuth avatar, or default avatar."""
         if self.profile_photo:
+            if self.profile_photo.startswith('http://') or self.profile_photo.startswith('https://'):
+                return self.profile_photo
             return f'/static/uploads/profiles/{self.profile_photo}'
+        if self.avatar_url:
+            return self.avatar_url
         return '/static/images/default-avatar.svg'
 
     # -------------------------------------------------------------------------
