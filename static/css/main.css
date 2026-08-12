@@ -1874,7 +1874,7 @@ img, video, canvas, svg {
  * HOME PAGE MOBILE RESPONSIVE LAYOUT (320px – 430px)
  * ============================================================ */
 @media (max-width: 767px) {
-  /* 0. CONTEST MARQUEE TICKER (FULL VIEWPORT GUARD) */
+  /* 0. CONTEST MARQUEE TICKER (FULL VIEWPORT GUARD & SMOOTH SLOW SPEED) */
   .marquee-container {
     width: 100% !important;
     max-width: 100vw !important;
@@ -1884,22 +1884,23 @@ img, video, canvas, svg {
   }
   .marquee-track {
     gap: 20px !important;
+    animation: marqueeLeftToRight 40s linear infinite !important;
   }
   .marquee-item {
     font-size: 11px !important;
     gap: 8px !important;
   }
 
-  /* 1. HERO SECTION & 2-COLUMN MOBILE HERO (Text Left 58%, Globe Right 42%) */
+  /* 1. HERO SECTION & 2-COLUMN MOBILE HERO (Text Left 57%, Globe Right 43%) */
   .hero-section {
     padding-block: 10px 6px !important;
     min-height: auto !important;
   }
   .hero-grid {
     display: grid !important;
-    grid-template-columns: 62% 38% !important;
+    grid-template-columns: 57% 43% !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
     width: 100% !important;
   }
   .hero-left {
@@ -1979,7 +1980,7 @@ img, video, canvas, svg {
     line-height: 1 !important;
   }
   
-  /* 3D GLOBE RIGHT SIDE (Slightly increased ~10% & Vertically Centered) */
+  /* 3D GLOBE RIGHT SIDE (Increased 15-20% & Vertically Centered) */
   .hero-right {
     display: flex !important;
     justify-content: center !important;
@@ -1989,13 +1990,13 @@ img, video, canvas, svg {
   }
   .hero-globe-card {
     width: 100% !important;
-    max-width: 138px !important;
+    max-width: 160px !important;
     margin: 0 auto !important;
     position: relative !important;
   }
   .hero-globe-img {
     width: 100% !important;
-    max-width: 128px !important;
+    max-width: 148px !important;
     height: auto !important;
     object-fit: contain !important;
     display: block !important;
@@ -2007,9 +2008,9 @@ img, video, canvas, svg {
     border-radius: 99px !important;
     white-space: nowrap !important;
   }
-  .pip-top-left { top: -2px !important; left: -6px !important; }
-  .pip-mid-right { top: 45% !important; right: -8px !important; }
-  .pip-bottom-left { bottom: -2px !important; left: -6px !important; }
+  .pip-top-left { top: -2px !important; left: -4px !important; }
+  .pip-mid-right { top: 45% !important; right: -4px !important; }
+  .pip-bottom-left { bottom: -2px !important; left: -4px !important; }
 
   /* 3. PLATFORM STATS (5 IN ONE SINGLE HORIZONTAL ROW) */
   .section-sm { padding-block: 8px 5px !important; }
