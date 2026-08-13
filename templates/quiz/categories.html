@@ -396,10 +396,10 @@
   }
 
   /* RESPONSIVE MEDIA QUERIES */
-  @media (max-width: 1024px) {
+  @media (max-width: 1024px) and (min-width: 768px) {
     .cat-hero-grid {
       flex-direction: column;
-      gap: 40px;
+      gap: 30px;
       text-align: center;
     }
     .cat-hero-left {
@@ -414,21 +414,90 @@
       justify-content: center;
     }
     .user-globe-stage, .user-globe-hero-img {
-      width: 440px;
+      width: 380px;
     }
   }
 
-  @media (max-width: 640px) {
+  /* MOBILE RESPONSIVE OVERRIDES (max-width: 767px) */
+  @media (max-width: 767px) {
     .cat-hero-section {
-      padding-top: 40px;
-      padding-bottom: 40px;
+      padding-top: 14px !important;
+      padding-bottom: 12px !important;
     }
-    .cat-stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    .cat-hero-grid {
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+      text-align: left !important;
+    }
+    .cat-hero-left {
+      flex: 0 0 58% !important;
+      max-width: 58% !important;
+      text-align: left !important;
+      margin: 0 !important;
+    }
+    .cat-hero-right {
+      flex: 0 0 40% !important;
+      max-width: 40% !important;
+      margin: 0 !important;
+    }
+    .cat-hero-title {
+      font-size: clamp(1.05rem, 4.2vw, 1.35rem) !important;
+      line-height: 1.15 !important;
+      margin-bottom: 4px !important;
+    }
+    .cat-hero-subtitle {
+      font-size: 10.5px !important;
+      line-height: 1.35 !important;
+      margin-bottom: 10px !important;
+      max-width: 100% !important;
+    }
+    .cat-hero-badge {
+      font-size: 8px !important;
+      padding: 3px 8px !important;
+      margin-bottom: 6px !important;
+      white-space: nowrap !important;
+    }
+    .cat-breadcrumb {
+      font-size: 9.5px !important;
+      margin-bottom: 6px !important;
     }
     .user-globe-stage, .user-globe-hero-img {
-      width: 320px;
+      width: 100% !important;
+      max-width: 145px !important;
+      height: auto !important;
+      margin: 0 auto !important;
+    }
+    .cat-stats-grid {
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 4px !important;
+    }
+    .stat-glass-card {
+      padding: 6px 3px 5px 3px !important;
+      border-radius: 10px !important;
+    }
+    .stat-icon-wrap {
+      width: 22px !important;
+      height: 22px !important;
+      border-radius: 6px !important;
+      margin-bottom: 3px !important;
+    }
+    .stat-icon-wrap svg {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .stat-value {
+      font-size: 11.5px !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+      margin-bottom: 2px !important;
+    }
+    .stat-label {
+      font-size: 7.5px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
   }
 </style>
