@@ -2246,13 +2246,13 @@ img, video, canvas, svg {
   .newsletter-card-wrap {
     flex-direction: column !important;
     align-items: stretch !important;
-    padding: 20px !important;
-    gap: 18px !important;
+    padding: 18px 16px 16px 16px !important;
+    gap: 12px !important;
     height: auto !important;
     min-height: unset !important;
     border-radius: 16px !important;
-    margin-inline: auto !important;
-    width: 100% !important;
+    margin: 0 auto 32px auto !important;
+    width: calc(100% - 48px) !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     background: linear-gradient(135deg, rgba(108,99,255,0.14), rgba(57,200,255,0.06)) !important;
@@ -2280,12 +2280,12 @@ img, video, canvas, svg {
   .newsletter-title {
     font-size: 22px !important;
     font-weight: 800 !important;
-    margin-bottom: 3px !important;
+    margin-bottom: 2px !important;
     color: #FFFFFF !important;
     line-height: 1.15 !important;
   }
   .newsletter-desc {
-    font-size: 14.5px !important;
+    font-size: 15px !important;
     line-height: 1.45 !important;
     color: var(--text-2) !important;
     margin: 0 !important;
@@ -2304,10 +2304,10 @@ img, video, canvas, svg {
   }
   .newsletter-input {
     width: 100% !important;
-    height: 48px !important;
+    height: 45px !important;
     border-radius: 12px !important;
     padding: 0 16px !important;
-    font-size: 13.5px !important;
+    font-size: 15px !important;
     background: rgba(13, 13, 26, 0.85) !important;
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
     color: #FFFFFF !important;
@@ -2321,7 +2321,7 @@ img, video, canvas, svg {
   }
   .newsletter-submit-btn {
     width: 100% !important;
-    height: 48px !important;
+    height: 45px !important;
     border-radius: 12px !important;
     font-size: 15.5px !important;
     font-weight: 600 !important;
@@ -2337,7 +2337,7 @@ img, video, canvas, svg {
     white-space: nowrap !important;
   }
   #newsletter-msg {
-    margin-top: 6px !important;
+    margin-top: 4px !important;
     font-size: 12px !important;
     text-align: center !important;
   }
