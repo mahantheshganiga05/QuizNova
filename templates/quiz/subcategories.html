@@ -12,47 +12,47 @@
       <span style="color:var(--text-1);font-weight:500;">{{ category.name }}</span>
     </div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;">
-      <div data-aos="fade-right" style="flex:1;min-width:300px;">
-        <div style="display:flex;align-items:center;gap:16px;">
-          <div style="width:56px;height:56px;border-radius:16px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.35);box-shadow:0 0 16px rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    <div class="sub-hero-flex" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+      <div data-aos="fade-right" class="sub-hero-info" style="flex:1;min-width:280px;">
+        <div style="display:flex;align-items:flex-start;gap:14px;">
+          <div class="sub-hero-icon-wrap" style="width:52px;height:52px;border-radius:14px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.35);box-shadow:0 0 16px rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           </div>
-          <div>
-            <h1 class="font-display" style="font-size:clamp(1.75rem,3vw,2.25rem);font-weight:800;color:white;margin-bottom:4px;">{{ category.name }}</h1>
-            <p style="font-size:14px;color:var(--text-2);margin-bottom:10px;">{{ category.description or 'Core concepts across popular topics.' }}</p>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#FBBF24;font-weight:600;display:inline-flex;align-items:center;gap:4px;">⭐ Popular</span>
-              <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60A5FA;font-weight:600;display:inline-flex;align-items:center;gap:4px;">📈 High Demand</span>
-              <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-2);font-weight:500;display:inline-flex;align-items:center;gap:4px;">👥 12.5K+ Students</span>
+          <div style="flex:1;min-width:0;">
+            <h1 class="font-display sub-hero-title" style="font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:white;margin-bottom:4px;line-height:1.2;word-break:break-word;">{{ category.name }}</h1>
+            <p class="sub-hero-desc" style="font-size:13.5px;color:var(--text-2);margin-bottom:10px;line-height:1.4;">{{ category.description or 'Core concepts across popular topics.' }}</p>
+            <div class="sub-hero-badges" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:11.5px;padding:3px 9px;border-radius:99px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#FBBF24;font-weight:600;display:inline-flex;align-items:center;gap:4px;">⭐ Popular</span>
+              <span style="font-size:11.5px;padding:3px 9px;border-radius:99px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60A5FA;font-weight:600;display:inline-flex;align-items:center;gap:4px;">📈 High Demand</span>
+              <span style="font-size:11.5px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-2);font-weight:500;display:inline-flex;align-items:center;gap:4px;">👥 12.5K+ Students</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div style="display:flex;gap:12px;" data-aos="fade-left">
-        <div style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;text-align:center;min-width:100px;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#9D5FFC;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      <div class="sub-hero-stats" style="display:flex;gap:10px;" data-aos="fade-left">
+        <div class="sub-stat-card" style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;text-align:center;flex:1;min-width:85px;">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#9D5FFC;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
           </div>
-          <div class="font-display" style="font-size:1.5rem;font-weight:800;color:white;">{{ subcategories | length }}</div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">TOPICS</div>
+          <div class="font-display sub-stat-val" style="font-size:1.35rem;font-weight:800;color:white;">{{ subcategories | length }}</div>
+          <div class="sub-stat-lbl" style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">TOPICS</div>
         </div>
 
-        <div style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;text-align:center;min-width:100px;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#34D399;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        <div class="sub-stat-card" style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;text-align:center;flex:1;min-width:85px;">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#34D399;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
           </div>
-          <div class="font-display" style="font-size:1.5rem;font-weight:800;color:#34D399;">{{ subcategories[0].pass_threshold if subcategories else 60 }}%</div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">PASS MARK</div>
+          <div class="font-display sub-stat-val" style="font-size:1.35rem;font-weight:800;color:#34D399;">{{ subcategories[0].pass_threshold if subcategories else 60 }}%</div>
+          <div class="sub-stat-lbl" style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">PASS MARK</div>
         </div>
 
-        <div style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;text-align:center;min-width:100px;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#9D5FFC;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div class="sub-stat-card" style="background:rgba(13,13,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;text-align:center;flex:1;min-width:85px;">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#9D5FFC;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
-          <div class="font-display" style="font-size:1.5rem;font-weight:800;color:white;">20</div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">QS/QUIZ</div>
+          <div class="font-display sub-stat-val" style="font-size:1.35rem;font-weight:800;color:white;">20</div>
+          <div class="sub-stat-lbl" style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:var(--text-3);text-transform:uppercase;">QS/QUIZ</div>
         </div>
       </div>
     </div>
@@ -441,9 +441,95 @@
       grid-template-columns: repeat(2, 1fr);
     }
   }
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .sub-card-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
+      gap: 14px !important;
+      width: 100% !important;
+    }
+    .sub-glass-card {
+      border-radius: 16px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .sub-card-inner {
+      padding: 16px !important;
+      gap: 12px !important;
+      box-sizing: border-box !important;
+    }
+    .sub-icon-wrap {
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 10px !important;
+    }
+    .sub-diff-badge {
+      padding: 3px 8px !important;
+      font-size: 10px !important;
+    }
+    .sub-card-title {
+      font-size: 16.5px !important;
+      line-height: 1.3 !important;
+    }
+    .sub-card-desc {
+      font-size: 12.5px !important;
+      line-height: 1.4 !important;
+      height: auto !important;
+      max-height: 54px !important;
+      -webkit-line-clamp: 2 !important;
+    }
+    .sub-meta-row {
+      gap: 6px !important;
+    }
+    .sub-meta-pill {
+      padding: 3px 8px !important;
+      height: 26px !important;
+      font-size: 11px !important;
+    }
+    .sub-start-btn, .sub-login-btn {
+      height: 46px !important;
+      border-radius: 12px !important;
+      font-size: 14.5px !important;
+      font-weight: 600 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Hero section responsive overrides */
+    .sub-hero-flex {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 16px !important;
+    }
+    .sub-hero-info {
+      min-width: 100% !important;
+      width: 100% !important;
+    }
+    .sub-hero-stats {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+    .sub-stat-card {
+      min-width: 0 !important;
+      padding: 10px 4px !important;
+    }
+    .sub-stat-val {
+      font-size: 1.15rem !important;
+    }
+    .sub-stat-lbl {
+      font-size: 8.5px !important;
+      letter-spacing: 0.05em !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sub-meta-pill {
+      padding: 2px 7px !important;
+      font-size: 10.5px !important;
+    }
+    .sub-stat-val {
+      font-size: 1.05rem !important;
     }
   }
 
