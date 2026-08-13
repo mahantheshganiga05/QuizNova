@@ -2099,7 +2099,7 @@ img, video, canvas, svg {
     text-overflow: ellipsis !important;
   }
 
-  /* 4. TOP CATEGORIES (Heading reduced ~15%, View All aligned right, image 70px) */
+  /* 4. TOP CATEGORIES (Uniform 2-Column Grid for Databases & all cards, image 70px) */
   .top-cat-header-wrap {
     display: flex !important;
     align-items: center !important;
@@ -2120,9 +2120,9 @@ img, video, canvas, svg {
     gap: 8px !important;
   }
   .top-cats-grid > :nth-child(5) {
-    grid-column: 1 / -1 !important;
-    max-width: 280px !important;
-    margin-inline: auto !important;
+    grid-column: auto !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
     width: 100% !important;
   }
   .top-cat-img-wrap {
@@ -2210,13 +2210,36 @@ img, video, canvas, svg {
     margin: 4px auto 0 auto !important;
   }
 
-  /* 7. BOTTOM CTA */
+  /* 7. BOTTOM CTA BANNER (COMPACT MOBILE OVERRIDES) */
+  section[aria-label="Bottom CTA"] {
+    padding-block: 6px 4px !important;
+  }
   section[aria-label="Bottom CTA"] .card {
     flex-direction: column !important;
     text-align: center !important;
-    gap: 8px !important;
+    gap: 6px !important;
     align-items: center !important;
-    padding: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+  }
+  section[aria-label="Bottom CTA"] h2 {
+    font-size: clamp(1.05rem, 4.4vw, 1.25rem) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 3px !important;
+  }
+  section[aria-label="Bottom CTA"] p {
+    font-size: 10.5px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 4px !important;
+  }
+  section[aria-label="Bottom CTA"] .btn {
+    width: 100% !important;
+    max-width: 170px !important;
+    min-height: 32px !important;
+    padding: 5px 12px !important;
+    font-size: 11.5px !important;
+    justify-content: center !important;
+    border-radius: var(--r-full) !important;
   }
 
   /* 8. FOOTER COMPACT REDESIGN */

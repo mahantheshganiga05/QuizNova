@@ -79,6 +79,8 @@ def create_app(config_name: str = 'default') -> Flask:
     # -------------------------------------------------------------------------
     from routes.public import public_bp
     app.register_blueprint(public_bp)
+    from routes.public import newsletter_subscribe
+    csrf.exempt(newsletter_subscribe)
 
     # -------------------------------------------------------------------------
     # Template Filters & Context Processors

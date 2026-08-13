@@ -156,9 +156,12 @@
           </div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:8px;" class="w-mobile-full">
-          <input type="email" placeholder="Enter your email" style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-full);padding:10px 16px;font-size:13px;color:var(--text-1);outline:none;width:100%;min-width:0;">
-          <button class="btn btn-primary btn-sm" type="button" onclick="alert('Subscribed successfully!')">Subscribe</button>
+        <div style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;" class="w-mobile-full">
+          <form id="newsletter-form" onsubmit="handleNewsletterSubmit(event)" style="display:flex;align-items:center;gap:8px;width:100%;">
+            <input type="email" id="newsletter-email" placeholder="Enter your email" required style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-full);padding:10px 16px;font-size:13px;color:var(--text-1);outline:none;width:100%;min-width:0;box-sizing:border-box;">
+            <button class="btn btn-primary btn-sm" type="submit" id="newsletter-btn" style="white-space:nowrap;flex-shrink:0;">Subscribe</button>
+          </form>
+          <div id="newsletter-msg" style="font-size:12px;font-weight:600;display:none;"></div>
         </div>
       </div>
 
@@ -192,10 +195,10 @@
         <div>
           <p class="footer-col-title">Resources</p>
           <ul class="footer-links">
-            <li><a href="{{ url_for('public.about') }}"   class="footer-link">Blog</a></li>
-            <li><a href="{{ url_for('public.about') }}"   class="footer-link">Guides</a></li>
-            <li><a href="{{ url_for('public.contact') }}" class="footer-link">Help Center</a></li>
-            <li><a href="{{ url_for('public.faq') }}"     class="footer-link">FAQ</a></li>
+            <li><a href="{{ url_for('public.about') }}"             class="footer-link">Blog</a></li>
+            <li><a href="{{ url_for('public.ai_recommendations') }}" class="footer-link">Guides</a></li>
+            <li><a href="{{ url_for('public.contact') }}"           class="footer-link">Help Center</a></li>
+            <li><a href="{{ url_for('public.faq') }}"               class="footer-link">FAQ</a></li>
           </ul>
         </div>
 
@@ -205,8 +208,8 @@
           <ul class="footer-links">
             <li><a href="{{ url_for('public.about') }}"   class="footer-link">About Us</a></li>
             <li><a href="{{ url_for('public.contact') }}" class="footer-link">Contact Us</a></li>
-            <li><a href="#" class="footer-link">Terms of Service</a></li>
-            <li><a href="#" class="footer-link">Privacy Policy</a></li>
+            <li><a href="{{ url_for('public.pricing') }}" class="footer-link">Pricing</a></li>
+            <li><a href="{{ url_for('auth.register') }}" class="footer-link">Create Account</a></li>
           </ul>
         </div>
 
@@ -249,5 +252,52 @@
   <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
   {% block extra_js %}{% endblock %}
+  <script>
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const emailEl = document.getElementById('newsletter-email');
+      const btnEl = document.getElementById('newsletter-btn');
+      const msgEl = document.getElementById('newsletter-msg');
+      if (!emailEl || !emailEl.value.trim()) return;
+
+      const email = emailEl.value.trim();
+      btnEl.disabled = true;
+      btnEl.innerText = 'Subscribing...';
+
+      fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': window.CSRF_TOKEN || ''
+        },
+        body: JSON.stringify({ email: email })
+      })
+      .then(res => res.json())
+      .then(data => {
+        btnEl.disabled = false;
+        btnEl.innerText = 'Subscribe';
+        if (msgEl) {
+          msgEl.style.display = 'block';
+          msgEl.style.color = (data.status === 'success' || data.status === 'info') ? 'var(--success)' : 'var(--error)';
+          msgEl.innerText = data.message;
+        }
+        if (typeof showFlash === 'function') {
+          showFlash(data.message, data.status === 'error' ? 'error' : (data.status === 'info' ? 'warning' : 'success'));
+        }
+        if (data.status === 'success') {
+          emailEl.value = '';
+        }
+      })
+      .catch(err => {
+        btnEl.disabled = false;
+        btnEl.innerText = 'Subscribe';
+        if (msgEl) {
+          msgEl.style.display = 'block';
+          msgEl.style.color = 'var(--error)';
+          msgEl.innerText = 'Subscription failed. Please try again.';
+        }
+      });
+    }
+  </script>
 </body>
 </html>

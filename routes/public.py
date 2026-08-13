@@ -90,6 +90,38 @@ def ai_recommendations():
     return render_template('ai_recommendations.html')
 
 
+@public_bp.route('/api/newsletter/subscribe', methods=['POST'])
+def newsletter_subscribe():
+    """Handle real newsletter subscription via AJAX."""
+    from app import csrf
+    # Exempt endpoint dynamically if needed, or handle input
+    from models.subscriber import NewsletterSubscriber
+    from utils.validators import validate_email
+    from flask import jsonify, request
+
+    data = request.get_json(silent=True) or request.form or request.args
+    email = (data.get('email') or '').strip().lower()
+
+    err = validate_email(email)
+    if err:
+        return jsonify({'status': 'error', 'message': err}), 400
+
+    existing = NewsletterSubscriber.query.filter_by(email=email).first()
+    if existing:
+        return jsonify({'status': 'info', 'message': "You're already subscribed!"}), 200
+
+    try:
+        subscriber = NewsletterSubscriber(email=email)
+        from models import db
+        db.session.add(subscriber)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': "You're subscribed! We'll keep you updated."}), 200
+    except Exception as e:
+        from models import db
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': 'An error occurred. Please try again.'}), 500
+
+
 @public_bp.route('/faq')
 def faq():
     return render_template('faq.html')
