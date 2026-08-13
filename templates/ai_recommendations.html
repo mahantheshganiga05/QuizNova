@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}AI Recommendations & Personalized Learning — QuizNova{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top:40px;padding-bottom:60px;">
+  <div class="container">
+
+    <!-- Page Header -->
+    <div style="text-align:center;max-width:720px;margin:0 auto 48px auto;" data-aos="fade-up">
+      <div class="section-eyebrow" style="margin-bottom:12px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        AI-Powered Learning Engine
+      </div>
+      <h1 class="font-display" style="font-size:clamp(1.8rem, 4vw, 2.75rem);font-weight:800;color:#FFFFFF;margin-bottom:16px;line-height:1.2;">
+        Smart Recommendations Tailored to Your Learning Goals
+      </h1>
+      <p style="font-size:16px;color:var(--text-2);line-height:1.65;">
+        QuizNova's AI engine analyzes your quiz attempt history, accuracy trends, and completion speed to generate personalized study paths and practice recommendations.
+      </p>
+    </div>
+
+    <!-- Main Feature Grid -->
+    <div class="grid-2" style="gap:24px;margin-bottom:48px;">
+
+      <!-- Card 1 -->
+      <div class="card p-5" data-aos="fade-up" data-aos-delay="100">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:18px;font-weight:700;color:#FFFFFF;margin-bottom:10px;">
+          1. Adaptive Quiz Selection
+        </h3>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6;">
+          Our recommendation system suggests topics where you have the highest growth potential, matching questions to your current skill level.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card p-5" data-aos="fade-up" data-aos-delay="200">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:18px;font-weight:700;color:#FFFFFF;margin-bottom:10px;">
+          2. Weak-Area Focus Analytics
+        </h3>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6;">
+          Pinpoints subtopics with lower accuracy and automatically builds targeted practice sets to reinforce concepts before placement exams.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card p-5" data-aos="fade-up" data-aos-delay="300">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:18px;font-weight:700;color:#FFFFFF;margin-bottom:10px;">
+          3. Real-Time Performance Tracking
+        </h3>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6;">
+          Track your accuracy percentage, question response time, and streak milestones in real-time with comprehensive breakdown dashboards.
+        </p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="card p-5" data-aos="fade-up" data-aos-delay="400">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:18px;font-weight:700;color:#FFFFFF;margin-bottom:10px;">
+          4. Verifiable Achievement Badges
+        </h3>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6;">
+          Earn certificates and achievements as your AI-calculated readiness score improves across Python, DSA, Web Dev, and Aptitude.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Bottom Action CTA -->
+    <div class="card p-5 text-center" style="background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(37,99,235,0.15));border:1px solid rgba(124,58,237,0.35);" data-aos="fade-up">
+      <h2 class="font-display" style="font-size:22px;font-weight:800;color:#FFFFFF;margin-bottom:10px;">
+        Ready to Boost Your Performance?
+      </h2>
+      <p style="font-size:14px;color:var(--text-2);max-width:520px;margin:0 auto 20px auto;">
+        Explore our top quiz categories and let QuizNova guide your learning journey today.
+      </p>
+      <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary btn-lg" id="explore-ai-quizzes-btn">
+        Explore Categories &rarr;
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -83,6 +83,13 @@ def contact():
     return render_template('contact.html')
 
 
+@public_bp.route('/ai-recommendations')
+@public_bp.route('/ai-recommendations/')
+def ai_recommendations():
+    """Dedicated AI Recommendations & Personalized Learning Page."""
+    return render_template('ai_recommendations.html')
+
+
 @public_bp.route('/faq')
 def faq():
     return render_template('faq.html')
