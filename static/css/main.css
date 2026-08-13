@@ -2246,13 +2246,13 @@ img, video, canvas, svg {
   .newsletter-card-wrap {
     flex-direction: column !important;
     align-items: stretch !important;
-    padding: 24px !important;
-    gap: 16px !important;
+    padding: 20px !important;
+    gap: 18px !important;
     height: auto !important;
     min-height: unset !important;
-    border-radius: 20px !important;
-    margin: 0 auto 32px auto !important;
-    width: 100% !important;
+    border-radius: 18px !important;
+    margin: 0 16px 32px 16px !important;
+    width: calc(100% - 32px) !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     background: linear-gradient(135deg, rgba(108,99,255,0.14), rgba(57,200,255,0.06)) !important;
@@ -2263,14 +2263,14 @@ img, video, canvas, svg {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 16px !important;
+    gap: 14px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .newsletter-icon-box {
-    width: 64px !important;
-    height: 64px !important;
-    border-radius: 16px !important;
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 14px !important;
     flex-shrink: 0 !important;
   }
   .newsletter-header-wrap > div:last-child {
@@ -2278,15 +2278,15 @@ img, video, canvas, svg {
     text-align: left !important;
   }
   .newsletter-title {
-    font-size: 28px !important;
+    font-size: 26px !important;
     font-weight: 800 !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 3px !important;
     color: #FFFFFF !important;
     line-height: 1.15 !important;
   }
   .newsletter-desc {
-    font-size: 16px !important;
-    line-height: 1.45 !important;
+    font-size: 15.5px !important;
+    line-height: 1.35 !important;
     color: var(--text-2) !important;
     margin: 0 !important;
   }
@@ -2294,21 +2294,20 @@ img, video, canvas, svg {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    margin-top: 4px !important;
   }
   .newsletter-form {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 12px !important;
+    gap: 11px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .newsletter-input {
     width: 100% !important;
-    height: 50px !important;
-    border-radius: 14px !important;
-    padding: 0 18px !important;
-    font-size: 15px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    padding: 0 16px !important;
+    font-size: 15.5px !important;
     background: rgba(13, 13, 26, 0.85) !important;
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
     color: #FFFFFF !important;
@@ -2322,10 +2321,10 @@ img, video, canvas, svg {
   }
   .newsletter-submit-btn {
     width: 100% !important;
-    height: 52px !important;
-    border-radius: 14px !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 17px !important;
+    font-weight: 650 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
