@@ -2246,11 +2246,11 @@ img, video, canvas, svg {
   .newsletter-card-wrap {
     flex-direction: column !important;
     align-items: stretch !important;
-    padding: 16px 14px !important;
-    gap: 14px !important;
+    padding: 14px 12px !important;
+    gap: 10px !important;
     height: auto !important;
     min-height: unset !important;
-    border-radius: 16px !important;
+    border-radius: 14px !important;
   }
   .newsletter-header-wrap {
     display: flex !important;
@@ -2259,9 +2259,9 @@ img, video, canvas, svg {
     width: 100% !important;
   }
   .newsletter-icon-box {
-    width: 42px !important;
-    height: 42px !important;
-    border-radius: 12px !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
     flex-shrink: 0 !important;
   }
   .newsletter-title {
@@ -2280,12 +2280,12 @@ img, video, canvas, svg {
   .newsletter-form {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 12px !important;
+    gap: 9px !important;
     width: 100% !important;
   }
   .newsletter-input {
     width: 100% !important;
-    height: 52px !important;
+    height: 46px !important;
     border-radius: 12px !important;
     padding: 0 16px !important;
     font-size: 13.5px !important;
@@ -2302,18 +2302,20 @@ img, video, canvas, svg {
   }
   .newsletter-submit-btn {
     width: 100% !important;
-    height: 52px !important;
+    height: 46px !important;
     border-radius: 12px !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: linear-gradient(135deg, #7C3AED, #2563EB) !important;
     color: #FFFFFF !important;
     border: none !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
     box-sizing: border-box !important;
     margin: 0 !important;
+    white-space: nowrap !important;
   }
   #newsletter-msg {
     margin-top: 4px !important;
