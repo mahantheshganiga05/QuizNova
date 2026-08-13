@@ -145,21 +145,21 @@
     <div class="container">
 
       <!-- Top Newsletter / Stay Updated Bar -->
-      <div class="card p-5 newsletter-card-wrap" style="background:linear-gradient(135deg, rgba(108,99,255,0.12), rgba(57,200,255,0.06));border-color:rgba(108,99,255,0.25);margin-bottom:var(--s8);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-        <div class="newsletter-header-wrap" style="display:flex;align-items:center;gap:16px;">
-          <div class="newsletter-icon-box" style="width:48px;height:48px;border-radius:12px;background:var(--g-brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">
+      <div class="card p-5 newsletter-card-wrap">
+        <div class="newsletter-header-wrap">
+          <div class="newsletter-icon-box" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </div>
           <div>
-            <h3 class="font-display newsletter-title" style="font-size:16px;font-weight:700;">Stay Updated!</h3>
-            <p class="newsletter-desc" style="font-size:12px;color:var(--text-2);">Subscribe to our newsletter for latest quizzes, offers and updates.</p>
+            <h3 class="font-display newsletter-title">Stay Updated!</h3>
+            <p class="newsletter-desc">Subscribe to our newsletter for latest quizzes, offers and updates.</p>
           </div>
         </div>
 
-        <div class="newsletter-form-container" style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;">
-          <form id="newsletter-form" onsubmit="handleNewsletterSubmit(event)" class="newsletter-form" style="display:flex;align-items:center;gap:8px;width:100%;">
-            <input type="email" id="newsletter-email" class="newsletter-input" placeholder="Enter your email" required style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-full);padding:10px 16px;font-size:13px;color:var(--text-1);outline:none;width:100%;min-width:0;box-sizing:border-box;">
-            <button class="btn btn-primary btn-sm newsletter-submit-btn" type="submit" id="newsletter-btn" style="white-space:nowrap;flex-shrink:0;">Subscribe</button>
+        <div class="newsletter-form-container">
+          <form id="newsletter-form" onsubmit="handleNewsletterSubmit(event)" class="newsletter-form">
+            <input type="email" id="newsletter-email" class="newsletter-input" placeholder="Enter your email" required>
+            <button class="btn btn-primary btn-sm newsletter-submit-btn" type="submit" id="newsletter-btn">Subscribe</button>
           </form>
           <div id="newsletter-msg" style="font-size:12px;font-weight:600;display:none;"></div>
         </div>
