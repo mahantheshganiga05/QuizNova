@@ -242,10 +242,10 @@ function showFlash(message, type = 'info') {
   mobileMenu.id = 'mobile-menu';
   mobileMenu.style.cssText = `
     position: fixed; inset: 0; top: var(--nav-h, 64px);
-    background: rgba(5,5,8,0.98); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    z-index: 999; padding: 20px;
-    flex-direction: column; gap: 12px; overflow-y: auto;
-    display: none; border-top: 1px solid rgba(255,255,255,0.08);
+    background: rgba(8, 8, 16, 0.98); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    z-index: 999; padding: 16px 14px 32px 14px;
+    flex-direction: column; gap: 8px; overflow-y: auto; overflow-x: hidden;
+    display: none; border-top: 1px solid rgba(255,255,255,0.08); box-sizing: border-box;
   `;
   document.body.appendChild(mobileMenu);
 
@@ -256,35 +256,73 @@ function showFlash(message, type = 'info') {
     if (open) {
       mobileMenu.innerHTML = '';
       
-      // Full-width mobile search
+      // 1. Full-width compact mobile search input
       const searchWrap = document.createElement('div');
-      searchWrap.style.cssText = 'position:relative; width:100%; margin-bottom:8px;';
+      searchWrap.style.cssText = 'position:relative; width:100%; margin-bottom:6px; box-sizing:border-box;';
       searchWrap.innerHTML = `
-        <input type="text" placeholder="Search quizzes..." 
-               style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:99px; padding:10px 16px 10px 36px; font-size:14px; color:#fff; outline:none;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9898B0" stroke-width="2" style="position:absolute; left:12px; top:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search quizzes..." id="mobile-search-input"
+               style="width:100%; height:44px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:0 16px 0 40px; font-size:13.5px; color:#FFFFFF; outline:none; box-sizing:border-box; transition:border-color 0.2s ease;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9898B0" stroke-width="2" style="position:absolute; left:14px; top:14px; pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       `;
       mobileMenu.appendChild(searchWrap);
 
-      // Clone links
+      // Add enter key listener to mobile search
+      setTimeout(() => {
+        const mobileSearchEl = document.getElementById('mobile-search-input');
+        if (mobileSearchEl) {
+          mobileSearchEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && mobileSearchEl.value.trim()) {
+              window.location.href = '/categories?q=' + encodeURIComponent(mobileSearchEl.value.trim());
+            }
+          });
+        }
+      }, 50);
+
+      // 2. Clone nav links as compact high-contrast list items (48px height)
       navLinks?.querySelectorAll('.nav-link').forEach(link => {
         const clone = link.cloneNode(true);
-        clone.style.cssText = 'display:block; padding:12px 16px; font-size:15px; font-weight:600; border-radius:10px; color:#F1F1F8; text-decoration:none; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);';
+        clone.className = 'mobile-nav-link ' + (link.classList.contains('active') ? 'active' : '');
+        clone.style.cssText = `
+          display: flex; align-items: center; width: 100%; height: 48px;
+          padding: 0 16px; font-size: 14.5px; font-weight: 600; font-family: var(--font-display);
+          border-radius: 12px; color: #FFFFFF !important; text-decoration: none;
+          background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+          box-sizing: border-box; transition: all 0.2s ease;
+        `;
+        if (link.classList.contains('active')) {
+          clone.style.background = 'rgba(124, 58, 237, 0.2)';
+          clone.style.borderColor = 'rgba(124, 58, 237, 0.5)';
+        }
         mobileMenu.appendChild(clone);
       });
 
-      // Actions
+      // 3. Actions (Log In, Sign Up, Log Out, Dashboard)
+      const actionsGroup = document.createElement('div');
+      actionsGroup.style.cssText = 'display:flex; flex-direction:column; gap:8px; margin-top:6px; width:100%; box-sizing:border-box;';
+      
       navActions?.querySelectorAll('a:not(.nav-avatar), button').forEach(el => {
         if (el.id === 'hamburger-btn') return;
         const clone = el.cloneNode(true);
-        clone.style.cssText = 'display:block; width:100%; text-align:center; padding:12px; font-size:14px; font-weight:700; border-radius:10px; margin-top:4px;';
-        mobileMenu.appendChild(clone);
+        const isPrimary = clone.classList.contains('btn-primary');
+        clone.style.cssText = `
+          display: flex; align-items: center; justify-content: center; width: 100%; height: 46px;
+          padding: 0 16px; font-size: 14px; font-weight: 700; border-radius: 12px; text-decoration: none;
+          box-sizing: border-box; transition: all 0.2s ease;
+          ${isPrimary 
+            ? 'background: linear-gradient(135deg, #7C3AED, #2563EB); color: #FFFFFF !important; border: none; box-shadow: 0 0 15px rgba(124,58,237,0.3);' 
+            : 'background: rgba(255, 255, 255, 0.06); color: #FFFFFF !important; border: 1px solid rgba(255, 255, 255, 0.12);'}
+        `;
+        actionsGroup.appendChild(clone);
       });
+      
+      if (actionsGroup.children.length > 0) {
+        mobileMenu.appendChild(actionsGroup);
+      }
 
       mobileMenu.style.display = 'flex';
       document.body.style.overflow = 'hidden';
       if (typeof gsap !== 'undefined') {
-        gsap.from(mobileMenu.children, { opacity: 0, y: -10, stagger: 0.04, duration: 0.25, ease: 'power2.out' });
+        gsap.from(mobileMenu.children, { opacity: 0, y: -8, stagger: 0.03, duration: 0.22, ease: 'power2.out' });
       }
     } else {
       mobileMenu.style.display = 'none';
