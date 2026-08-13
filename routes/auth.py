@@ -192,8 +192,25 @@ def profile():
 
 
 # =============================================================================
-# Google OAuth 2.0
+# OAuth Helpers & Routes (Google & GitHub 2.0)
 # =============================================================================
+
+def get_callback_url(endpoint_name: str, env_var_name: str) -> str:
+    """Helper to get exact callback URL, resolving HTTPS scheme for production/Vercel."""
+    configured = os.environ.get(env_var_name)
+    if configured:
+        return configured
+    
+    url = url_for(endpoint_name, _external=True)
+    is_secure = (
+        request.headers.get('X-Forwarded-Proto') == 'https' or
+        request.is_secure or
+        'vercel.app' in request.host.lower()
+    )
+    if is_secure and url.startswith('http://'):
+        url = 'https://' + url[7:]
+    return url
+
 
 @auth_bp.route('/google/login')
 def google_login():
@@ -207,7 +224,7 @@ def google_login():
     session['oauth_state'] = state
     session['oauth_provider'] = 'google'
 
-    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI') or url_for('auth.google_callback', _external=True)
+    redirect_uri = get_callback_url('auth.google_callback', 'GOOGLE_REDIRECT_URI')
 
     params = {
         'client_id': client_id,
@@ -246,7 +263,7 @@ def google_callback():
         flash('Missing authorization code from Google.', 'error')
         return redirect(url_for('auth.login'))
 
-    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI') or url_for('auth.google_callback', _external=True)
+    redirect_uri = get_callback_url('auth.google_callback', 'GOOGLE_REDIRECT_URI')
 
     try:
         token_url = 'https://oauth2.googleapis.com/token'
@@ -344,7 +361,7 @@ def github_login():
     session['oauth_state'] = state
     session['oauth_provider'] = 'github'
 
-    redirect_uri = os.environ.get('GITHUB_REDIRECT_URI') or url_for('auth.github_callback', _external=True)
+    redirect_uri = get_callback_url('auth.github_callback', 'GITHUB_REDIRECT_URI')
 
     params = {
         'client_id': client_id,
@@ -381,7 +398,7 @@ def github_callback():
         flash('Missing authorization code from GitHub.', 'error')
         return redirect(url_for('auth.login'))
 
-    redirect_uri = os.environ.get('GITHUB_REDIRECT_URI') or url_for('auth.github_callback', _external=True)
+    redirect_uri = get_callback_url('auth.github_callback', 'GITHUB_REDIRECT_URI')
 
     try:
         token_url = 'https://github.com/login/oauth/access_token'
