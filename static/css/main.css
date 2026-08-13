@@ -2242,7 +2242,84 @@ img, video, canvas, svg {
     border-radius: var(--r-full) !important;
   }
 
-  /* 8. FOOTER COMPACT REDESIGN */
+  /* 8. FOOTER COMPACT REDESIGN & NEWSLETTER MOBILE STACK */
+  .newsletter-card-wrap {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 16px 14px !important;
+    gap: 14px !important;
+    height: auto !important;
+    min-height: unset !important;
+    border-radius: 16px !important;
+  }
+  .newsletter-header-wrap {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  .newsletter-icon-box {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    flex-shrink: 0 !important;
+  }
+  .newsletter-title {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    margin-bottom: 2px !important;
+  }
+  .newsletter-desc {
+    font-size: 11.5px !important;
+    line-height: 1.35 !important;
+  }
+  .newsletter-form-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .newsletter-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  .newsletter-input {
+    width: 100% !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+    padding: 0 16px !important;
+    font-size: 13.5px !important;
+    background: rgba(13, 13, 26, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #FFFFFF !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+  .newsletter-input::placeholder {
+    color: #9898B0 !important;
+    opacity: 1 !important;
+  }
+  .newsletter-submit-btn {
+    width: 100% !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(135deg, #7C3AED, #2563EB) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+  #newsletter-msg {
+    margin-top: 4px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+  }
   .footer {
     padding-top: 20px !important;
     padding-bottom: 14px !important;
