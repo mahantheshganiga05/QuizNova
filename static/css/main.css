@@ -2129,41 +2129,49 @@ img, video, canvas, svg {
   
   .stat-5-grid {
     display: grid !important;
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: 3px !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  .stat-5-grid > :nth-child(5) {
+    grid-column: 1 / -1 !important;
+    max-width: 240px !important;
+    margin: 0 auto !important;
     width: 100% !important;
   }
   .stat-5-grid .card {
-    padding: 4px 2px !important;
-    flex-direction: column !important;
-    text-align: center !important;
+    padding: 10px 12px !important;
+    gap: 10px !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 2px !important;
-    border-radius: 8px !important;
+    border-radius: 14px !important;
     min-width: 0 !important;
+    flex-direction: row !important;
   }
   .stat-5-grid .card > div:first-child {
-    width: 18px !important;
-    height: 18px !important;
-    border-radius: 4px !important;
-    margin: 0 auto !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   .stat-5-grid .card svg {
-    width: 9px !important;
-    height: 9px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
   .stat-5-grid .card div[style*="font-size:1.15rem"] {
-    font-size: 9px !important;
+    font-size: 14px !important;
     font-weight: 800 !important;
-    line-height: 1.05 !important;
+    line-height: 1.2 !important;
   }
   .stat-5-grid .card div[style*="font-size:11px"] {
-    font-size: 6.5px !important;
-    line-height: 1.05 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 
   /* 4. TOP CATEGORIES (Uniform 2-Column Grid for Databases & all cards, image 70px) */

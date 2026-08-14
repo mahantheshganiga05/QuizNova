@@ -314,85 +314,7 @@
     font-weight: 500;
   }
 
-  /* QUICK ACTION CARDS GRID */
-  .quick-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
-  @media (max-width: 992px) {
-    .quick-cards-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (max-width: 768px) {
-    .quick-cards-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 10px !important;
-    }
-  }
-  .quick-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    background: var(--g-card);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(124, 58, 237, 0.25);
-    border-radius: 16px;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    min-width: 0;
-    overflow: hidden;
-  }
-  .quick-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(124, 58, 237, 0.5);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
-  }
-  .quick-card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    flex-shrink: 0;
-  }
-  .icon-bg-blue { background: rgba(59, 130, 246, 0.15); }
-  .icon-bg-purple { background: rgba(124, 58, 237, 0.15); }
-  .icon-bg-cyan { background: rgba(6, 182, 212, 0.15); }
-  .icon-bg-amber { background: rgba(245, 158, 11, 0.15); }
-
-  .quick-card-content {
-    min-width: 0;
-    flex: 1;
-  }
-  .quick-card-title {
-    font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 700;
-    color: #FFFFFF;
-    margin: 0 0 2px 0;
-    min-width: 0;
-    overflow-wrap: break-word;
-    word-break: normal;
-    white-space: normal;
-    line-height: 1.25;
-  }
-  .quick-card-desc {
-    font-size: 12px;
-    color: var(--text-2);
-    margin: 0;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  /* DESKTOP 2-COLUMN NEWSLETTER CARD */
+  /* DESKTOP 2-COLUMN NEWSLETTER CARD (MATCHING MOCKUP IMAGE) */
   .newsletter-home-card {
     display: grid !important;
     grid-template-columns: 1fr 220px !important;
@@ -442,73 +364,11 @@
     .newsletter-right-col {
       display: none !important;
     }
-    .quick-card {
-      padding: 12px 14px;
-      gap: 10px;
-    }
-    .quick-card-icon {
-      width: 36px;
-      height: 36px;
-      font-size: 18px;
-    }
-    .quick-card-title {
-      font-size: 13.5px;
-    }
-    .quick-card-desc {
-      font-size: 11px;
-    }
   }
 </style>
 
 <!-- ═══════════════════════════════════════════════════════
-     4. QUICK ACTION CARDS (CURRENT AFFAIRS, AI, TEST PREP, EARN)
-════════════════════════════════════════════════════════ -->
-<section class="section-sm" aria-label="Quick Actions">
-  <div class="container">
-    <div class="quick-cards-grid" data-aos="fade-up">
-
-      <!-- 1. Current Affairs -->
-      <a href="{{ url_for('quiz.subcategories', category_slug='aptitude') }}" class="quick-card">
-        <div class="quick-card-icon icon-bg-blue" aria-hidden="true">📋</div>
-        <div class="quick-card-content">
-          <h4 class="quick-card-title">Current Affairs</h4>
-          <p class="quick-card-desc">Daily news & GK</p>
-        </div>
-      </a>
-
-      <!-- 2. AI & Tech -->
-      <a href="{{ url_for('quiz.subcategories', category_slug='artificial-intelligence') }}" class="quick-card">
-        <div class="quick-card-icon icon-bg-purple" aria-hidden="true">🤖</div>
-        <div class="quick-card-content">
-          <h4 class="quick-card-title">AI & Tech</h4>
-          <p class="quick-card-desc">Trends & ML models</p>
-        </div>
-      </a>
-
-      <!-- 3. Test Prep -->
-      <a href="{{ url_for('quiz.subcategories', category_slug='competitive-exams') }}" class="quick-card">
-        <div class="quick-card-icon icon-bg-cyan" aria-hidden="true">📈</div>
-        <div class="quick-card-content">
-          <h4 class="quick-card-title">Test Prep</h4>
-          <p class="quick-card-desc">Excel in exams</p>
-        </div>
-      </a>
-
-      <!-- 4. Earn & Win -->
-      <a href="{{ url_for('competitions.index') }}" class="quick-card">
-        <div class="quick-card-icon icon-bg-amber" aria-hidden="true">🏆</div>
-        <div class="quick-card-content">
-          <h4 class="quick-card-title">Earn & Win</h4>
-          <p class="quick-card-desc">Contests & certs</p>
-        </div>
-      </a>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     5. ONE STAY UPDATED NEWSLETTER SECTION (MATCHING MOCKUP IMAGE)
+     4. ONE STAY UPDATED NEWSLETTER SECTION (SINGLE INSTANCE)
 ════════════════════════════════════════════════════════ -->
 <section class="section-sm" aria-label="Stay Updated Newsletter">
   <div class="container">
