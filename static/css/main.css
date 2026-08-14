@@ -2313,56 +2313,57 @@ img, video, canvas, svg {
   .newsletter-card-wrap {
     flex-direction: column !important;
     align-items: stretch !important;
-    padding: 18px 16px !important;
-    gap: 14px !important;
+    padding: 20px !important;
+    gap: 16px !important;
     height: auto !important;
     min-height: unset !important;
-    border-radius: 16px !important;
+    border-radius: 18px !important;
     margin: 0 16px 24px 16px !important;
     width: calc(100% - 32px) !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    background: linear-gradient(135deg, rgba(108,99,255,0.14), rgba(57,200,255,0.06)) !important;
+    background: linear-gradient(135deg, rgba(14, 14, 28, 0.95) 0%, rgba(20, 18, 42, 0.9) 100%) !important;
     border: 1px solid rgba(124, 58, 237, 0.35) !important;
-    box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(124, 58, 237, 0.15) !important;
   }
   .newsletter-header-wrap {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 14px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .newsletter-icon-box {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 12px !important;
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 14px !important;
     flex-shrink: 0 !important;
-    background: var(--g-brand) !important;
+    background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3) !important;
   }
   .newsletter-icon-box svg {
-    width: 22px !important;
-    height: 22px !important;
+    width: 26px !important;
+    height: 26px !important;
   }
   .newsletter-header-wrap > div:last-child {
     flex: 1 !important;
     text-align: left !important;
   }
   .newsletter-title {
-    font-size: 21px !important;
+    font-size: 23px !important;
     font-weight: 800 !important;
-    margin-bottom: 2px !important;
+    margin-bottom: 3px !important;
     color: #FFFFFF !important;
     line-height: 1.2 !important;
   }
   .newsletter-desc {
     font-size: 13.5px !important;
-    line-height: 1.4 !important;
-    color: var(--text-2) !important;
+    line-height: 1.35 !important;
+    color: #9898B0 !important;
     margin: 0 !important;
   }
   .newsletter-form-container {
@@ -2380,11 +2381,11 @@ img, video, canvas, svg {
   .newsletter-input {
     width: 100% !important;
     height: 46px !important;
-    border-radius: 12px !important;
-    padding: 0 16px !important;
+    border-radius: 10px !important;
+    padding: 0 16px 0 42px !important;
     font-size: 14px !important;
-    background: rgba(13, 13, 26, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    background: rgba(8, 8, 16, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     color: #FFFFFF !important;
     outline: none !important;
     box-sizing: border-box !important;
@@ -2396,17 +2397,17 @@ img, video, canvas, svg {
   }
   .newsletter-submit-btn {
     width: 100% !important;
-    height: 48px !important;
-    border-radius: 12px !important;
-    font-size: 15.5px !important;
-    font-weight: 650 !important;
+    height: 46px !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: linear-gradient(135deg, #7C3AED, #2563EB) !important;
+    background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%) !important;
     color: #FFFFFF !important;
     border: none !important;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.28) !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3) !important;
     box-sizing: border-box !important;
     margin: 0 !important;
     white-space: nowrap !important;
@@ -2418,35 +2419,43 @@ img, video, canvas, svg {
   }
   .footer {
     padding-top: 16px !important;
-    padding-bottom: 12px !important;
+    padding-bottom: 14px !important;
+  }
+  .footer-col-title {
+    color: #A78BFA !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    margin-bottom: 10px !important;
+  }
+  .footer-links {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .footer-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 13px !important;
+    color: #9898B0 !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+  }
+  .footer-link svg {
+    flex-shrink: 0 !important;
+    opacity: 0.8 !important;
   }
   .footer-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 16px 12px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px 6px !important;
     text-align: left !important;
     padding-bottom: 14px !important;
   }
-  .footer-grid > div:first-child {
-    grid-column: 1 / -1 !important;
-    margin-bottom: 2px !important;
-  }
-  .footer-grid > div:nth-child(4) {
-    grid-column: 1 / -1 !important;
-    margin-top: 4px !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
-    padding-top: 12px !important;
-  }
-  .footer-grid > div:nth-child(4) .footer-links {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px 12px !important;
-  }
-  .footer-bottom {
-    flex-direction: column !important;
-    gap: 8px !important;
-    text-align: center !important;
-    padding-top: 12px !important;
+  .footer-col:not(:first-child) {
+    border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding-left: 8px !important;
   }
 
   /* 9. CATEGORIES PAGE MOBILE OVERRIDES (2 CARDS PER ROW, HERO SIDE-BY-SIDE, 4-STAT ROW) */
