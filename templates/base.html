@@ -144,30 +144,6 @@
   <footer class="footer" aria-label="Site footer">
     <div class="container">
 
-      <!-- Top Newsletter / Stay Updated Bar -->
-      <div class="card p-5 newsletter-card-wrap">
-        <div class="newsletter-header-wrap">
-          <div class="newsletter-icon-box" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div>
-            <h3 class="font-display newsletter-title">Stay Updated!</h3>
-            <p class="newsletter-desc">Subscribe to our newsletter for latest quizzes, offers and updates.</p>
-          </div>
-        </div>
-
-        <div class="newsletter-form-container">
-          <form id="newsletter-form" onsubmit="handleNewsletterSubmit(event)" class="newsletter-form">
-            <div class="newsletter-input-wrap" style="position:relative;width:100%;">
-              <svg class="newsletter-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9898B0" stroke-width="2" aria-hidden="true" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="newsletter-email" class="newsletter-input" placeholder="Enter your email" required style="padding-left:42px;">
-            </div>
-            <button class="btn btn-primary btn-sm newsletter-submit-btn" type="submit" id="newsletter-btn">Subscribe</button>
-          </form>
-          <div id="newsletter-msg" style="font-size:12px;font-weight:600;display:none;"></div>
-        </div>
-      </div>
-
       <!-- Footer Main Content -->
       <div class="footer-brand-block" style="margin-bottom:20px;">
         <a href="{{ url_for('public.home') }}" class="nav-logo" style="display:flex;align-items:center;gap:12px;">
