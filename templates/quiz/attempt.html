@@ -59,8 +59,13 @@
       </div>
     </div>
 
-    <!-- Right Controls: Theme + Timer + Exit -->
+    <!-- Right Controls: Fullscreen Badge + Theme + Timer + Exit -->
     <div class="quiz-topbar-right">
+      <div class="fullscreen-status-badge active" id="fullscreen-status-badge" aria-label="Fullscreen status">
+        <span class="fs-dot"></span>
+        <span id="fs-badge-text">FULLSCREEN MODE</span>
+      </div>
+
       <button type="button" class="quiz-icon-btn" title="Toggle Dark Theme" aria-label="Toggle Theme">
         🌙
       </button>
@@ -70,8 +75,7 @@
         <span class="quiz-top-timer-text" id="quiz-timer-text" aria-live="polite">--:--</span>
       </div>
 
-      <button class="quiz-exit-btn" id="quiz-exit-btn" type="button"
-              onclick="if(confirm('Exit quiz? Your progress will be lost.'))window.location.href='{{ url_for('quiz.categories') }}'">
+      <button class="quiz-exit-btn" id="quiz-exit-btn" type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>Exit Quiz</span>
       </button>
@@ -295,8 +299,45 @@
   </div>
 </div>
 
+<!-- ── FULLSCREEN START OVERLAY ──────────────────────────────── -->
+<div class="confirm-overlay" id="fullscreen-start-overlay" role="dialog" aria-modal="true" style="display:none;">
+  <div class="confirm-dialog" style="max-width:440px;">
+    <div style="width:56px;height:56px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px auto;box-shadow:0 0 20px rgba(124,58,237,0.3);">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </div>
+    <h2 class="confirm-title" style="font-size:20px;">Enter Fullscreen to Start Quiz</h2>
+    <p class="confirm-sub" style="font-size:13.5px;line-height:1.5;color:var(--text-2);margin-bottom:20px;">
+      QuizNova exam room requires browser fullscreen mode to maintain exam integrity. Tap below to begin your exam.
+    </p>
+    <button class="btn btn-primary" type="button" id="start-fullscreen-btn" style="width:100%;min-height:44px;font-size:14px;border-radius:12px;">
+      🖥️ Launch Fullscreen Exam
+    </button>
+  </div>
+</div>
+
+<!-- ── EXIT QUIZ CONFIRMATION OVERLAY ───────────────────────── -->
+<div class="confirm-overlay" id="exit-quiz-overlay" role="dialog" aria-modal="true" style="display:none;">
+  <div class="confirm-dialog" style="max-width:400px;">
+    <div style="width:52px;height:52px;border-radius:50%;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px auto;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h2 class="confirm-title" style="font-size:18px;">Exit Quiz?</h2>
+    <p class="confirm-sub" style="font-size:13px;line-height:1.5;color:var(--text-2);margin-bottom:20px;">
+      Your current progress may be lost. Are you sure you want to exit the exam?
+    </p>
+    <div class="confirm-actions" style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" type="button" id="exit-cancel-btn" style="flex:1;">
+        Continue Quiz
+      </button>
+      <button class="btn btn-danger" type="button" id="exit-confirm-btn" style="flex:1;background:var(--error);color:white;border:none;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;">
+        Exit Quiz
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ── ANTI-CHEAT OVERLAY ─────────────────────────────────── -->
-<div class="anticheat-overlay" id="anticheat-overlay" role="alertdialog" aria-modal="true" aria-labelledby="anticheat-title">
+<div class="anticheat-overlay" id="anticheat-overlay" role="alertdialog" aria-modal="true" aria-labelledby="anticheat-title" style="display:none;">
   <div class="anticheat-dialog">
     <div class="anticheat-icon" aria-hidden="true">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>

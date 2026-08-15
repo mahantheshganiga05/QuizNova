@@ -1,67 +1,72 @@
 /**
- * QuizNova — Anti-Cheat System (anti-cheat.js)
- * ===============================================
- * Detects suspicious behavior during a quiz attempt.
- * Reports violations to the server and auto-submits when threshold is reached.
- *
- * BROWSER LIMITATIONS (documented honestly):
- * - Fullscreen can always be exited by the browser itself (no JS can prevent ESC key in all browsers)
- * - Tab switching via keyboard shortcuts may not be fully preventable on all OS/browsers
- * - Developer tools detection via DevTools is unreliable across browsers
- * - iOS Safari does not support the Fullscreen API at all
- *
- * WHAT WE DO IMPLEMENT:
- * - Request fullscreen on quiz start
- * - Detect and log fullscreen exit (visibilitychange, fullscreenchange)
- * - Detect tab switch (visibilitychange)
- * - Detect window minimize / alt-tab (window blur)
- * - Disable right-click context menu
- * - Disable copy/paste/cut
- * - Disable text selection
- * - Block common developer shortcuts
- * - Report all violations to server
- * - Auto-submit on max violation threshold
+ * QuizNova — Anti-Cheat System & Fullscreen Exam Engine (anti-cheat.js)
+ * ====================================================================
+ * Manages browser Fullscreen API, anti-cheat violation tracking (3-warning system),
+ * exit confirmation modals, and synchronized header status badges.
  */
 
 'use strict';
 
 const AntiCheat = (() => {
 
-  // Config injected from template
-  const attemptId    = window.QUIZ_ATTEMPT_ID;
-  const csrfToken    = window.CSRF_TOKEN;
-  const maxViolations = window.QUIZ_MAX_VIOLATIONS || 3;
+  // Config injected from window
+  const attemptId     = window.QUIZ_ATTEMPT_ID;
+  const csrfToken     = window.CSRF_TOKEN;
+  const maxViolations  = window.QUIZ_MAX_VIOLATIONS || 3;
 
-  let violationCount  = window.QUIZ_VIOLATIONS || 0;
-  let isFullscreen    = false;
-  let quizSubmitted   = false;
-  let warningVisible  = false;
+  let violationCount   = window.QUIZ_VIOLATIONS || 0;
+  let isFullscreen     = false;
+  let isSubmitting     = false;
+  let isReporting      = false;
 
   // -------------------------------------------------------------------------
   // INITIALIZATION
   // -------------------------------------------------------------------------
   function init() {
-    _requestFullscreen();
-    _attachListeners();
-    console.info('[AntiCheat] Initialized. Max violations:', maxViolations);
+    _updateBadgeStatus(false);
+    _attachEventListeners();
+    _attemptInitialFullscreen();
+    console.info('[AntiCheat] Initialized exam room engine. Max violations:', maxViolations);
   }
 
   // -------------------------------------------------------------------------
-  // FULLSCREEN
+  // FULLSCREEN MANAGEMENT
   // -------------------------------------------------------------------------
-  function _requestFullscreen() {
+  function requestFullscreen() {
     const el = document.documentElement;
     if (el.requestFullscreen) {
-      el.requestFullscreen().then(() => {
+      return el.requestFullscreen().then(() => {
         isFullscreen = true;
-      }).catch(() => {
-        // Fullscreen request blocked (some browsers require user gesture)
-        console.warn('[AntiCheat] Fullscreen request was blocked or not supported.');
+        _updateBadgeStatus(true);
+        _hideStartOverlay();
+      }).catch(err => {
+        console.warn('[AntiCheat] Fullscreen request blocked by browser policy:', err);
+        _showStartOverlay();
       });
     } else if (el.webkitRequestFullscreen) {
       el.webkitRequestFullscreen();
       isFullscreen = true;
+      _updateBadgeStatus(true);
+      _hideStartOverlay();
+    } else {
+      _showStartOverlay();
     }
+  }
+
+  function exitFullscreen() {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.warn('[AntiCheat] Exit fullscreen error:', err));
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+    isFullscreen = false;
+    _updateBadgeStatus(false);
+  }
+
+  function _attemptInitialFullscreen() {
+    requestFullscreen();
   }
 
   function _onFullscreenChange() {
@@ -70,87 +75,89 @@ const AntiCheat = (() => {
       document.webkitFullscreenElement
     );
 
+    if (isSubmitting) return;
+
     if (isFullscreen && !isNowFullscreen) {
-      // Fullscreen was exited
       isFullscreen = false;
-      _reportViolation('fullscreen_exit');
-      _showWarning('⚠️ Fullscreen Exited',
-        `You have exited fullscreen mode. This has been recorded as a violation (${violationCount + 1}/${maxViolations}). Return to fullscreen to continue.`,
-        'Return to Fullscreen',
-        _requestFullscreen
-      );
+      _updateBadgeStatus(false);
+      _handleViolation('fullscreen_exit', 'Fullscreen Exited');
     } else if (!isFullscreen && isNowFullscreen) {
       isFullscreen = true;
+      _updateBadgeStatus(true);
       _hideWarning();
     }
   }
 
+  function _updateBadgeStatus(active) {
+    const badge = document.getElementById('fullscreen-status-badge');
+    const badgeText = document.getElementById('fs-badge-text');
+    if (!badge || !badgeText) return;
+
+    if (active) {
+      badge.classList.remove('lost');
+      badge.classList.add('active');
+      badgeText.textContent = 'FULLSCREEN ACTIVE';
+    } else {
+      badge.classList.remove('active');
+      badge.classList.add('lost');
+      badgeText.textContent = 'FULLSCREEN LOST';
+    }
+  }
+
   // -------------------------------------------------------------------------
-  // TAB SWITCH / VISIBILITY
+  // START OVERLAY (Permission Fallback)
+  // -------------------------------------------------------------------------
+  function _showStartOverlay() {
+    const overlay = document.getElementById('fullscreen-start-overlay');
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  function _hideStartOverlay() {
+    const overlay = document.getElementById('fullscreen-start-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
+  // -------------------------------------------------------------------------
+  // EVENT HANDLERS (Tab Switch & Window Blur)
   // -------------------------------------------------------------------------
   function _onVisibilityChange() {
-    if (document.hidden) {
-      _reportViolation('tab_switch');
+    if (document.hidden && !isSubmitting) {
+      _handleViolation('tab_switch', 'Tab Switch Detected');
     }
   }
 
-  // -------------------------------------------------------------------------
-  // WINDOW BLUR (minimize or alt-tab without changing visibility)
-  // -------------------------------------------------------------------------
-  function _onWindowBlur() {
-    // Only fire if not already in a fullscreen-exit violation
-    if (!document.hidden) {
-      _reportViolation('window_blur');
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // CONTEXT MENU (right-click)
-  // -------------------------------------------------------------------------
   function _preventContextMenu(e) {
     e.preventDefault();
-    _reportViolation('right_click');
     return false;
   }
 
-  // -------------------------------------------------------------------------
-  // COPY / PASTE / CUT
-  // -------------------------------------------------------------------------
   function _preventCopy(e) {
     e.preventDefault();
-    _reportViolation('copy_paste');
     return false;
   }
 
-  // -------------------------------------------------------------------------
-  // TEXT SELECTION
-  // -------------------------------------------------------------------------
   function _preventSelection(e) {
-    // Allow selection in input fields and textareas
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     e.preventDefault();
     return false;
   }
 
-  // -------------------------------------------------------------------------
-  // KEYBOARD SHORTCUTS
-  // -------------------------------------------------------------------------
   function _onKeyDown(e) {
     const BLOCKED_COMBOS = [
-      { ctrl: true, key: 'u' },   // View source
+      { ctrl: true, key: 'u' },
       { ctrl: true, key: 'U' },
-      { ctrl: true, shift: true, key: 'I' }, // DevTools
+      { ctrl: true, shift: true, key: 'I' },
       { ctrl: true, shift: true, key: 'i' },
-      { ctrl: true, shift: true, key: 'J' }, // Console
+      { ctrl: true, shift: true, key: 'J' },
       { ctrl: true, shift: true, key: 'j' },
-      { ctrl: true, shift: true, key: 'C' }, // Inspect
+      { ctrl: true, shift: true, key: 'C' },
       { ctrl: true, shift: true, key: 'c' },
-      { key: 'F12' },                         // DevTools
-      { ctrl: true, key: 'a' },               // Select all
+      { key: 'F12' },
+      { ctrl: true, key: 'a' },
       { ctrl: true, key: 'A' },
-      { ctrl: true, key: 's' },               // Save
+      { ctrl: true, key: 's' },
       { ctrl: true, key: 'S' },
-      { ctrl: true, key: 'p' },               // Print
+      { ctrl: true, key: 'p' },
       { ctrl: true, key: 'P' },
     ];
 
@@ -165,22 +172,50 @@ const AntiCheat = (() => {
     if (isBlocked) {
       e.preventDefault();
       e.stopPropagation();
-      _reportViolation('keyboard_shortcut');
       return false;
     }
   }
 
   // -------------------------------------------------------------------------
-  // VIOLATION REPORTING
+  // VIOLATION & 3-WARNING SYSTEM
   // -------------------------------------------------------------------------
-  async function _reportViolation(eventType) {
-    if (quizSubmitted) return;
+  function _handleViolation(eventType, reasonTitle) {
+    if (isSubmitting || isReporting) return;
+    isReporting = true;
 
     violationCount++;
-    _updateViolationCounter();
+    _updateViolationBadges();
 
+    // Determine warning message based on count
+    let title = `Warning ${violationCount}/${maxViolations} – ${reasonTitle}`;
+    let message = `Please return to fullscreen mode to continue your exam.`;
+
+    if (violationCount === 1) {
+      title = `Warning 1/${maxViolations} – ${reasonTitle}`;
+      message = `You have exited fullscreen or switched tabs. Please return to fullscreen mode to continue your quiz.`;
+    } else if (violationCount === 2) {
+      title = `Warning 2/${maxViolations} – Leaving Fullscreen Again May Terminate Quiz`;
+      message = `Leaving fullscreen or switching tabs again will reach the maximum violation limit and automatically submit your quiz.`;
+    } else if (violationCount >= maxViolations) {
+      title = `Warning 3/${maxViolations} – Maximum Violations Reached`;
+      message = `Maximum violation limit reached. Your quiz progress is being submitted now.`;
+    }
+
+    _reportViolationToServer(eventType);
+
+    if (violationCount >= maxViolations) {
+      _showTerminationWarning(title, message);
+    } else {
+      _showWarning(title, message, 'Return to Fullscreen', () => {
+        isReporting = false;
+        requestFullscreen();
+      });
+    }
+  }
+
+  async function _reportViolationToServer(eventType) {
     try {
-      const res = await fetch(`/api/v1/quiz/${attemptId}/report-violation`, {
+      await fetch(`/api/v1/quiz/${attemptId}/report-violation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,55 +226,46 @@ const AntiCheat = (() => {
           meta: { timestamp: new Date().toISOString() }
         }),
       });
-
-      const data = await res.json();
-
-      if (data.success && data.data.auto_submit) {
-        quizSubmitted = true;
-        _showAutoSubmitScreen();
-      }
     } catch (err) {
-      console.warn('[AntiCheat] Failed to report violation:', err);
-      // Still enforce locally if server unreachable
-      if (violationCount >= maxViolations) {
-        _showAutoSubmitScreen();
+      console.warn('[AntiCheat] Error reporting violation to server:', err);
+    }
+  }
+
+  function _updateViolationBadges() {
+    const counter = document.getElementById('violation-count');
+    if (counter) counter.textContent = violationCount;
+
+    const remainingNum = document.getElementById('anticheat-violation-num');
+    if (remainingNum) remainingNum.textContent = violationCount;
+
+    const badge = document.getElementById('violation-badge');
+    if (badge) {
+      badge.classList.remove('warning-level', 'danger-level');
+      if (violationCount >= maxViolations - 1) {
+        badge.classList.add('danger-level');
+      } else if (violationCount > 0) {
+        badge.classList.add('warning-level');
       }
     }
   }
 
-  function _updateViolationCounter() {
-    const counter = document.getElementById('violation-count');
-    if (!counter) return;
-
-    counter.textContent = `${violationCount}/${maxViolations} violations`;
-    counter.parentElement.classList.remove('warning-level', 'danger-level');
-
-    if (violationCount >= maxViolations - 1) {
-      counter.parentElement.classList.add('danger-level');
-    } else if (violationCount > 0) {
-      counter.parentElement.classList.add('warning-level');
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // WARNING OVERLAY
-  // -------------------------------------------------------------------------
   function _showWarning(title, message, buttonText, onConfirm) {
-    if (warningVisible) return;
-    warningVisible = true;
-
     const overlay = document.getElementById('anticheat-overlay');
     if (!overlay) return;
 
-    overlay.querySelector('#ac-title').textContent   = title;
-    overlay.querySelector('#ac-message').textContent = message;
+    const titleEl = document.getElementById('anticheat-title');
+    const msgEl   = document.getElementById('anticheat-message');
+    const btn     = document.getElementById('anticheat-dismiss-btn');
 
-    const btn = overlay.querySelector('#ac-action-btn');
-    btn.textContent = buttonText;
-    btn.onclick = () => {
-      _hideWarning();
-      if (onConfirm) onConfirm();
-    };
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
+    if (btn) {
+      btn.textContent = buttonText;
+      btn.onclick = () => {
+        _hideWarning();
+        if (onConfirm) onConfirm();
+      };
+    }
 
     overlay.style.display = 'flex';
   }
@@ -247,37 +273,74 @@ const AntiCheat = (() => {
   function _hideWarning() {
     const overlay = document.getElementById('anticheat-overlay');
     if (overlay) overlay.style.display = 'none';
-    warningVisible = false;
+    isReporting = false;
   }
 
-  function _showAutoSubmitScreen() {
-    const overlay = document.getElementById('anticheat-overlay');
-    if (overlay) {
-      overlay.querySelector('#ac-title').textContent   = '🚫 Quiz Auto-Submitted';
-      overlay.querySelector('#ac-message').textContent =
-        `You have exceeded ${maxViolations} anti-cheat violations. Your quiz has been automatically submitted.`;
-      const btn = overlay.querySelector('#ac-action-btn');
-      btn.textContent = 'View Results';
-      btn.onclick = () => {
-        // Trigger quiz engine auto-submit
-        if (window.QuizEngine) {
-          window.QuizEngine.autoSubmit?.('max_violations');
-        } else {
-          window.location.href = `/quiz/result/${attemptId}`;
-        }
-      };
-      overlay.style.display = 'flex';
+  function _showTerminationWarning(title, message) {
+    isSubmitting = true;
+    _showWarning(title, message, 'Submitting Quiz...', () => {
+      _executeAutoSubmit();
+    });
+
+    setTimeout(() => {
+      _executeAutoSubmit();
+    }, 3000);
+  }
+
+  function _executeAutoSubmit() {
+    exitFullscreen();
+    if (window.QuizEngine && window.QuizEngine.autoSubmit) {
+      window.QuizEngine.autoSubmit('max_violations');
+    } else {
+      const form = document.getElementById('final-submit-form');
+      if (form) form.submit();
     }
   }
 
   // -------------------------------------------------------------------------
-  // ATTACH ALL LISTENERS
+  // EXIT QUIZ & SUBMIT HANDLERS
   // -------------------------------------------------------------------------
-  function _attachListeners() {
+  function _setupExitModal() {
+    const exitBtn = document.getElementById('quiz-exit-btn');
+    const overlay = document.getElementById('exit-quiz-overlay');
+    const confirmBtn = document.getElementById('exit-confirm-btn');
+    const cancelBtn  = document.getElementById('exit-cancel-btn');
+
+    if (exitBtn && overlay) {
+      exitBtn.addEventListener('click', () => {
+        overlay.style.display = 'flex';
+      });
+    }
+
+    if (cancelBtn && overlay) {
+      cancelBtn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        isSubmitting = true;
+        exitFullscreen();
+        window.location.href = '/quiz/categories/';
+      });
+    }
+
+    const startBtn = document.getElementById('start-fullscreen-btn');
+    if (startBtn) {
+      startBtn.addEventListener('click', () => {
+        requestFullscreen();
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // LISTENERS
+  // -------------------------------------------------------------------------
+  function _attachEventListeners() {
     document.addEventListener('fullscreenchange',       _onFullscreenChange);
     document.addEventListener('webkitfullscreenchange', _onFullscreenChange);
     document.addEventListener('visibilitychange',       _onVisibilityChange);
-    window.addEventListener('blur',                     _onWindowBlur);
     document.addEventListener('contextmenu',            _preventContextMenu);
     document.addEventListener('copy',                   _preventCopy);
     document.addEventListener('cut',                    _preventCopy);
@@ -285,17 +348,16 @@ const AntiCheat = (() => {
     document.addEventListener('selectstart',            _preventSelection);
     document.addEventListener('keydown',                _onKeyDown, true);
 
-    // CSS-level selection prevention (belt-and-suspenders)
-    document.body.style.userSelect = 'none';
-    document.body.style.webkitUserSelect = 'none';
+    _setupExitModal();
   }
 
-  // -------------------------------------------------------------------------
-  // PUBLIC API
-  // -------------------------------------------------------------------------
-  return { init };
+  return {
+    init,
+    requestFullscreen,
+    exitFullscreen
+  };
 
 })();
 
-// Auto-initialize when DOM is ready
+// Initialize when DOM ready
 document.addEventListener('DOMContentLoaded', () => AntiCheat.init());

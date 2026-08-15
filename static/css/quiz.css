@@ -83,6 +83,29 @@
   display: flex; align-items: center; gap: 12px; flex-shrink: 0;
 }
 
+.fullscreen-status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10B981;
+  transition: all 0.25s ease;
+}
+.fullscreen-status-badge .fs-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #10B981;
+  box-shadow: 0 0 8px #10B981; animation: pulseGlow 2s infinite;
+}
+.fullscreen-status-badge.lost {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #EF4444;
+}
+.fullscreen-status-badge.lost .fs-dot {
+  background: #EF4444;
+  box-shadow: 0 0 8px #EF4444;
+}
+
 .quiz-icon-btn {
   width: 36px; height: 36px; border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
