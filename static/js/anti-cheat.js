@@ -177,9 +177,16 @@ const AntiCheat = (() => {
   }
 
   // -------------------------------------------------------------------------
-  // VIOLATION & 3-WARNING SYSTEM
+  // VIOLATION & 3-WARNING SYSTEM (With 2s Debounce Cooldown)
   // -------------------------------------------------------------------------
+  let lastViolationTime = 0;
+
   function _handleViolation(eventType, reasonTitle) {
+    const now = Date.now();
+    // Prevent duplicate event triggers within 2 seconds (e.g. visibilitychange + blur)
+    if (now - lastViolationTime < 2000) return;
+    lastViolationTime = now;
+
     if (isSubmitting || isReporting) return;
     isReporting = true;
 
@@ -191,13 +198,13 @@ const AntiCheat = (() => {
     let message = `Please return to fullscreen mode to continue your exam.`;
 
     if (violationCount === 1) {
-      title = `Warning 1/${maxViolations} – ${reasonTitle}`;
-      message = `You have exited fullscreen or switched tabs. Please return to fullscreen mode to continue your quiz.`;
+      title = `Warning 1/${maxViolations}: Please remain in fullscreen mode and stay on the quiz page.`;
+      message = `You have exited fullscreen or switched away from the quiz page. Return to fullscreen to continue your exam.`;
     } else if (violationCount === 2) {
-      title = `Warning 2/${maxViolations} – Leaving Fullscreen Again May Terminate Quiz`;
-      message = `Leaving fullscreen or switching tabs again will reach the maximum violation limit and automatically submit your quiz.`;
+      title = `Warning 2/${maxViolations}: Leaving the quiz environment again may terminate your attempt.`;
+      message = `Leaving fullscreen or switching away again will exceed the maximum violation limit and automatically submit your quiz.`;
     } else if (violationCount >= maxViolations) {
-      title = `Warning 3/${maxViolations} – Maximum Violations Reached`;
+      title = `Warning 3/${maxViolations}: Maximum violations reached.`;
       message = `Maximum violation limit reached. Your quiz progress is being submitted now.`;
     }
 

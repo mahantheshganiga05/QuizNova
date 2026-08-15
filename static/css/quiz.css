@@ -115,6 +115,10 @@
 }
 .quiz-icon-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(167, 139, 250, 0.4); }
 
+.mobile-palette-trigger {
+  display: none;
+}
+
 .quiz-top-timer-badge {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 14px; border-radius: 99px;

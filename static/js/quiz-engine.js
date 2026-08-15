@@ -317,6 +317,9 @@ function _attachEvents() {
       const order = parseInt(paletteBtn.dataset.order);
       if (!isNaN(order)) {
         showQuestion(order);
+        // Scroll question card into view smoothly on mobile
+        const slide = document.getElementById(`slide-${order}`);
+        if (slide) slide.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       return;
     }
