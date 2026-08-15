@@ -205,8 +205,53 @@
         </div>
       </a>
       {% endfor %}
-    </div>
+  </div>
+</section>
 
+<!-- ═══════════════════════════════════════════════════════
+     FEATURE CARDS (4 DOMAINS: CURRENT AFFAIRS, AI, TEST PREP, EARN & WIN)
+════════════════════════════════════════════════════════ -->
+<section class="section-sm feature-cards-section" aria-label="Feature Domains">
+  <div class="container">
+    <div class="feature-cards-grid" data-aos="fade-up">
+
+      <!-- 1. Current Affairs -->
+      <a href="{{ url_for('quiz.subcategories', category_slug='aptitude') }}" class="feature-card">
+        <div class="feature-card-icon icon-bg-blue" aria-hidden="true">📋</div>
+        <div class="feature-card-content">
+          <h4 class="feature-card-title">Current Affairs</h4>
+          <p class="feature-card-desc">Daily news & GK</p>
+        </div>
+      </a>
+
+      <!-- 2. AI & Tech -->
+      <a href="{{ url_for('quiz.subcategories', category_slug='artificial-intelligence') }}" class="feature-card">
+        <div class="feature-card-icon icon-bg-purple" aria-hidden="true">🤖</div>
+        <div class="feature-card-content">
+          <h4 class="feature-card-title">AI & Tech</h4>
+          <p class="feature-card-desc">Trends & ML models</p>
+        </div>
+      </a>
+
+      <!-- 3. Test Prep -->
+      <a href="{{ url_for('quiz.subcategories', category_slug='competitive-exams') }}" class="feature-card">
+        <div class="feature-card-icon icon-bg-cyan" aria-hidden="true">📈</div>
+        <div class="feature-card-content">
+          <h4 class="feature-card-title">Test Prep</h4>
+          <p class="feature-card-desc">Excel in exams</p>
+        </div>
+      </a>
+
+      <!-- 4. Earn & Win -->
+      <a href="{{ url_for('competitions.index') }}" class="feature-card">
+        <div class="feature-card-icon icon-bg-amber" aria-hidden="true">🏆</div>
+        <div class="feature-card-content">
+          <h4 class="feature-card-title">Earn & Win</h4>
+          <p class="feature-card-desc">Contests & certs</p>
+        </div>
+      </a>
+
+    </div>
   </div>
 </section>
 
@@ -314,6 +359,76 @@
     font-weight: 500;
   }
 
+  /* FEATURE CARDS (4 DOMAINS ABOVE STAY UPDATED) */
+  .feature-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .feature-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--g-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 16px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(124, 58, 237, 0.5);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+  }
+  .feature-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .icon-bg-blue { background: rgba(59, 130, 246, 0.15); }
+  .icon-bg-purple { background: rgba(124, 58, 237, 0.15); }
+  .icon-bg-cyan { background: rgba(6, 182, 212, 0.15); }
+  .icon-bg-amber { background: rgba(245, 158, 11, 0.15); }
+
+  .feature-card-content {
+    min-width: 0;
+    flex: 1;
+  }
+  .feature-card-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 2px 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+    line-height: 1.25;
+  }
+  .feature-card-desc {
+    font-size: 12px;
+    color: var(--text-2);
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
   /* DESKTOP 2-COLUMN NEWSLETTER CARD (MATCHING MOCKUP IMAGE) */
   .newsletter-home-card {
     display: grid !important;
@@ -353,6 +468,57 @@
   }
 
   @media (max-width: 768px) {
+    .feature-cards-section {
+      padding-block: 8px 10px !important;
+    }
+    .feature-cards-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .feature-card {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding: 12px 10px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      border-radius: 14px !important;
+      box-sizing: border-box !important;
+    }
+    .feature-card-icon {
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 18px !important;
+      border-radius: 10px !important;
+      flex-shrink: 0 !important;
+    }
+    .feature-card-content {
+      min-width: 0 !important;
+      flex: 1 !important;
+    }
+    .feature-card-title {
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      margin: 0 0 2px 0 !important;
+      min-width: 0 !important;
+      overflow-wrap: break-word !important;
+      word-break: normal !important;
+      white-space: normal !important;
+      line-height: 1.2 !important;
+    }
+    .feature-card-desc {
+      font-size: 10.5px !important;
+      margin: 0 !important;
+      min-width: 0 !important;
+      overflow-wrap: break-word !important;
+      word-break: normal !important;
+      white-space: normal !important;
+      line-height: 1.25 !important;
+    }
     .newsletter-home-card {
       display: grid !important;
       grid-template-columns: 1fr 100px !important;
