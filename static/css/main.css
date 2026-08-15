@@ -2346,62 +2346,11 @@ img, video, canvas, svg {
     border-radius: var(--r-full) !important;
   }
 
-  /* 8. FOOTER COMPACT REDESIGN & NEWSLETTER MOBILE STACK REDESIGN */
-  .newsletter-card-wrap {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    padding: 20px 18px !important;
-    gap: 14px !important;
-    height: auto !important;
-    min-height: unset !important;
-    border-radius: 18px !important;
-    margin: 0 16px 24px 16px !important;
-    width: calc(100% - 32px) !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    background: linear-gradient(135deg, rgba(14, 14, 28, 0.95) 0%, rgba(20, 18, 42, 0.9) 100%) !important;
-    border: 1px solid rgba(124, 58, 237, 0.35) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(124, 58, 237, 0.15) !important;
-  }
-  .newsletter-header-wrap {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 14px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-  .newsletter-icon-box {
-    width: 56px !important;
-    height: 56px !important;
-    border-radius: 14px !important;
-    flex-shrink: 0 !important;
-    background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3) !important;
-  }
-  .newsletter-icon-box svg {
-    width: 26px !important;
-    height: 26px !important;
-  }
-  .newsletter-header-wrap > div:last-child {
-    flex: 1 !important;
+  /* 8. FOOTER MOBILE RESPONSIVE LAYOUT */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
     text-align: left !important;
-  }
-  .newsletter-title {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    margin-bottom: 3px !important;
-    color: #FFFFFF !important;
-    line-height: 1.2 !important;
-  }
-  .newsletter-desc {
-    font-size: 13.5px !important;
-    line-height: 1.4 !important;
-    color: #9898B0 !important;
-    margin: 0 !important;
   }
   .newsletter-form-container {
     width: 100% !important;
