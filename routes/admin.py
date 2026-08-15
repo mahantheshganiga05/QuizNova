@@ -7,14 +7,14 @@ All admin panel routes behind @admin_required.
 import csv, io
 from datetime import datetime
 from flask import (Blueprint, render_template, request, redirect,
-                   url_for, flash, make_response, current_app)
+                   url_for, flash, make_response, current_app, jsonify)
 from flask_login import login_user, logout_user, current_user
 from models import db
 from models.user import User
 from models.category import Category
 from models.subcategory import Subcategory
 from models.question import Question
-from models.quiz import QuizAttempt
+from models.quiz import QuizAttempt, AttemptQuestion, AttemptAnswer
 from models.result import Result
 from models.certificate import Certificate
 from models.log import Settings
@@ -186,8 +186,11 @@ def questions():
         page=page, per_page=current_app.config['ADMIN_QUESTIONS_PER_PAGE'], error_out=False
     )
     subcategories = Subcategory.query.filter_by(is_active=True).all()
+    selected_sub = Subcategory.query.get(sub_filter) if sub_filter else None
+    sub_question_count = Question.query.filter_by(subcategory_id=sub_filter).count() if sub_filter else 0
     return render_template('admin/questions.html', pagination=pagination,
-                           subcategories=subcategories, search=search, sub_filter=sub_filter)
+                           subcategories=subcategories, search=search, sub_filter=sub_filter,
+                           selected_sub=selected_sub, sub_question_count=sub_question_count)
 
 
 @admin_bp.route('/questions/add', methods=['POST'])
@@ -394,15 +397,114 @@ def import_questions_api():
     return redirect(url_for('admin.questions'))
 
 
-@admin_bp.route('/questions/<int:question_id>/delete', methods=['POST'])
+@admin_bp.route('/questions/<int:question_id>/delete', methods=['POST', 'DELETE'])
 @admin_required
 def delete_question(question_id):
-    """Delete a question from the question bank."""
-    q = Question.query.get_or_404(question_id)
-    db.session.delete(q)
-    db.session.commit()
-    flash('Question deleted successfully.', 'success')
-    return redirect(url_for('admin.questions'))
+    """Safely delete a single question from the question bank with explicit dependency cleanup."""
+    is_ajax = (request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 
+              request.is_json or 
+              request.content_type == 'application/json')
+    
+    q = Question.query.get(question_id)
+    if not q:
+        if is_ajax:
+            return jsonify({'success': False, 'message': 'Question not found'}), 404
+        flash('Question not found.', 'error')
+        return redirect(url_for('admin.questions'))
+
+    try:
+        # Step 1: Find matching AttemptQuestion records
+        matching_aqs = AttemptQuestion.query.filter_by(question_id=q.id).all()
+        aq_ids = [aq.id for aq in matching_aqs]
+
+        if aq_ids:
+            # Step 2: Delete dependent AttemptAnswer records
+            AttemptAnswer.query.filter(AttemptAnswer.attempt_question_id.in_(aq_ids)).delete(synchronize_session=False)
+            # Step 3: Delete dependent AttemptQuestion records
+            AttemptQuestion.query.filter(AttemptQuestion.id.in_(aq_ids)).delete(synchronize_session=False)
+
+        # Step 4: Delete the Question itself
+        sub_id = q.subcategory_id
+        db.session.delete(q)
+        db.session.commit()
+
+        if is_ajax:
+            return jsonify({'success': True, 'message': 'Question deleted successfully'})
+
+        flash('Question deleted successfully.', 'success')
+        return redirect(url_for('admin.questions', subcategory_id=sub_id if sub_id else ''))
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'Error deleting question {question_id}: {e}', exc_info=True)
+        if is_ajax:
+            return jsonify({'success': False, 'message': f'Failed to delete question: {str(e)}'}), 500
+        flash(f'Failed to delete question: {str(e)}', 'error')
+        return redirect(url_for('admin.questions'))
+
+
+@admin_bp.route('/subcategories/<int:subcategory_id>/questions/delete-all', methods=['POST', 'DELETE'])
+@admin_required
+def delete_all_subcategory_questions(subcategory_id):
+    """Safely delete all questions belonging to a specific subcategory with explicit dependency cleanup."""
+    is_ajax = (request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 
+              request.is_json or 
+              request.content_type == 'application/json')
+
+    sub = Subcategory.query.get(subcategory_id)
+    if not sub:
+        if is_ajax:
+            return jsonify({'success': False, 'message': 'Subcategory not found'}), 404
+        flash('Subcategory not found.', 'error')
+        return redirect(url_for('admin.questions'))
+
+    try:
+        sub_questions = Question.query.filter_by(subcategory_id=sub.id).all()
+        q_ids = [q.id for q in sub_questions]
+        deleted_count = len(q_ids)
+
+        if deleted_count == 0:
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': 'No questions found in this subcategory',
+                    'deleted_count': 0
+                })
+            flash('No questions found in this subcategory.', 'info')
+            return redirect(url_for('admin.questions', subcategory_id=sub.id))
+
+        # Step 1: Find matching AttemptQuestion records for all questions in this subcategory
+        matching_aqs = AttemptQuestion.query.filter(AttemptQuestion.question_id.in_(q_ids)).all()
+        aq_ids = [aq.id for aq in matching_aqs]
+
+        if aq_ids:
+            # Step 2: Delete dependent AttemptAnswer records
+            AttemptAnswer.query.filter(AttemptAnswer.attempt_question_id.in_(aq_ids)).delete(synchronize_session=False)
+            # Step 3: Delete dependent AttemptQuestion records
+            AttemptQuestion.query.filter(AttemptQuestion.id.in_(aq_ids)).delete(synchronize_session=False)
+
+        # Step 4: Delete ONLY Questions belonging to this subcategory
+        Question.query.filter(Question.id.in_(q_ids)).delete(synchronize_session=False)
+        db.session.commit()
+
+        msg = f'All {deleted_count} questions from {sub.name} deleted successfully.'
+        if is_ajax:
+            return jsonify({
+                'success': True,
+                'message': msg,
+                'deleted_count': deleted_count
+            })
+
+        flash(msg, 'success')
+        return redirect(url_for('admin.questions', subcategory_id=sub.id))
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'Error deleting all questions for subcategory {subcategory_id}: {e}', exc_info=True)
+        if is_ajax:
+            return jsonify({'success': False, 'message': f'Failed to delete questions: {str(e)}'}), 500
+        flash(f'Failed to delete questions: {str(e)}', 'error')
+        return redirect(url_for('admin.questions', subcategory_id=subcategory_id))
 
 
 # =============================================================================

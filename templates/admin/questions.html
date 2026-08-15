@@ -69,8 +69,17 @@
         {% if search or sub_filter %}
         <a href="{{ url_for('admin.questions') }}" class="btn btn-ghost btn-sm">Clear</a>
         {% endif %}
+
+        {% if sub_filter and selected_sub %}
+        <button type="button" class="btn btn-sm" style="background:#EF4444;color:white;border:none;margin-left:auto;" onclick="openDeleteAllModal('{{ selected_sub.id }}', '{{ selected_sub.name | escape }}', {{ sub_question_count }})">
+          🗑️ Delete All Questions
+        </button>
+        {% endif %}
       </form>
     </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;"></div>
 
     <!-- Questions Data Table -->
     <div class="card p-4">
@@ -86,9 +95,9 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="questions-table-body">
             {% for q in pagination.items %}
-            <tr>
+            <tr id="q-row-{{ q.id }}">
               <td style="color:var(--text-3);">{{ q.id }}</td>
               <td style="max-width:380px;font-weight:500;color:white;">{{ q.question_text | truncate(70) }}</td>
               <td><span class="badge badge-purple">{{ q.subcategory.name if q.subcategory else '' }}</span></td>
@@ -100,15 +109,14 @@
               <td style="text-transform:uppercase;font-weight:700;color:var(--brand-cyan);">Option {{ q.correct_option }}</td>
               <td>
                 <div style="display:flex;gap:6px;">
-                  <form method="POST" action="{{ url_for('admin.delete_question', question_id=q.id) }}" onsubmit="return confirm('Are you sure you want to delete this question?');">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--error);">Delete</button>
-                  </form>
+                  <button type="button" class="btn btn-ghost btn-sm" style="color:#EF4444;padding:4px 10px;font-size:12px;" onclick="openSingleDeleteModal('{{ q.id }}', `{{ q.question_text | truncate(50) }}`)">
+                    🗑️ Delete
+                  </button>
                 </div>
               </td>
             </tr>
             {% else %}
-            <tr>
+            <tr id="empty-questions-row">
               <td colspan="6" style="text-align:center;padding:32px;color:var(--text-3);">
                 No questions found matching your filter criteria.
               </td>
@@ -120,7 +128,7 @@
 
       <!-- Pagination -->
       {% if pagination.pages > 1 %}
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <div id="pagination-controls" style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
         <span style="font-size:12px;color:var(--text-2);">Page {{ pagination.page }} of {{ pagination.pages }}</span>
         <div style="display:flex;gap:6px;">
           {% if pagination.has_prev %}
@@ -135,6 +143,39 @@
     </div>
 
   </main>
+</div>
+
+<!-- Single Question Delete Confirmation Modal -->
+<div id="delete-single-q-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div class="card p-5" style="max-width:440px;width:100%;border:1px solid rgba(239,68,68,0.4);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h3 class="font-display" style="font-size:18px;font-weight:800;color:white;">Delete Question?</h3>
+      <button onclick="closeSingleDeleteModal()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:20px;">✕</button>
+    </div>
+    <p style="font-size:14px;color:var(--text-1);margin-bottom:8px;">Are you sure you want to permanently delete this question?</p>
+    <p id="delete-single-q-preview" style="font-size:12px;color:var(--text-2);font-style:italic;margin-bottom:14px;background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;"></p>
+    <p style="font-size:12px;color:#F87171;font-weight:600;margin-bottom:20px;">⚠️ This action cannot be undone.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeSingleDeleteModal()">Cancel</button>
+      <button type="button" id="confirm-single-delete-btn" class="btn btn-sm" style="background:#EF4444;color:white;border:none;" onclick="submitSingleDelete()">Delete Question</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete All Questions Confirmation Modal -->
+<div id="delete-all-q-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div class="card p-5" style="max-width:460px;width:100%;border:1px solid rgba(239,68,68,0.5);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h3 class="font-display" style="font-size:18px;font-weight:800;color:white;">Delete All Questions?</h3>
+      <button onclick="closeDeleteAllModal()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:20px;">✕</button>
+    </div>
+    <p id="delete-all-q-msg" style="font-size:14px;color:var(--text-1);margin-bottom:12px;line-height:1.4;"></p>
+    <p style="font-size:12px;color:#F87171;font-weight:600;margin-bottom:20px;">⚠️ This action cannot be undone.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeDeleteAllModal()">Cancel</button>
+      <button type="button" id="confirm-all-delete-btn" class="btn btn-sm" style="background:#EF4444;color:white;border:none;" onclick="submitDeleteAll()">Delete All Questions</button>
+    </div>
+  </div>
 </div>
 
 <!-- Add Question Modal -->
@@ -269,4 +310,169 @@
     </form>
   </div>
 </div>
+
+<script>
+const csrfToken = "{{ csrf_token() }}";
+let activeDeleteQuestionId = null;
+let activeDeleteSubcategoryId = null;
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  
+  const toast = document.createElement('div');
+  toast.style.padding = '12px 18px';
+  toast.style.borderRadius = '10px';
+  toast.style.fontSize = '13px';
+  toast.style.fontWeight = '600';
+  toast.style.color = '#fff';
+  toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+  toast.style.pointerEvents = 'auto';
+  toast.style.display = 'flex';
+  toast.style.alignItems = 'center';
+  toast.style.gap = '10px';
+  toast.style.backdropFilter = 'blur(12px)';
+
+  if (type === 'error') {
+    toast.style.background = 'rgba(239, 68, 68, 0.9)';
+    toast.style.border = '1px solid rgba(239, 68, 68, 0.5)';
+    toast.innerHTML = '<span>❌ ' + message + '</span>';
+  } else {
+    toast.style.background = 'rgba(16, 185, 129, 0.9)';
+    toast.style.border = '1px solid rgba(16, 185, 129, 0.5)';
+    toast.innerHTML = '<span>✅ ' + message + '</span>';
+  }
+
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+function openSingleDeleteModal(questionId, questionPreview) {
+  activeDeleteQuestionId = questionId;
+  const previewEl = document.getElementById('delete-single-q-preview');
+  if (previewEl) {
+    previewEl.textContent = `"${questionPreview}"`;
+  }
+  document.getElementById('delete-single-q-modal').style.display = 'flex';
+}
+
+function closeSingleDeleteModal() {
+  activeDeleteQuestionId = null;
+  document.getElementById('delete-single-q-modal').style.display = 'none';
+}
+
+async function submitSingleDelete() {
+  if (!activeDeleteQuestionId) return;
+
+  const btn = document.getElementById('confirm-single-delete-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Deleting...';
+
+  try {
+    const response = await fetch(`/admin/questions/${activeDeleteQuestionId}/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      const row = document.getElementById(`q-row-${activeDeleteQuestionId}`);
+      if (row) row.remove();
+      
+      showToast(data.message || 'Question deleted successfully.', 'success');
+      closeSingleDeleteModal();
+
+      const tableBody = document.getElementById('questions-table-body');
+      if (tableBody && tableBody.children.length === 0) {
+        tableBody.innerHTML = `
+          <tr id="empty-questions-row">
+            <td colspan="6" style="text-align:center;padding:32px;color:var(--text-3);">
+              No questions found matching your filter criteria.
+            </td>
+          </tr>
+        `;
+      }
+    } else {
+      showToast(data.message || 'Failed to delete question.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while deleting question.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
+function openDeleteAllModal(subId, subName, count) {
+  activeDeleteSubcategoryId = subId;
+  const msgEl = document.getElementById('delete-all-q-msg');
+  if (msgEl) {
+    msgEl.innerHTML = `You are about to permanently delete all <strong>${count}</strong> questions from <strong>${subName}</strong>.`;
+  }
+  document.getElementById('delete-all-q-modal').style.display = 'flex';
+}
+
+function closeDeleteAllModal() {
+  activeDeleteSubcategoryId = null;
+  document.getElementById('delete-all-q-modal').style.display = 'none';
+}
+
+async function submitDeleteAll() {
+  if (!activeDeleteSubcategoryId) return;
+
+  const btn = document.getElementById('confirm-all-delete-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Deleting All...';
+
+  try {
+    const response = await fetch(`/admin/subcategories/${activeDeleteSubcategoryId}/questions/delete-all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      const tableBody = document.getElementById('questions-table-body');
+      if (tableBody) {
+        tableBody.innerHTML = `
+          <tr id="empty-questions-row">
+            <td colspan="6" style="text-align:center;padding:32px;color:var(--text-3);">
+              No questions found in this subcategory.
+            </td>
+          </tr>
+        `;
+      }
+      
+      const paginationControls = document.getElementById('pagination-controls');
+      if (paginationControls) paginationControls.style.display = 'none';
+
+      showToast(data.message || 'All questions deleted successfully.', 'success');
+      closeDeleteAllModal();
+    } else {
+      showToast(data.message || 'Failed to delete all questions.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while performing bulk delete.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+</script>
 {% endblock %}
