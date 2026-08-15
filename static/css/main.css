@@ -2123,34 +2123,48 @@ img, video, canvas, svg {
   .pip-mid-right { top: 45% !important; right: -4px !important; }
   .pip-bottom-left { bottom: -2px !important; left: -4px !important; }
 
-  /* 3. PLATFORM STATS (5 IN ONE SINGLE HORIZONTAL ROW) */
+  /* 3. PLATFORM STATS (5 IN ONE SINGLE HORIZONTAL SWIPEABLE ROW) */
   .section-sm { padding-block: 8px 5px !important; }
   .section { padding-block: 12px 8px !important; }
   
   .stat-5-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    padding: 4px 16px 8px 16px !important;
+    margin-left: -16px !important;
+    margin-right: -16px !important;
+    width: calc(100% + 32px) !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+  }
+  .stat-5-grid::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari, Opera */
   }
   .stat-5-grid > :nth-child(5) {
-    grid-column: 1 / -1 !important;
-    max-width: 240px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
+    grid-column: unset !important;
+    max-width: unset !important;
+    margin: 0 !important;
+    width: auto !important;
   }
   .stat-5-grid .card {
-    padding: 10px 12px !important;
+    flex: 0 0 auto !important;
+    min-width: 160px !important;
+    padding: 12px 14px !important;
     gap: 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     border-radius: 14px !important;
-    min-width: 0 !important;
-    flex-direction: row !important;
+    box-sizing: border-box !important;
   }
   .stat-5-grid .card > div:first-child {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 8px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -2158,20 +2172,18 @@ img, video, canvas, svg {
     justify-content: center !important;
   }
   .stat-5-grid .card svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
   .stat-5-grid .card div[style*="font-size:1.15rem"] {
-    font-size: 14px !important;
+    font-size: 14.5px !important;
     font-weight: 800 !important;
     line-height: 1.2 !important;
   }
   .stat-5-grid .card div[style*="font-size:11px"] {
     font-size: 11px !important;
     line-height: 1.25 !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
+    white-space: nowrap !important;
   }
 
   /* 4. TOP CATEGORIES (Uniform 2-Column Grid for Databases & all cards, image 70px) */
