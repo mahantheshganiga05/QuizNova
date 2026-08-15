@@ -407,76 +407,104 @@
 }
 
 @media (max-width: 768px) {
-  /* Global Page Overflow Guard */
+  /* Global Page & Viewport Overflow Guard */
   html, body, .quiz-layout {
     overflow-x: hidden !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
     box-sizing: border-box !important;
   }
 
-  /* 1. MOBILE HEADER TOPBAR (COMPACT 0 CLIPPING) */
+  /* 1. COMPACT DYNAMIC MOBILE HEADER (NO OVERLAPPING CONTROLS) */
   .quiz-topbar {
-    padding-inline: 8px !important;
+    padding-inline: 6px !important;
     gap: 4px !important;
-    height: 50px !important;
+    height: 48px !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
     justify-content: space-between !important;
   }
   .quiz-topbar-brand {
     gap: 4px !important;
     flex-shrink: 1 !important;
     min-width: 0 !important;
+    overflow: hidden !important;
   }
   .quiz-topbar-img {
-    width: 24px !important;
-    height: 24px !important;
+    width: 22px !important;
+    height: 22px !important;
+    flex-shrink: 0 !important;
   }
   .quiz-logo-text {
-    font-size: 14px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
   }
   .quiz-topbar-divider, .quiz-sub-badge, .quiz-progress-wrap, .mobile-palette-trigger {
     display: none !important;
   }
   .quiz-topbar-right {
-    gap: 4px !important;
+    gap: 3px !important;
     flex-shrink: 0 !important;
     min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
   }
+  /* Compact Fullscreen Dot Indicator on Mobile */
   .fullscreen-status-badge {
-    padding: 3px 7px !important;
-    font-size: 9.5px !important;
+    padding: 3px 6px !important;
+    font-size: 9px !important;
     gap: 3px !important;
+  }
+  #fs-badge-text {
+    display: none !important; /* Hide long text on mobile to avoid overlapping */
+  }
+  .fullscreen-status-badge::after {
+    content: "FULLSCREEN";
+    font-size: 8.5px;
+    font-weight: 700;
   }
   .quiz-icon-btn {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 11px !important;
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 10.5px !important;
+    flex-shrink: 0 !important;
   }
   .quiz-top-timer-badge {
-    padding: 3px 8px !important;
-    font-size: 11.5px !important;
+    padding: 3px 6px !important;
+    font-size: 11px !important;
     gap: 3px !important;
+    flex-shrink: 0 !important;
+  }
+  .quiz-top-timer-badge svg {
+    width: 12px !important;
+    height: 12px !important;
   }
   .quiz-exit-btn {
-    padding: 3px 8px !important;
-    font-size: 10.5px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
     gap: 3px !important;
+    flex-shrink: 0 !important;
+  }
+  .quiz-exit-btn svg {
+    width: 12px !important;
+    height: 12px !important;
   }
   .quiz-exit-btn span {
-    font-size: 10.5px !important;
+    font-size: 10px !important;
   }
 
-  /* 2. 2-COLUMN MAIN BODY GRID (LEFT QUESTION AREA + RIGHT EXAM SIDEBAR) */
+  /* 2. 70/30 MOBILE EXAMINATION ROOM GRID LAYOUT */
   .quiz-body {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 150px !important;
-    gap: 10px !important;
-    padding: 10px 8px !important;
+    grid-template-columns: minmax(0, 1fr) 120px !important;
+    gap: 8px !important;
+    padding: 8px 6px !important;
     width: 100% !important;
+    max-width: 100vw !important;
     box-sizing: border-box !important;
     align-items: start !important;
   }
@@ -485,34 +513,35 @@
     min-width: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    gap: 10px !important;
+    gap: 8px !important;
   }
 
   .sidebar-panel {
-    width: 150px !important;
-    min-width: 150px !important;
+    width: 120px !important;
+    min-width: 120px !important;
     position: sticky !important;
-    top: 58px !important;
+    top: 54px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
+    gap: 6px !important;
     box-sizing: border-box !important;
+    align-self: start !important;
   }
 
   .panel-card {
-    padding: 10px 8px !important;
-    border-radius: 12px !important;
+    padding: 8px 5px !important;
+    border-radius: 10px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  /* 3. QUESTION HEADER META (BADGES + BOOKMARK) */
+  /* 3. QUESTION HEADER META (100% INSIDE LEFT COLUMN) */
   .question-card-meta {
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 6px !important;
+    gap: 4px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
@@ -522,66 +551,69 @@
     gap: 4px !important;
   }
   .q-number-badge {
-    padding: 3px 8px !important;
-    font-size: 10.5px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
   }
   .q-type-badge {
-    padding: 3px 8px !important;
-    font-size: 10.5px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
   }
   .bookmark-btn {
-    padding: 3px 8px !important;
-    font-size: 10.5px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
     gap: 3px !important;
   }
+  .bookmark-btn span {
+    font-size: 10px !important;
+  }
 
-  /* 4. QUESTION CARD SURFACE & OPTIONS */
+  /* 4. PRIMARY QUESTION CARD SURFACE & READABLE OPTIONS */
   .question-card {
-    padding: 14px 10px !important;
-    gap: 12px !important;
-    border-radius: 14px !important;
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    border-radius: 12px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .question-text {
-    font-size: 14px !important;
-    line-height: 1.4 !important;
+    font-size: 13.5px !important;
+    line-height: 1.35 !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
   }
   .options-list {
-    gap: 8px !important;
+    gap: 6px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .option {
-    padding: 10px 8px !important;
-    gap: 8px !important;
-    border-radius: 10px !important;
+    padding: 8px 6px !important;
+    gap: 6px !important;
+    border-radius: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .option-key-avatar {
-    width: 26px !important;
-    height: 26px !important;
-    font-size: 11.5px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
     flex-shrink: 0 !important;
   }
   .option-text {
-    font-size: 12.5px !important;
-    line-height: 1.3 !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
     flex: 1 !important;
     min-width: 0 !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
   }
   .option-radio-indicator {
-    width: 16px !important;
-    height: 16px !important;
+    width: 14px !important;
+    height: 14px !important;
     flex-shrink: 0 !important;
   }
 
-  /* 5. PREVIOUS / NEXT NAVIGATION BUTTONS INSIDE QUESTION COLUMN */
+  /* 5. PREVIOUS / NEXT NAVIGATION BUTTONS (INSIDE LEFT COLUMN) */
   .q-nav {
     display: flex !important;
     flex-direction: row !important;
@@ -595,71 +627,71 @@
   .q-nav .btn {
     flex: 1 !important;
     width: 50% !important;
-    min-height: 38px !important;
-    padding: 6px 8px !important;
-    font-size: 12px !important;
+    min-height: 36px !important;
+    padding: 5px 6px !important;
+    font-size: 11.5px !important;
     justify-content: center !important;
     border-radius: var(--r-full) !important;
   }
 
-  /* 6. COMPACT TIME REMAINING CARD IN RIGHT PANEL */
+  /* 6. COMPACT TIME REMAINING CARD IN 30% RIGHT SIDEBAR */
   .time-panel-card {
-    padding: 8px !important;
+    padding: 6px 4px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 2px !important;
     text-align: center !important;
   }
   .panel-header-row {
-    gap: 4px !important;
+    gap: 3px !important;
   }
   .panel-title {
-    font-size: 10px !important;
-    letter-spacing: 0.02em !important;
+    font-size: 9px !important;
+    letter-spacing: 0.01em !important;
   }
   .timer-large-value {
-    font-size: 16px !important;
+    font-size: 14px !important;
     line-height: 1.1 !important;
   }
   .timer-total-sub {
-    font-size: 9px !important;
+    font-size: 8.5px !important;
   }
   .time-panel-right {
     margin-top: 2px !important;
   }
   .time-panel-right svg {
-    width: 44px !important;
-    height: 44px !important;
+    width: 36px !important;
+    height: 36px !important;
   }
   .ring-rem-label {
-    font-size: 7.5px !important;
+    font-size: 7px !important;
   }
 
-  /* 7. QUESTION PALETTE: 2 COLUMNS IN RIGHT PANEL */
+  /* 7. QUESTION PALETTE: COMPACT 2 COLUMNS IN RIGHT SIDEBAR */
   .panel-header-flex {
     flex-direction: column !important;
     align-items: center !important;
     gap: 2px !important;
   }
   .palette-counter-badge {
-    font-size: 9px !important;
-    padding: 2px 6px !important;
+    font-size: 8.5px !important;
+    padding: 1px 4px !important;
   }
   .palette-grid {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 4px !important;
+    gap: 3px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .palette-btn {
     width: 100% !important;
     min-width: 0 !important;
-    height: 32px !important;
+    height: 26px !important;
     aspect-ratio: 1 !important;
-    border-radius: 6px !important;
-    font-size: 11px !important;
+    border-radius: 5px !important;
+    font-size: 10px !important;
     font-weight: 700 !important;
     display: flex !important;
     align-items: center !important;
@@ -667,72 +699,76 @@
     box-sizing: border-box !important;
   }
 
-  /* 8. PALETTE LEGEND (COMPACT IN RIGHT PANEL) */
+  /* 8. PALETTE LEGEND (COMPACT LIST IN RIGHT SIDEBAR) */
   .palette-legend {
     display: grid !important;
     grid-template-columns: 1fr !important;
-    gap: 4px !important;
-    padding-top: 6px !important;
-    margin-top: 6px !important;
+    gap: 2px !important;
+    padding-top: 4px !important;
+    margin-top: 4px !important;
   }
   .legend-item {
-    font-size: 9.5px !important;
-    gap: 4px !important;
+    font-size: 8.5px !important;
+    gap: 3px !important;
   }
   .legend-dot {
-    width: 6px !important;
-    height: 6px !important;
+    width: 5px !important;
+    height: 5px !important;
   }
 
-  /* 9. SUBMIT QUIZ SECTION IN RIGHT PANEL */
+  /* 9. SUBMIT QUIZ SECTION IN RIGHT SIDEBAR */
   .submit-card-box {
-    padding: 8px !important;
-    gap: 6px !important;
+    padding: 6px 4px !important;
+    gap: 4px !important;
   }
   .btn-submit-action {
-    padding: 8px 6px !important;
-    font-size: 11.5px !important;
-    min-height: 36px !important;
+    padding: 6px 4px !important;
+    font-size: 10.5px !important;
+    min-height: 32px !important;
     border-radius: 8px !important;
   }
+  .btn-submit-action svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
   .violations-badge {
-    font-size: 9.5px !important;
-    padding: 3px 6px !important;
+    font-size: 8.5px !important;
+    padding: 2px 4px !important;
   }
 }
 
 /* BREAKPOINT FOR 360px - 389px */
 @media (max-width: 389px) {
   .quiz-body {
-    grid-template-columns: minmax(0, 1fr) 125px !important;
+    grid-template-columns: minmax(0, 1fr) 105px !important;
     gap: 6px !important;
-    padding: 6px 4px !important;
+    padding: 6px 3px !important;
   }
   .sidebar-panel {
-    width: 125px !important;
-    min-width: 125px !important;
+    width: 105px !important;
+    min-width: 105px !important;
   }
   .question-text {
-    font-size: 13.5px !important;
+    font-size: 13px !important;
   }
   .option-text {
-    font-size: 12px !important;
+    font-size: 11.5px !important;
   }
   .palette-btn {
-    height: 28px !important;
-    font-size: 10px !important;
+    height: 24px !important;
+    font-size: 9.5px !important;
   }
 }
 
 /* BREAKPOINT FOR < 360px */
 @media (max-width: 359px) {
   .quiz-body {
-    grid-template-columns: minmax(0, 1fr) 110px !important;
+    grid-template-columns: minmax(0, 1fr) 95px !important;
     gap: 4px !important;
     padding: 4px 2px !important;
   }
   .sidebar-panel {
-    width: 110px !important;
-    min-width: 110px !important;
+    width: 95px !important;
+    min-width: 95px !important;
   }
 }
