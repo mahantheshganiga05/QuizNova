@@ -387,16 +387,173 @@
   .recommended-grid { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 640px) {
-  .dash-main { padding: 12px; gap: 16px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .dash-grid-3 { grid-template-columns: 1fr; }
-  .achievements-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
-  .certs-grid { grid-template-columns: 1fr; }
-  .dash-topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+@media (max-width: 768px) {
+  /* Global Mobile Guard */
+  html, body, .dash-layout {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  .dash-main {
+    margin-left: 0 !important;
+    padding: 14px 12px !important;
+    gap: 14px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 1. WELCOME HERO CARD */
+  .dash-topbar-header {
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    margin-bottom: 14px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .header-left-title {
+    font-size: 20px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 10px !important;
+  }
+  .header-meta-pills {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .header-meta-pill {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .header-action-btns {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .header-action-btns .btn {
+    flex: 1 !important;
+    width: 50% !important;
+    justify-content: center !important;
+    font-size: 13px !important;
+    padding: 10px 12px !important;
+    border-radius: var(--r-full) !important;
+  }
+
+  /* 2. QUICK STATS CARDS (2-COLUMN GRID 2x3) */
+  .stats-grid-6 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .stat-card-glass {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .stat-icon-wrap {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    font-size: 18px !important;
+  }
+  .stat-val-num {
+    font-size: 18px !important;
+  }
+  .stat-lbl-txt {
+    font-size: 10.5px !important;
+  }
+
+  /* 3. MAIN DASHBOARD VERTICAL FLEX FLOW */
+  .dash-main-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    margin-bottom: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 4. PERFORMANCE ANALYTICS & CARDS */
+  .card.p-4, .card {
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .chart-wrap, canvas#performanceChart {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* 5. RECOMMENDED QUIZZES (1-COLUMN VERTICAL STACK) */
+  .rec-cards-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .rec-card-glass {
+    padding: 14px !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 6. RECENT ACTIVITY & NOTIFICATIONS */
+  .notif-item {
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    gap: 10px !important;
+  }
+  .activity-item {
+    padding-block: 10px !important;
+  }
+  .activity-dot {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+  }
+
+  /* 7. LEADERBOARD PREVIEW TABLE */
+  .table-container {
+    border-radius: 12px !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .data-table {
+    font-size: 12px !important;
+  }
+  .data-table th, .data-table td {
+    padding: 8px 10px !important;
+    white-space: nowrap !important;
+  }
 }
 
 @media (max-width: 480px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .dash-main { padding: 10px; gap: 12px; }
+  .header-meta-pills { grid-template-columns: 1fr !important; }
+  .stats-grid-6 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .podium-stand { width: 50px; }
 }
