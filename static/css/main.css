@@ -2235,6 +2235,80 @@ img, video, canvas, svg {
     font-size: 9.5px !important;
   }
 
+  /* 4.5 FEATURE CARDS COMPACT VERTICAL 4-CARD SINGLE ROW LAYOUT */
+  .feature-cards-section {
+    padding-block: 6px 10px !important;
+  }
+  .feature-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .feature-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    padding: 8px 3px !important;
+    gap: 3px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+  }
+  .feature-card-icon {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 15px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+    margin: 0 auto 2px auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .feature-card-content {
+    min-width: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .feature-card-title {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    margin: 0 0 2px 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    white-space: normal !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    color: #FFFFFF !important;
+  }
+  .feature-card-desc {
+    font-size: 8px !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    white-space: normal !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    color: var(--text-2) !important;
+  }
+
   /* 5. ONE STAY UPDATED NEWSLETTER SECTION */
   section[aria-label="Stay Updated Newsletter"] {
     padding-block: 10px 12px !important;
