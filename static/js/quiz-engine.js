@@ -231,10 +231,13 @@ function _updateUI() {
 
   const pctVal = Math.round((currentNum / total) * 100);
 
+  // Count actually attempted/answered questions
+  const answeredCount = Object.keys(state.answers).filter(k => state.answers[k] !== undefined && state.answers[k] !== null && state.answers[k] !== -1).length;
+
   if (progressText) progressText.textContent = `Question ${currentNum} of ${total}`;
   if (progressFill) progressFill.style.width = `${pctVal}%`;
   if (progressPct) progressPct.textContent = `${pctVal}% Completed`;
-  if (paletteCounter) paletteCounter.textContent = `${currentNum} / ${total}`;
+  if (paletteCounter) paletteCounter.textContent = `${answeredCount} / ${total} Attempted`;
 
   // Palette Buttons
   const paletteBtns = document.querySelectorAll('.palette-btn');
