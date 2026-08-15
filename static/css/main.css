@@ -2002,9 +2002,16 @@ img, video, canvas, svg {
     gap: 8px !important;
   }
 
-  /* 1. HERO SECTION & 2-COLUMN MOBILE HERO (Text Left 57%, Globe Right 43%) */
+  /* 1. SYSTEMIC MOBILE SECTION SPACING SYSTEM (16px–24px GAPS, ZERO BLANK SPACE) */
+  .section {
+    padding-block: 20px 14px !important;
+  }
+  .section-sm {
+    padding-block: 12px 10px !important;
+  }
+
   .hero-section {
-    padding-block: 10px 6px !important;
+    padding-block: 10px 4px !important;
     min-height: auto !important;
   }
   .hero-grid {
@@ -2022,7 +2029,7 @@ img, video, canvas, svg {
     width: 100% !important;
   }
   
-  /* 20-25% Smaller Eyebrow Badge (Does not dominate heading) */
+  /* Eyebrow Badge */
   .section-eyebrow {
     font-size: 7.5px !important;
     padding: 2.5px 6px !important;
@@ -2074,7 +2081,7 @@ img, video, canvas, svg {
     border-radius: var(--r-full) !important;
   }
 
-  /* 2. TRUSTED BY LEARNERS (Single Horizontal Non-Wrapping Row) */
+  /* 2. TRUSTED BY LEARNERS */
   .hero-trusted-row {
     gap: 5px !important;
     margin-top: 4px !important;
@@ -2091,7 +2098,7 @@ img, video, canvas, svg {
     line-height: 1 !important;
   }
   
-  /* 3D GLOBE RIGHT SIDE (Increased 15-20% & Vertically Centered) */
+  /* 3D GLOBE RIGHT SIDE */
   .hero-right {
     display: flex !important;
     justify-content: center !important;
@@ -2123,7 +2130,10 @@ img, video, canvas, svg {
   .pip-mid-right { top: 45% !important; right: -4px !important; }
   .pip-bottom-left { bottom: -2px !important; left: -4px !important; }
 
-  /* 3. PLATFORM STATS (5 COMPACT CARDS IN ONE SINGLE HORIZONTAL ROW) */
+  /* 3. PLATFORM STATS (5 COMPACT CARDS IN ONE SINGLE HORIZONTAL ROW IMMEDIATELY BELOW HERO) */
+  section[aria-label="Platform Stats"] {
+    padding-block: 4px 8px !important;
+  }
   .stat-5-grid {
     display: grid !important;
     grid-template-columns: repeat(5, 1fr) !important;
@@ -2182,7 +2192,10 @@ img, video, canvas, svg {
     color: var(--text-2) !important;
   }
 
-  /* 4. TOP CATEGORIES (Uniform 2-Column Grid for Databases & all cards, image 70px) */
+  /* 4. TOP CATEGORIES */
+  section[id="categories"] {
+    padding-block: 10px 14px !important;
+  }
   .top-cat-header-wrap {
     display: flex !important;
     align-items: center !important;
@@ -2222,9 +2235,14 @@ img, video, canvas, svg {
     font-size: 9.5px !important;
   }
 
-  /* 5. AI RECOMMENDATION BANNER (COMPACT MOBILE LAYOUT) */
+  /* 5. ONE STAY UPDATED NEWSLETTER SECTION */
+  section[aria-label="Stay Updated Newsletter"] {
+    padding-block: 10px 12px !important;
+  }
+
+  /* 6. AI RECOMMENDATION BANNER */
   section[aria-label="AI Recommendation"] {
-    padding-block: 6px 4px !important;
+    padding-block: 10px 12px !important;
   }
   div[aria-label="AI Recommendation"] .card,
   section[aria-label="AI Recommendation"] .card {
@@ -2262,7 +2280,10 @@ img, video, canvas, svg {
     border-radius: var(--r-full) !important;
   }
 
-  /* 6. LEADERBOARD & PLATFORM HIGHLIGHTS */
+  /* 7. LEADERBOARD & PLATFORM HIGHLIGHTS */
+  section[aria-label="Leaderboard and Highlights"] {
+    padding-block: 10px 14px !important;
+  }
   .lb-header-wrap {
     display: flex !important;
     align-items: center !important;
@@ -2293,9 +2314,9 @@ img, video, canvas, svg {
     margin: 4px auto 0 auto !important;
   }
 
-  /* 7. BOTTOM CTA BANNER (COMPACT MOBILE OVERRIDES) */
+  /* 8. BOTTOM CTA BANNER */
   section[aria-label="Bottom CTA"] {
-    padding-block: 6px 4px !important;
+    padding-block: 10px 12px !important;
   }
   section[aria-label="Bottom CTA"] .card {
     flex-direction: column !important;
