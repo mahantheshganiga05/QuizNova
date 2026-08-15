@@ -469,55 +469,65 @@
 
   @media (max-width: 768px) {
     .feature-cards-section {
-      padding-block: 8px 10px !important;
+      padding-block: 6px 10px !important;
     }
     .feature-cards-grid {
       display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 10px !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 6px !important;
       width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
       box-sizing: border-box !important;
     }
     .feature-card {
       display: flex !important;
-      flex-direction: row !important;
+      flex-direction: column !important;
       align-items: center !important;
-      gap: 10px !important;
-      padding: 12px 10px !important;
+      justify-content: center !important;
+      text-align: center !important;
+      padding: 8px 4px !important;
+      gap: 4px !important;
       width: 100% !important;
       min-width: 0 !important;
-      border-radius: 14px !important;
+      border-radius: 12px !important;
       box-sizing: border-box !important;
+      overflow: hidden !important;
     }
     .feature-card-icon {
-      width: 36px !important;
-      height: 36px !important;
-      font-size: 18px !important;
-      border-radius: 10px !important;
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 16px !important;
+      border-radius: 8px !important;
       flex-shrink: 0 !important;
+      margin: 0 auto 2px auto !important;
     }
     .feature-card-content {
       min-width: 0 !important;
-      flex: 1 !important;
+      width: 100% !important;
+      text-align: center !important;
     }
     .feature-card-title {
-      font-size: 13px !important;
+      font-size: 11px !important;
       font-weight: 700 !important;
       margin: 0 0 2px 0 !important;
       min-width: 0 !important;
       overflow-wrap: break-word !important;
       word-break: normal !important;
       white-space: normal !important;
-      line-height: 1.2 !important;
+      line-height: 1.15 !important;
+      text-align: center !important;
     }
     .feature-card-desc {
-      font-size: 10.5px !important;
+      font-size: 8.5px !important;
       margin: 0 !important;
       min-width: 0 !important;
       overflow-wrap: break-word !important;
       word-break: normal !important;
       white-space: normal !important;
-      line-height: 1.25 !important;
+      line-height: 1.15 !important;
+      text-align: center !important;
+      color: var(--text-2) !important;
     }
     .newsletter-home-card {
       display: grid !important;
