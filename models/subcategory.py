@@ -62,8 +62,8 @@ class Subcategory(db.Model):
 
     @property
     def has_enough_questions(self) -> bool:
-        """Returns True if subcategory has at least 1 active question available."""
-        return self.active_question_count >= 1
+        """Returns True if subcategory has at least questions_per_quiz (default 20) active questions available."""
+        return self.active_question_count >= self.questions_per_quiz
 
     @property
     def time_limit_seconds(self) -> int:

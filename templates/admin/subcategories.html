@@ -50,6 +50,7 @@
               <th>ID</th>
               <th>Topic Name</th>
               <th>Category</th>
+              <th>Question Bank</th>
               <th>Qs / Quiz</th>
               <th>Time Limit</th>
               <th>Pass Threshold</th>
@@ -62,6 +63,11 @@
               <td style="color:var(--text-3);">{{ sub.id }}</td>
               <td style="font-weight:700;color:white;">{{ sub.name }}</td>
               <td><span class="badge badge-purple">{{ sub.category.name if sub.category else '' }}</span></td>
+              <td>
+                <span class="badge {{ 'badge-success' if sub.active_question_count >= sub.questions_per_quiz else 'badge-warning' }}">
+                  {{ sub.active_question_count }} Qs in Bank
+                </span>
+              </td>
               <td>{{ sub.questions_per_quiz }} Qs</td>
               <td>{{ sub.time_limit_minutes }} mins</td>
               <td><span class="badge badge-success">{{ sub.pass_threshold }}%</span></td>

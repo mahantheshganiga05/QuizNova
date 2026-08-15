@@ -85,7 +85,9 @@ def start(subcategory_id):
     sub = Subcategory.query.filter_by(id=subcategory_id, is_active=True).first_or_404()
 
     if not sub.has_enough_questions:
-        flash(f'Not enough questions available for {sub.name}. Please try again later.', 'error')
+        avail = sub.active_question_count
+        req = sub.questions_per_quiz
+        flash(f'This quiz requires at least {req} questions. Only {avail} question{"s are" if avail != 1 else " is"} currently available for {sub.name}.', 'error')
         return redirect(url_for('quiz.subcategories', category_slug=sub.category.slug))
 
     # Create attempt record

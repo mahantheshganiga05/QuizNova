@@ -81,6 +81,18 @@
     <!-- Toast Notifications Container -->
     <div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;"></div>
 
+    {% if selected_sub %}
+    <!-- Subcategory Question Status Badge -->
+    <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);padding:10px 16px;border-radius:12px;">
+      <span style="font-size:13px;font-weight:700;color:white;">
+        📚 Topic: <span style="color:var(--brand-purple-light);">{{ selected_sub.name }}</span>
+      </span>
+      <span class="badge badge-purple" style="font-size:12px;padding:4px 10px;">
+        {{ sub_question_count }} Total Questions in Bank
+      </span>
+    </div>
+    {% endif %}
+
     <!-- Questions Data Table -->
     <div class="card p-4">
       <div class="data-table-wrap">
@@ -98,7 +110,7 @@
           <tbody id="questions-table-body">
             {% for q in pagination.items %}
             <tr id="q-row-{{ q.id }}">
-              <td style="color:var(--text-3);">{{ q.id }}</td>
+              <td style="color:var(--text-3);font-weight:600;">{{ ((pagination.page - 1) * pagination.per_page) + loop.index }}</td>
               <td style="max-width:380px;font-weight:500;color:white;">{{ q.question_text | truncate(70) }}</td>
               <td><span class="badge badge-purple">{{ q.subcategory.name if q.subcategory else '' }}</span></td>
               <td>
