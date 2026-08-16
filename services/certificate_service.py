@@ -35,34 +35,63 @@ from utils.helpers import ensure_dir
 # Public Entry Point
 # =============================================================================
 
-def generate_certificate(result_id: int) -> Certificate:
+def generate_certificate(result_id: int, recipient_name: str | None = None) -> Certificate:
     """
-    Generate a PDF certificate for a passed quiz result.
+    Generate a PDF certificate for a passed quiz result (Score >= 70%).
     Idempotent: returns existing certificate if already generated.
 
     Args:
         result_id: The ID of the Result record.
+        recipient_name: Optional explicit recipient full name.
 
     Returns:
         The Certificate model instance.
 
     Raises:
-        ValueError: If result is not passed or user is not found.
+        ValueError: If result score < 70% or user is not found.
     """
     result = Result.query.get_or_404(result_id)
 
-    # Return existing certificate if already generated
-    if result.has_certificate:
-        return result.certificate
-
-    if not result.is_passed:
-        raise ValueError(f'Result {result_id} did not pass — cannot generate certificate.')
+    # Check Score >= 70% Eligibility
+    if float(result.percentage) < 70.0:
+        raise ValueError('Certificate not available. You need at least 70% to earn this certificate.')
 
     user = User.query.get(result.user_id)
     if not user:
         raise ValueError(f'User {result.user_id} not found.')
 
     sub = Subcategory.query.get(result.subcategory_id)
+    
+    # Recipient Name Resolution
+    display_name = recipient_name.strip() if (recipient_name and recipient_name.strip()) else user.display_name
+
+    # Return existing certificate if already generated (update recipient_name if provided)
+    if result.has_certificate:
+        cert = result.certificate
+        if recipient_name and recipient_name.strip():
+            cert.recipient_name = display_name
+            db.session.commit()
+            # Re-render PDF with updated name
+            cert_dir = os.path.join(current_app.root_path, 'static', 'certificates')
+            cert_path = os.path.join(cert_dir, cert.pdf_filename)
+            site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
+            verification_url = f'{site_url}/verify/{cert.verification_id}'
+            _render_pdf(
+                output_path=cert_path,
+                candidate_name=display_name,
+                quiz_name=sub.name,
+                category_name=sub.category.name,
+                percentage=float(result.percentage),
+                score=result.score,
+                max_score=result.max_score,
+                issue_date=cert.issue_date,
+                certificate_id=cert.verification_id,
+                verification_url=verification_url,
+                profile_photo_path=_get_profile_photo_path(user),
+                app_root=current_app.root_path,
+            )
+        return cert
+
     cert_uuid = str(uuid.uuid4())
     cert_filename = f'{cert_uuid}.pdf'
     cert_dir = os.path.join(current_app.root_path, 'static', 'certificates')
@@ -75,19 +104,20 @@ def generate_certificate(result_id: int) -> Certificate:
         certificate_uuid=cert_uuid,
         user_id=user.id,
         result_id=result.id,
+        recipient_name=display_name,
         issue_date=date.today(),
         file_path=relative_path,
     )
     db.session.add(cert)
     db.session.flush()  # Get cert.verification_id
 
-    site_url = current_app.config.get('SITE_URL', 'http://localhost:5000')
+    site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
     verification_url = f'{site_url}/verify/{cert.verification_id}'
 
     # Generate the PDF
     _render_pdf(
         output_path=cert_path,
-        candidate_name=user.display_name,
+        candidate_name=display_name,
         quiz_name=sub.name,
         category_name=sub.category.name,
         percentage=float(result.percentage),
@@ -132,32 +162,20 @@ def _render_pdf(
     app_root: str,
 ) -> None:
     """
-    Render the certificate PDF using ReportLab canvas.
-
-    Layout (Landscape A4 — 297mm x 210mm):
-      - Dark navy background
-      - Gold decorative border (double-line)
-      - QuizNova logo (top center)
-      - "Certificate of Achievement" title
-      - Candidate name (large)
-      - Quiz details
-      - Score and date
-      - Candidate photo (top right, circular crop approximated)
-      - QR code (bottom left)
-      - Certificate ID (bottom center)
-      - Signature images (bottom right pair)
+    Render the official QuizNova certificate PDF using ReportLab canvas.
+    Landscape A4 — 297mm x 210mm
     """
     page_w, page_h = landscape(A4)
     c = rl_canvas.Canvas(output_path, pagesize=landscape(A4))
 
-    # Background
-    c.setFillColor(HexColor('#0D0B2E'))
+    # Background: Deep Navy (#050508)
+    c.setFillColor(HexColor('#050508'))
     c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
 
-    # Decorative gradient overlay (approximated with semi-transparent rectangle)
-    c.setFillColor(HexColor('#1A0533'))
-    c.setFillAlpha(0.4)
-    c.rect(0, page_h * 0.6, page_w, page_h * 0.4, fill=1, stroke=0)
+    # Purple/Indigo Gradient Glow Overlay
+    c.setFillColor(HexColor('#140D2B'))
+    c.setFillAlpha(0.6)
+    c.rect(0, page_h * 0.5, page_w, page_h * 0.5, fill=1, stroke=0)
     c.setFillAlpha(1.0)
 
     # Gold outer border
@@ -175,114 +193,117 @@ def _render_pdf(
         c.setFillColor(HexColor('#D4AF37'))
         c.circle(x, y, 3*mm, fill=1, stroke=0)
 
-    # Header: "QuizNova" brand
+    # Header: "QuizNova" brand + FOUNDED BY MAHANTHESH GANIGA
     c.setFillColor(HexColor('#7C3AED'))
-    c.setFont('Helvetica-Bold', 28)
-    c.drawCentredString(page_w * 0.45, page_h - 30*mm, 'QuizNova')
+    c.setFont('Helvetica-Bold', 26)
+    c.drawCentredString(page_w * 0.5, page_h - 28*mm, 'QuizNova')
 
-    c.setFillColor(HexColor('#D4AF37'))
-    c.setFont('Helvetica', 10)
-    c.drawCentredString(page_w * 0.45, page_h - 36*mm, '— Test Your Knowledge. Ignite Your Potential. —')
+    c.setFillColor(HexColor('#9898B0'))
+    c.setFont('Helvetica-Bold', 8)
+    c.drawCentredString(page_w * 0.5, page_h - 34*mm, 'FOUNDED BY MAHANTHESH GANIGA')
 
     # Divider line
     c.setStrokeColor(HexColor('#D4AF37'))
-    c.setLineWidth(0.5)
-    c.line(30*mm, page_h - 40*mm, page_w * 0.72, page_h - 40*mm)
+    c.setLineWidth(0.75)
+    c.line(40*mm, page_h - 38*mm, page_w - 40*mm, page_h - 38*mm)
 
-    # "Certificate of Achievement" title
-    c.setFillColor(HexColor('#F0E68C'))
+    # "CERTIFICATE OF ACHIEVEMENT" title
+    c.setFillColor(HexColor('#F59E0B'))
     c.setFont('Helvetica-Bold', 22)
-    c.drawCentredString(page_w * 0.45, page_h - 52*mm, 'CERTIFICATE OF ACHIEVEMENT')
+    c.drawCentredString(page_w * 0.5, page_h - 50*mm, 'CERTIFICATE OF ACHIEVEMENT')
 
-    # Body text
-    c.setFillColor(HexColor('#C8C8D8'))
+    # Recipient presentation text
+    c.setFillColor(HexColor('#9898B0'))
     c.setFont('Helvetica', 11)
-    c.drawCentredString(page_w * 0.45, page_h - 62*mm, 'This is to certify that')
+    c.drawCentredString(page_w * 0.5, page_h - 60*mm, 'This certificate is proudly presented to')
 
-    # Candidate name
+    # Candidate Name (Large Elegant)
     c.setFillColor(HexColor('#FFFFFF'))
-    c.setFont('Helvetica-Bold', 30)
-    c.drawCentredString(page_w * 0.45, page_h - 76*mm, candidate_name)
+    c.setFont('Helvetica-Bold', 28)
+    c.drawCentredString(page_w * 0.5, page_h - 74*mm, candidate_name)
 
     # Underline for name
-    name_width = c.stringWidth(candidate_name, 'Helvetica-Bold', 30)
+    name_width = c.stringWidth(candidate_name, 'Helvetica-Bold', 28)
     c.setStrokeColor(HexColor('#7C3AED'))
     c.setLineWidth(1.5)
-    center = page_w * 0.45
-    c.line(center - name_width/2, page_h - 78.5*mm, center + name_width/2, page_h - 78.5*mm)
+    center = page_w * 0.5
+    c.line(center - name_width/2, page_h - 76.5*mm, center + name_width/2, page_h - 76.5*mm)
 
     # Completion text
-    c.setFillColor(HexColor('#C8C8D8'))
+    c.setFillColor(HexColor('#9898B0'))
     c.setFont('Helvetica', 11)
-    c.drawCentredString(page_w * 0.45, page_h - 87*mm, 'has successfully completed the')
+    c.drawCentredString(page_w * 0.5, page_h - 85*mm, 'for successfully completing the quiz')
 
     # Quiz name
-    c.setFillColor(HexColor('#9D5FFC'))
-    c.setFont('Helvetica-Bold', 16)
-    c.drawCentredString(page_w * 0.45, page_h - 96*mm, f'{quiz_name} Quiz')
+    c.setFillColor(HexColor('#A78BFA'))
+    c.setFont('Helvetica-Bold', 18)
+    c.drawCentredString(page_w * 0.5, page_h - 95*mm, quiz_name)
 
-    # Category
-    c.setFillColor(HexColor('#A0A0B8'))
-    c.setFont('Helvetica', 10)
-    c.drawCentredString(page_w * 0.45, page_h - 103*mm, f'Category: {category_name}')
+    # Metrics Row Pill Background
+    pill_w = 140*mm
+    pill_h = 12*mm
+    pill_x = page_w * 0.5 - pill_w/2
+    pill_y = page_h - 114*mm
+    c.setFillColor(HexColor('#141425'))
+    c.setStrokeColor(HexColor('#7C3AED'))
+    c.setLineWidth(1)
+    c.roundRect(pill_x, pill_y, pill_w, pill_h, 6*mm, fill=1, stroke=1)
 
-    # Score pill background
-    pill_x = page_w * 0.45 - 25*mm
-    pill_y = page_h - 120*mm
-    c.setFillColor(HexColor('#7C3AED'))
-    c.roundRect(pill_x, pill_y, 50*mm, 12*mm, 6*mm, fill=1, stroke=0)
     c.setFillColor(HexColor('#FFFFFF'))
-    c.setFont('Helvetica-Bold', 13)
-    c.drawCentredString(page_w * 0.45, pill_y + 4*mm, f'Score: {score}/{max_score}  ·  {percentage:.1f}%')
-
-    # Issue date and certificate ID
-    c.setFillColor(HexColor('#A0A0B8'))
-    c.setFont('Helvetica', 9)
-    c.drawCentredString(page_w * 0.45, page_h - 130*mm,
-                        f'Date of Issue: {issue_date.strftime("%B %d, %Y")}  ·  Certificate ID: {certificate_id}')
+    c.setFont('Helvetica-Bold', 10)
+    metrics_str = f'SCORE: {percentage:.0f}%   ·   CATEGORY: {category_name}   ·   DATE: {issue_date.strftime("%d %B %Y")}'
+    c.drawCentredString(page_w * 0.5, pill_y + 4*mm, metrics_str)
 
     # Second divider
     c.setStrokeColor(HexColor('#2A2050'))
-    c.setLineWidth(1)
-    c.line(30*mm, page_h - 145*mm, page_w - 30*mm, page_h - 145*mm)
-
-    # Signature placeholders
-    sig_y = page_h - 160*mm
-
-    # Left signature
-    c.setStrokeColor(HexColor('#D4AF37'))
     c.setLineWidth(0.5)
-    c.line(page_w * 0.25 - 20*mm, sig_y + 8*mm, page_w * 0.25 + 20*mm, sig_y + 8*mm)
-    c.setFillColor(HexColor('#A0A0B8'))
-    c.setFont('Helvetica', 8)
-    c.drawCentredString(page_w * 0.25, sig_y + 4*mm, 'Instructor')
-    c.drawCentredString(page_w * 0.25, sig_y, 'QuizNova Education')
+    c.line(40*mm, page_h - 132*mm, page_w - 40*mm, page_h - 132*mm)
 
-    # Right signature
-    c.line(page_w * 0.65 - 20*mm, sig_y + 8*mm, page_w * 0.65 + 20*mm, sig_y + 8*mm)
-    c.drawCentredString(page_w * 0.65, sig_y + 4*mm, 'Director')
-    c.drawCentredString(page_w * 0.65, sig_y, 'QuizNova Platform')
+    # Bottom Area: Verification (Left), Seal (Center), Founder Signature (Right)
+    bottom_y = page_h - 175*mm
 
-    # Official seal (circle)
-    c.setStrokeColor(HexColor('#D4AF37'))
-    c.setFillColor(HexColor('#1A0533'))
-    c.setLineWidth(2)
-    c.circle(page_w * 0.45, sig_y + 5*mm, 10*mm, fill=1, stroke=1)
-    c.setFillColor(HexColor('#D4AF37'))
-    c.setFont('Helvetica-Bold', 6)
-    c.drawCentredString(page_w * 0.45, sig_y + 6.5*mm, 'OFFICIAL')
-    c.drawCentredString(page_w * 0.45, sig_y + 3.5*mm, 'SEAL')
-
-    # QR Code (bottom left)
+    # QR Code & Verification Info (Bottom Left)
     qr_img = _generate_qr_image(verification_url)
     if qr_img:
-        qr_x = 20*mm
-        qr_y = 18*mm
-        qr_size = 28*mm
+        qr_size = 26*mm
+        qr_x = 25*mm
+        qr_y = bottom_y
         c.drawInlineImage(qr_img, qr_x, qr_y, width=qr_size, height=qr_size)
+        c.setFillColor(HexColor('#9898B0'))
+        c.setFont('Helvetica-Bold', 7)
+        c.drawString(qr_x + qr_size + 4*mm, qr_y + 18*mm, 'VERIFY CERTIFICATE')
+        c.setFont('Helvetica', 7)
+        c.setFillColor(HexColor('#A78BFA'))
+        c.drawString(qr_x + qr_size + 4*mm, qr_y + 12*mm, certificate_id)
         c.setFillColor(HexColor('#6B6B85'))
         c.setFont('Helvetica', 6)
-        c.drawString(qr_x, qr_y - 4*mm, 'Scan to verify certificate')
+        c.drawString(qr_x + qr_size + 4*mm, qr_y + 6*mm, 'Scan QR or visit verification link')
+
+    # QuizNova Official Seal (Center)
+    seal_x = page_w * 0.5
+    seal_y = bottom_y + 12*mm
+    c.setStrokeColor(HexColor('#F59E0B'))
+    c.setFillColor(HexColor('#1E1538'))
+    c.setLineWidth(2)
+    c.circle(seal_x, seal_y, 11*mm, fill=1, stroke=1)
+    c.setFillColor(HexColor('#F59E0B'))
+    c.setFont('Helvetica-Bold', 7)
+    c.drawCentredString(seal_x, seal_y + 3*mm, 'QUIZNOVA')
+    c.setFont('Helvetica-Bold', 6)
+    c.setFillColor(HexColor('#A78BFA'))
+    c.drawCentredString(seal_x, seal_y - 3*mm, 'CERTIFIED')
+
+    # Founder Signature (Bottom Right)
+    sig_x = page_w - 55*mm
+    c.setStrokeColor(HexColor('#D4AF37'))
+    c.setLineWidth(0.75)
+    c.line(sig_x - 20*mm, bottom_y + 16*mm, sig_x + 20*mm, bottom_y + 16*mm)
+    c.setFillColor(HexColor('#FFFFFF'))
+    c.setFont('Helvetica-Bold', 11)
+    c.drawCentredString(sig_x, bottom_y + 9*mm, 'Mahanthesh Ganiga')
+    c.setFillColor(HexColor('#9898B0'))
+    c.setFont('Helvetica', 8)
+    c.drawCentredString(sig_x, bottom_y + 3*mm, 'Founder, QuizNova')
 
     # Profile photo placeholder (top right, circular frame)
     photo_x = page_w - 48*mm
@@ -324,7 +345,7 @@ def _generate_qr_image(url: str):
         )
         qr.add_data(url)
         qr.make(fit=True)
-        img = qr.make_image(fill_color='white', back_color='#0D0B2E')
+        img = qr.make_image(fill_color='white', back_color='#050508')
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         buffer.seek(0)
@@ -336,14 +357,36 @@ def _generate_qr_image(url: str):
 def _get_profile_photo_path(user: User) -> str | None:
     """
     Return the absolute filesystem path to the user's profile photo.
-
-    Args:
-        user: The User model instance.
-
-    Returns:
-        Absolute path string or None if no photo.
     """
-    if not user.profile_photo:
+    if not getattr(user, 'profile_photo', None):
         return None
     from flask import current_app
     return os.path.join(current_app.root_path, 'static', 'uploads', 'profiles', user.profile_photo)
+
+
+def send_certificate_email(cert: Certificate, user: User) -> bool:
+    """
+    Send an email notification with certificate details & verification links.
+    Safe: logs message and returns status without throwing on unconfigured mail servers.
+    """
+    try:
+        recipient_email = user.email
+        recipient_name = cert.recipient_name or user.display_name
+        sub_name = cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'Quiz'
+        pct = round(float(cert.result.percentage), 1) if cert.result else 0
+        site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
+        verify_link = f'{site_url}/verify/{cert.verification_id}'
+        view_link = f'{site_url}/certificate/{cert.verification_id}'
+
+        current_app.logger.info(
+            f'[EMAIL NOTIFICATION] Subject: 🎉 Your QuizNova Certificate of Achievement | To: {recipient_email}\n'
+            f'Recipient: {recipient_name} | Quiz: {sub_name} | Score: {pct}%\n'
+            f'Cert ID: {cert.verification_id}\n'
+            f'View Link: {view_link} | Verify Link: {verify_link}'
+        )
+        return True
+    except Exception as e:
+        current_app.logger.error(f'Failed to send certificate email: {e}')
+        return False
+
+

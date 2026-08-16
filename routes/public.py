@@ -147,6 +147,55 @@ def verify_certificate(verification_id):
     return render_template('certificate/verify.html', cert=cert)
 
 
+@public_bp.route('/certificate/<string:verification_id>')
+def view_certificate(verification_id):
+    from models.certificate import Certificate
+    cert = Certificate.query.filter_by(verification_id=verification_id).first_or_404()
+    return render_template('certificate/view.html', cert=cert)
+
+
+@public_bp.route('/certificate/<string:verification_id>/download/pdf')
+def download_certificate_pdf(verification_id):
+    import os
+    from flask import send_file, current_app, abort
+    from models.certificate import Certificate
+    cert = Certificate.query.filter_by(verification_id=verification_id).first_or_404()
+    if not cert.is_valid:
+        abort(400, 'Certificate has been revoked.')
+
+    file_path = os.path.join(current_app.root_path, cert.file_path or '')
+    if not cert.file_path or not os.path.exists(file_path):
+        # Regenerate if file missing
+        from services.certificate_service import generate_certificate
+        cert = generate_certificate(cert.result_id, recipient_name=cert.recipient_name)
+        file_path = os.path.join(current_app.root_path, cert.file_path)
+
+    cert.record_download()
+    from models import db
+    db.session.commit()
+
+    return send_file(
+        file_path,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'QuizNova_Certificate_{cert.verification_id}.pdf'
+    )
+
+
+@public_bp.route('/certificate/<string:verification_id>/email', methods=['GET', 'POST'])
+def email_certificate_route(verification_id):
+    from flask import flash, redirect, url_for
+    from models.certificate import Certificate
+    from services.certificate_service import send_certificate_email
+    cert = Certificate.query.filter_by(verification_id=verification_id).first_or_404()
+    success = send_certificate_email(cert, cert.user)
+    if success:
+        flash(f'🎉 Certificate email notification sent to {cert.user.email}!', 'success')
+    else:
+        flash('Failed to send certificate email.', 'error')
+    return redirect(url_for('public.view_certificate', verification_id=verification_id))
+
+
 # -------------------------------------------------------------------------
 # Global Category Navigation Aliases & Fallback Handlers
 # -------------------------------------------------------------------------

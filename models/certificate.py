@@ -14,12 +14,13 @@ from models import db
 
 def _generate_verification_id() -> str:
     """
-    Generate a short unique verification ID for QR code URLs.
-    Format: QN-XXXXXXXX (8 alphanumeric chars after prefix).
+    Generate a unique verification ID for QR code URLs.
+    Format: QN-CERT-2026-XXXXXX (6 alphanumeric chars).
     """
+    year = datetime.now().year
     chars = string.ascii_uppercase + string.digits
-    suffix = ''.join(random.choices(chars, k=8))
-    return f'QN-{suffix}'
+    suffix = ''.join(random.choices(chars, k=6))
+    return f'QN-CERT-{year}-{suffix}'
 
 
 class Certificate(db.Model):
@@ -36,13 +37,14 @@ class Certificate(db.Model):
     id               = db.Column(db.Integer, primary_key=True, autoincrement=True)
     certificate_uuid = db.Column(db.String(36), nullable=False, unique=True,
                                  default=lambda: str(uuid.uuid4()))
-    verification_id  = db.Column(db.String(12), nullable=False, unique=True,
+    verification_id  = db.Column(db.String(30), nullable=False, unique=True,
                                  default=_generate_verification_id)
     user_id          = db.Column(db.Integer, db.ForeignKey('users.id',
                                  ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     result_id        = db.Column(db.Integer, db.ForeignKey('results.id',
                                  ondelete='CASCADE', onupdate='CASCADE'),
                                  nullable=False, unique=True)
+    recipient_name   = db.Column(db.String(150), nullable=True)   # Exact recipient full name
     file_path        = db.Column(db.String(500), nullable=True)   # Local path to PDF
     issue_date       = db.Column(db.Date, nullable=False, default=date.today)
     is_valid         = db.Column(db.Boolean, nullable=False, default=True)

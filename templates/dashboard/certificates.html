@@ -105,16 +105,23 @@
         </div>
 
         <!-- Actions -->
-        <div class="cert-card-actions">
-          <a href="{{ url_for('api.download_certificate', cert_id=cert.id) }}"
-             class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" id="dl-cert-{{ cert.id }}-btn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download
+        <div class="cert-card-actions" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;">
+          <a href="{{ url_for('public.view_certificate', verification_id=cert.verification_id) }}"
+             class="btn btn-primary btn-sm" style="flex:1;min-width:70px;justify-content:center;background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;font-size:11px;" id="view-cert-{{ cert.id }}-btn">
+            👁 View
           </a>
-          <a href="/verify/{{ cert.verification_id }}"
-             class="btn btn-ghost btn-sm" id="verify-cert-{{ cert.id }}-btn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Verify
+          <a href="{{ url_for('public.download_certificate_pdf', verification_id=cert.verification_id) }}"
+             class="btn btn-ghost btn-sm" style="font-size:11px;" id="dl-cert-{{ cert.id }}-btn">
+            📥 PDF
+          </a>
+          {% set linkedin_url = "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=" ~ (cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'Quiz' | urlencode) ~ "&organizationName=QuizNova&issueYear=" ~ cert.issue_date.year ~ "&issueMonth=" ~ cert.issue_date.month ~ "&certUrl=" ~ ((request.host_url ~ "verify/" ~ cert.verification_id) | urlencode) %}
+          <a href="{{ linkedin_url }}" target="_blank" rel="noopener noreferrer"
+             class="btn btn-ghost btn-sm" style="font-size:11px;color:#60A5FA;">
+            💼 LinkedIn
+          </a>
+          <a href="{{ url_for('public.verify_certificate', verification_id=cert.verification_id) }}"
+             class="btn btn-ghost btn-sm" style="font-size:11px;" id="verify-cert-{{ cert.id }}-btn">
+            🔍 Verify
           </a>
         </div>
 

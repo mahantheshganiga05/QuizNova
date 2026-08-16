@@ -53,7 +53,7 @@
 
         <!-- Candidate Name -->
         <h1 class="cert-candidate text-gradient" style="margin-bottom:var(--s2);">
-          {{ cert.user.display_name or cert.user.username }}
+          {{ cert.recipient_name or cert.user.display_name or cert.user.username }}
         </h1>
 
         <p style="font-size:15px;color:var(--text-2);margin-bottom:var(--s2);">has successfully completed</p>
@@ -66,14 +66,15 @@
         <!-- Score -->
         <div style="display:inline-flex;align-items:center;gap:var(--s4);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:var(--r-lg);padding:var(--s3) var(--s5);margin-bottom:var(--s5);">
           <div>
-            <div class="cert-score-display font-display" style="color:var(--success);">{{ cert.percentage | round }}%</div>
+            <div class="cert-score-display font-display" style="color:var(--success);">{{ (cert.result.percentage if cert.result else 0) | round }}%</div>
             <div class="label-caps" style="color:var(--success);">Score</div>
           </div>
           <div style="width:1px;height:48px;background:rgba(16,185,129,0.2);" aria-hidden="true"></div>
           <div>
             <div class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--text-1);">
-              {% if cert.percentage >= 90 %}Distinction
-              {% elif cert.percentage >= 75 %}Merit
+              {% set pct = (cert.result.percentage if cert.result else 0) | float %}
+              {% if pct >= 90 %}Distinction
+              {% elif pct >= 75 %}Merit
               {% else %}Pass{% endif %}
             </div>
             <div class="label-caps">Grade</div>
@@ -84,6 +85,7 @@
         <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
           <p style="font-size:13px;color:var(--text-3);">Issued on {{ cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A' }}</p>
           <p class="font-mono" style="font-size:11px;color:var(--text-3);">ID: {{ cert.verification_id }}</p>
+          <p style="font-size:11.5px;color:var(--brand-purple-light);margin-top:2px;">Issued by QuizNova (Founded by Mahanthesh Ganiga)</p>
         </div>
 
         <!-- Official badge -->
@@ -96,15 +98,14 @@
 
     <!-- Actions -->
     <div style="display:flex;gap:var(--s2);justify-content:center;flex-wrap:wrap;margin-top:var(--s5);" data-aos="fade-up" data-aos-delay="80">
-      {% if cert.file_path %}
-      <a href="{{ url_for('api.download_certificate', cert_id=cert.id) }}" class="btn btn-primary btn-lg" id="verify-dl-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download PDF
+      <a href="{{ url_for('public.view_certificate', verification_id=cert.verification_id) }}" class="btn btn-primary btn-lg" id="verify-view-btn" style="background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;">
+        👁 View Full Certificate
       </a>
-      {% endif %}
+      <a href="{{ url_for('public.download_certificate_pdf', verification_id=cert.verification_id) }}" class="btn btn-ghost btn-lg" id="verify-dl-btn">
+        📥 Download PDF
+      </a>
       <button class="btn btn-ghost btn-lg" type="button" onclick="window.QuizNova?.copyToClipboard(window.location.href, this)" id="share-cert-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Copy Verify Link
+        🔗 Copy Verify Link
       </button>
     </div>
 
@@ -113,10 +114,10 @@
       <h3 class="font-display" style="font-size:15px;font-weight:600;margin-bottom:var(--s3);">Certificate Details</h3>
       <table style="width:100%;border-collapse:collapse;">
         {% set rows = [
-          ('Issued To',       cert.user.display_name or cert.user.username),
-          ('Quiz Topic',      cert.result.attempt.subcategory.name),
-          ('Category',        cert.result.attempt.subcategory.category.name),
-          ('Score',           (cert.percentage | round) | string + '%'),
+          ('Issued To',       cert.recipient_name or cert.user.display_name or cert.user.username),
+          ('Quiz Topic',      cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'Quiz'),
+          ('Category',        cert.result.attempt.subcategory.category.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'General'),
+          ('Score',           (((cert.result.percentage if cert.result else 0) | round | int) | string) + '%'),
           ('Date Issued',     cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A'),
           ('Certificate ID',  cert.verification_id),
           ('Status',          'Valid'),

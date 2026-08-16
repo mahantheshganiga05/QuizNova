@@ -371,3 +371,42 @@ def leaderboard():
         scope=scope,
         subcategory_id=subcategory_id,
     )
+
+
+# =============================================================================
+# Certificate Generation
+# =============================================================================
+
+@quiz_bp.route('/generate-certificate/<int:result_id>', methods=['POST'])
+@login_required
+def generate_certificate_route(result_id):
+    """Generate or update certificate for a passed quiz attempt (Score >= 70%)."""
+    result = Result.query.get_or_404(result_id)
+    if result.user_id != current_user.id and not current_user.is_admin:
+        flash('Unauthorized access.', 'error')
+        return redirect(url_for('dashboard.index'))
+
+    if float(result.percentage) < 70.0:
+        flash('Certificate not available. You need at least 70% to earn this certificate.', 'warning')
+        return redirect(url_for('quiz.result', attempt_id=result.attempt_id))
+
+    full_name = request.form.get('full_name', '').strip()
+    if not full_name:
+        flash('Please enter your full name for the certificate.', 'warning')
+        return redirect(url_for('quiz.result', attempt_id=result.attempt_id))
+
+    try:
+        from services.certificate_service import generate_certificate, send_certificate_email
+        cert = generate_certificate(result.id, recipient_name=full_name)
+        try:
+            send_certificate_email(cert, current_user)
+        except Exception as mail_err:
+            current_app.logger.error(f'Certificate email failed: {mail_err}')
+
+        flash('🎉 Certificate of Achievement generated successfully!', 'success')
+        return redirect(url_for('public.view_certificate', verification_id=cert.verification_id))
+    except Exception as e:
+        current_app.logger.error(f'Certificate generation error: {e}')
+        flash(f'Certificate generation error: {e}', 'error')
+        return redirect(url_for('quiz.result', attempt_id=result.attempt_id))
+

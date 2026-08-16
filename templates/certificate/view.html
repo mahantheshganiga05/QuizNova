@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}Certificate of Achievement — {{ cert.recipient_name or cert.user.display_name }} — QuizNova{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cert-view-container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .cert-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 16px;
+    padding: 16px;
+    backdrop-filter: blur(12px);
+  }
+  .cert-frame-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  
+  /* A4 Landscape Canvas Frame (1123px x 794px ratio) */
+  .cert-canvas-card {
+    width: 960px;
+    min-width: 960px;
+    height: 678px;
+    background: #050508;
+    position: relative;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(124, 58, 237, 0.15);
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    color: #FFFFFF;
+  }
+
+  /* Gold Outer & Inner Borders */
+  .cert-border-outer {
+    position: absolute;
+    top: 16px; left: 16px; right: 16px; bottom: 16px;
+    border: 2px solid #D4AF37;
+    pointer-events: none;
+  }
+  .cert-border-inner {
+    position: absolute;
+    top: 22px; left: 22px; right: 22px; bottom: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.6);
+    pointer-events: none;
+  }
+  .cert-corner-ornament {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: #D4AF37;
+    border-radius: 50%;
+  }
+  .cert-corner-tl { top: 20px; left: 20px; }
+  .cert-corner-tr { top: 20px; right: 20px; }
+  .cert-corner-bl { bottom: 20px; left: 20px; }
+  .cert-corner-br { bottom: 20px; right: 20px; }
+
+  /* Glow Overlay */
+  .cert-glow-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 50%;
+    background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 767px) {
+    .cert-actions-bar {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: grid !important;
+      gap: 8px !important;
+      padding: 12px !important;
+    }
+    .cert-actions-bar .btn {
+      width: 100% !important;
+      justify-content: center !important;
+      font-size: 11px !important;
+      padding: 8px 6px !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-sm">
+  <div class="cert-view-container">
+    
+    <!-- Action Toolbar -->
+    <div class="cert-actions-bar" data-aos="fade-down">
+      <a href="{{ url_for('public.download_certificate_pdf', verification_id=cert.verification_id) }}" class="btn btn-primary btn-sm" id="btn-dl-pdf" style="background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;">
+        📥 Download PDF
+      </a>
+      
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-dl-png" onclick="downloadCertificatePNG()">
+        🖼 Download PNG
+      </button>
+
+      <button type="button" class="btn btn-ghost btn-sm" onclick="window.QuizNova?.copyToClipboard(window.location.origin + '/verify/{{ cert.verification_id }}', this)">
+        🔗 Copy Verify Link
+      </button>
+
+      {% set linkedin_url = "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=" ~ (cert.result.attempt.subcategory.name | urlencode) ~ "&organizationName=QuizNova&issueYear=" ~ cert.issue_date.year ~ "&issueMonth=" ~ cert.issue_date.month ~ "&certUrl=" ~ ((request.host_url ~ "verify/" ~ cert.verification_id) | urlencode) %}
+      <a href="{{ linkedin_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" style="color:#60A5FA;">
+        💼 Add to LinkedIn
+      </a>
+
+      <a href="{{ url_for('public.verify_certificate', verification_id=cert.verification_id) }}" class="btn btn-ghost btn-sm">
+        🔍 Verify
+      </a>
+
+      <a href="{{ url_for('public.email_certificate_route', verification_id=cert.verification_id) }}" class="btn btn-ghost btn-sm" style="color:#A78BFA;">
+        ✉ Email Me
+      </a>
+    </div>
+
+    <!-- Certificate Landscape Canvas Container -->
+    <div class="cert-frame-wrapper" data-aos="fade-up">
+      <div class="cert-canvas-card" id="quiznova-certificate-card">
+        <div class="cert-border-outer"></div>
+        <div class="cert-border-inner"></div>
+        <div class="cert-corner-ornament cert-corner-tl"></div>
+        <div class="cert-corner-ornament cert-corner-tr"></div>
+        <div class="cert-corner-ornament cert-corner-bl"></div>
+        <div class="cert-corner-ornament cert-corner-br"></div>
+        <div class="cert-glow-overlay"></div>
+
+        <!-- Certificate Header -->
+        <div style="text-align:center;position:relative;z-index:2;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;">
+            <div style="width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#7C3AED,#2563EB);">
+              <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova" style="width:34px;height:34px;object-fit:cover;">
+            </div>
+            <span class="font-display" style="font-size:28px;font-weight:800;letter-spacing:0.02em;color:white;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></span>
+          </div>
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:0.18em;color:#9898B0;text-transform:uppercase;">FOUNDED BY MAHANTHESH GANIGA</div>
+          <div style="width:70%;height:1px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:14px auto 0;"></div>
+        </div>
+
+        <!-- Certificate Body -->
+        <div style="text-align:center;position:relative;z-index:2;margin:10px 0;">
+          <div style="font-family:'Cinzel',serif,sans-serif;font-size:24px;font-weight:800;color:#F59E0B;letter-spacing:0.08em;margin-bottom:6px;">
+            CERTIFICATE OF ACHIEVEMENT
+          </div>
+          <div style="font-size:13px;color:#9898B0;margin-bottom:12px;">
+            This certificate is proudly presented to
+          </div>
+          
+          <!-- Recipient Name -->
+          <div style="font-size:34px;font-weight:800;color:#FFFFFF;font-family:'Poppins',sans-serif;letter-spacing:0.02em;margin-bottom:4px;display:inline-block;position:relative;padding:0 20px;">
+            {{ cert.recipient_name or cert.user.display_name or cert.user.username }}
+            <div style="width:100%;height:2px;background:linear-gradient(90deg,transparent,#7C3AED,transparent);position:absolute;bottom:-4px;left:0;"></div>
+          </div>
+
+          <div style="font-size:13px;color:#9898B0;margin-top:14px;margin-bottom:6px;">
+            for successfully completing the quiz
+          </div>
+
+          <!-- Quiz Title -->
+          <div style="font-size:22px;font-weight:800;color:#A78BFA;font-family:var(--font-display);margin-bottom:16px;">
+            {{ cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'QuizNova Knowledge Test' }}
+          </div>
+
+          <!-- Info Row Pill -->
+          <div style="display:inline-flex;align-items:center;gap:24px;background:#141425;border:1px solid rgba(124,58,237,0.4);border-radius:30px;padding:8px 28px;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+            <div style="font-size:12px;font-weight:700;color:white;">
+              SCORE: <span style="color:#34D399;">{{ (cert.result.percentage | round) if cert.result else 0 }}%</span>
+            </div>
+            <div style="width:1px;height:14px;background:rgba(255,255,255,0.15);"></div>
+            <div style="font-size:12px;font-weight:700;color:white;">
+              CATEGORY: <span style="color:#60A5FA;">{{ cert.result.attempt.subcategory.category.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'General' }}</span>
+            </div>
+            <div style="width:1px;height:14px;background:rgba(255,255,255,0.15);"></div>
+            <div style="font-size:12px;font-weight:700;color:white;">
+              DATE: <span style="color:#FBBF24;">{{ cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certificate Footer -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;position:relative;z-index:2;padding-top:10px;border-top:1px solid rgba(42,32,80,0.6);">
+          
+          <!-- Left: Verification & QR Code -->
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:68px;height:68px;background:white;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ (request.host_url ~ 'verify/' ~ cert.verification_id) | urlencode }}" alt="QR Code" style="width:60px;height:60px;">
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:800;color:#9898B0;letter-spacing:0.06em;">VERIFY CERTIFICATE</div>
+              <div style="font-size:11px;font-weight:700;color:#A78BFA;font-family:monospace;">{{ cert.verification_id }}</div>
+              <div style="font-size:9px;color:#6B6B85;margin-top:2px;">Scan QR code or visit verify page</div>
+            </div>
+          </div>
+
+          <!-- Center: Official Seal -->
+          <div style="text-align:center;">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1E1538,#0D0B1A);border:2px solid #F59E0B;box-shadow:0 0 16px rgba(245,158,11,0.25);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto;">
+              <div style="font-size:8px;font-weight:800;color:#F59E0B;letter-spacing:0.04em;">QUIZNOVA</div>
+              <div style="font-size:7px;font-weight:700;color:#A78BFA;margin-top:1px;">CERTIFIED</div>
+            </div>
+          </div>
+
+          <!-- Right: Founder Signature -->
+          <div style="text-align:center;">
+            <div style="font-family:'Sacramento', 'Dancing Script', cursive, sans-serif;font-size:22px;color:#FFFFFF;font-weight:700;line-height:1;margin-bottom:4px;border-bottom:1px solid #D4AF37;padding-bottom:4px;width:140px;margin-inline:auto;">
+              Mahanthesh Ganiga
+            </div>
+            <div style="font-size:11px;font-weight:700;color:white;">Mahanthesh Ganiga</div>
+            <div style="font-size:9.5px;color:#9898B0;">Founder, QuizNova</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- html2canvas for instant client-side PNG download -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+function downloadCertificatePNG() {
+  const card = document.getElementById('quiznova-certificate-card');
+  if (!card || typeof html2canvas === 'undefined') {
+    alert('Preparing high-resolution PNG download...');
+    return;
+  }
+  html2canvas(card, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#050508'
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'QuizNova_Certificate_{{ cert.verification_id }}.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+</script>
+{% endblock %}
