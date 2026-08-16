@@ -77,7 +77,7 @@ def generate_certificate(result_id: int, recipient_name: str | None = None) -> C
             site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
             verification_url = f'{site_url}/verify/{cert.verification_id}'
             _render_pdf(
-                output_path=cert_path,
+                output_target=cert_path,
                 candidate_name=display_name,
                 quiz_name=sub.name,
                 category_name=sub.category.name,
@@ -95,8 +95,6 @@ def generate_certificate(result_id: int, recipient_name: str | None = None) -> C
     cert_uuid = str(uuid.uuid4())
     cert_filename = f'{cert_uuid}.pdf'
     cert_dir = os.path.join(current_app.root_path, 'static', 'certificates')
-    ensure_dir(cert_dir)
-    cert_path = os.path.join(cert_dir, cert_filename)
     relative_path = os.path.join('static', 'certificates', cert_filename)
 
     # Create DB record first to get the verification_id for QR code
@@ -114,21 +112,26 @@ def generate_certificate(result_id: int, recipient_name: str | None = None) -> C
     site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
     verification_url = f'{site_url}/verify/{cert.verification_id}'
 
-    # Generate the PDF
-    _render_pdf(
-        output_path=cert_path,
-        candidate_name=display_name,
-        quiz_name=sub.name,
-        category_name=sub.category.name,
-        percentage=float(result.percentage),
-        score=result.score,
-        max_score=result.max_score,
-        issue_date=cert.issue_date,
-        certificate_id=cert.verification_id,
-        verification_url=verification_url,
-        profile_photo_path=_get_profile_photo_path(user),
-        app_root=current_app.root_path,
-    )
+    # Attempt disk render if environment permits
+    try:
+        ensure_dir(cert_dir)
+        cert_path = os.path.join(cert_dir, cert_filename)
+        _render_pdf(
+            output_target=cert_path,
+            candidate_name=display_name,
+            quiz_name=sub.name,
+            category_name=sub.category.name,
+            percentage=float(result.percentage),
+            score=result.score,
+            max_score=result.max_score,
+            issue_date=cert.issue_date,
+            certificate_id=cert.verification_id,
+            verification_url=verification_url,
+            profile_photo_path=_get_profile_photo_path(user),
+            app_root=current_app.root_path,
+        )
+    except Exception as fs_err:
+        current_app.logger.warning(f'Disk file render skipped (Serverless/Read-only): {fs_err}')
 
     log = ActivityLog(
         user_id=user.id,
@@ -143,12 +146,43 @@ def generate_certificate(result_id: int, recipient_name: str | None = None) -> C
     return cert
 
 
+def generate_certificate_pdf_bytes(cert: Certificate) -> BytesIO:
+    """
+    Generate ReportLab PDF directly into an in-memory BytesIO buffer.
+    Serverless safe — requires zero disk writes!
+    """
+    buffer = BytesIO()
+    user = User.query.get(cert.user_id)
+    result = Result.query.get(cert.result_id)
+    sub = Subcategory.query.get(result.subcategory_id) if result else None
+    site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
+    verification_url = f'{site_url}/verify/{cert.verification_id}'
+    display_name = cert.recipient_name or (user.display_name if user else 'QuizNova Learner')
+
+    _render_pdf(
+        output_target=buffer,
+        candidate_name=display_name,
+        quiz_name=sub.name if sub else 'Quiz',
+        category_name=sub.category.name if (sub and sub.category) else 'General',
+        percentage=float(result.percentage) if result else 100.0,
+        score=result.score if result else 0,
+        max_score=result.max_score if result else 100,
+        issue_date=cert.issue_date,
+        certificate_id=cert.verification_id,
+        verification_url=verification_url,
+        profile_photo_path=_get_profile_photo_path(user) if user else None,
+        app_root=current_app.root_path,
+    )
+    buffer.seek(0)
+    return buffer
+
+
 # =============================================================================
 # PDF Rendering
 # =============================================================================
 
 def _render_pdf(
-    output_path: str,
+    output_target: str | BytesIO,
     candidate_name: str,
     quiz_name: str,
     category_name: str,
@@ -166,7 +200,7 @@ def _render_pdf(
     Landscape A4 — 297mm x 210mm
     """
     page_w, page_h = landscape(A4)
-    c = rl_canvas.Canvas(output_path, pagesize=landscape(A4))
+    c = rl_canvas.Canvas(output_target, pagesize=landscape(A4))
 
     # Background: Deep Navy (#050508)
     c.setFillColor(HexColor('#050508'))

@@ -156,26 +156,22 @@ def view_certificate(verification_id):
 
 @public_bp.route('/certificate/<string:verification_id>/download/pdf')
 def download_certificate_pdf(verification_id):
-    import os
-    from flask import send_file, current_app, abort
+    from flask import send_file, abort
     from models.certificate import Certificate
+    from services.certificate_service import generate_certificate_pdf_bytes
+    from models import db
+
     cert = Certificate.query.filter_by(verification_id=verification_id).first_or_404()
     if not cert.is_valid:
         abort(400, 'Certificate has been revoked.')
 
-    file_path = os.path.join(current_app.root_path, cert.file_path or '')
-    if not cert.file_path or not os.path.exists(file_path):
-        # Regenerate if file missing
-        from services.certificate_service import generate_certificate
-        cert = generate_certificate(cert.result_id, recipient_name=cert.recipient_name)
-        file_path = os.path.join(current_app.root_path, cert.file_path)
+    pdf_buffer = generate_certificate_pdf_bytes(cert)
 
     cert.record_download()
-    from models import db
     db.session.commit()
 
     return send_file(
-        file_path,
+        pdf_buffer,
         mimetype='application/pdf',
         as_attachment=True,
         download_name=f'QuizNova_Certificate_{cert.verification_id}.pdf'
