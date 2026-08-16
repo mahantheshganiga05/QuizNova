@@ -10,9 +10,21 @@
   {% include 'partials/_sidebar.html' %}
   <main class="dash-main" aria-label="Achievements">
 
-    <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
+    <!-- Mobile Top Header Branding Bar -->
+    <div class="dash-mobile-top-bar">
+      <a href="{{ url_for('public.home') }}" class="dash-mobile-logo-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <div style="width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7c3aed,#2563eb);">
+          <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova" style="width:30px;height:30px;object-fit:cover;border-radius:8px;">
+        </div>
+        <div>
+          <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;color:white;line-height:1;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></div>
+          <div style="font-size:9.5px;color:var(--brand-purple-light);font-weight:600;letter-spacing:0.02em;">Student Dashboard</div>
+        </div>
+      </a>
+      <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
 
     <!-- Header -->
     <div class="dash-topbar">
