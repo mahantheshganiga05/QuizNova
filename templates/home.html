@@ -362,10 +362,11 @@
   /* FEATURE CARDS (4 DOMAINS ABOVE STAY UPDATED) */
   .feature-cards-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
   }
   .feature-card {
     display: flex;
@@ -379,6 +380,7 @@
     border-radius: 16px;
     text-decoration: none;
     transition: all 0.25s ease;
+    width: 100%;
     min-width: 0;
     box-sizing: border-box;
   }
@@ -427,6 +429,88 @@
     word-break: normal;
     white-space: normal;
     line-height: 1.3;
+  }
+
+  /* MOBILE RESPONSIVE FIT FOR 4 FEATURE CARDS IN ONE SINGLE ROW (360PX–768PX) */
+  @media (max-width: 768px) {
+    .feature-cards-section {
+      padding-inline: 0 !important;
+    }
+    .feature-cards-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 5px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    .feature-card {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      text-align: center !important;
+      padding: 8px 4px !important;
+      gap: 5px !important;
+      border-radius: 12px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box !important;
+    }
+    .feature-card-icon {
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 16px !important;
+      border-radius: 8px !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+    }
+    .feature-card-content {
+      width: 100% !important;
+      min-width: 0 !important;
+      text-align: center !important;
+    }
+    .feature-card-title {
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      margin: 0 0 2px 0 !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      white-space: normal !important;
+    }
+    .feature-card-desc {
+      font-size: 9.5px !important;
+      color: var(--text-2) !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      margin: 0 !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      white-space: normal !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .feature-cards-grid {
+      gap: 4px !important;
+    }
+    .feature-card {
+      padding: 7px 3px !important;
+      gap: 4px !important;
+    }
+    .feature-card-icon {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 14px !important;
+    }
+    .feature-card-title {
+      font-size: 10.5px !important;
+    }
+    .feature-card-desc {
+      font-size: 9px !important;
+    }
   }
 
   /* DESKTOP 2-COLUMN NEWSLETTER CARD (MATCHING MOCKUP IMAGE) */
