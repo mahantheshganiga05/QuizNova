@@ -4,7 +4,7 @@
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=20260816_v7">
 <style>
   .admin-stat-card {
     background: rgba(15, 23, 42, 0.8);
@@ -20,6 +20,123 @@
     width: 48px; height: 48px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; flex-shrink: 0;
+  }
+  .admin-kpi-grid,
+  .admin-comp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  /* MOBILE RESPONSIVE OVERRIDES (max-width: 767px) */
+  @media (max-width: 767px) {
+    .dash-topbar {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+      margin-bottom: 16px !important;
+    }
+    .dash-topbar > div:last-child {
+      width: 100% !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+    }
+    .dash-topbar > div:last-child .btn {
+      width: 100% !important;
+      justify-content: center !important;
+      font-size: 11px !important;
+      padding: 7px 4px !important;
+      text-align: center !important;
+    }
+    .dash-topbar > div:last-child a:last-child {
+      grid-column: 1 / -1 !important;
+    }
+    .admin-kpi-grid,
+    .admin-comp-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+      margin-bottom: 16px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .admin-stat-card {
+      padding: 12px 10px !important;
+      gap: 10px !important;
+      border-radius: 12px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box !important;
+    }
+    .admin-stat-icon {
+      width: 38px !important;
+      height: 38px !important;
+      font-size: 16px !important;
+      border-radius: 10px !important;
+    }
+    .admin-stat-card div div:first-child {
+      font-size: 18px !important;
+    }
+    .admin-stat-card div div:last-child {
+      font-size: 10.5px !important;
+      line-height: 1.2 !important;
+    }
+    .dash-grid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 16px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      margin-bottom: 16px !important;
+    }
+    .chart-card {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      padding: 14px 10px !important;
+    }
+    .chart-wrap {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 210px !important;
+      position: relative !important;
+    }
+    .chart-title {
+      font-size: 13px !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    .data-table-wrap {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      box-sizing: border-box !important;
+    }
+    .data-table {
+      min-width: 520px !important;
+      width: 100% !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .admin-stat-card {
+      padding: 10px 8px !important;
+      gap: 8px !important;
+    }
+    .admin-stat-icon {
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 14px !important;
+    }
+    .admin-stat-card div div:first-child {
+      font-size: 16px !important;
+    }
+    .admin-stat-card div div:last-child {
+      font-size: 9.5px !important;
+    }
   }
 </style>
 {% endblock %}
@@ -66,8 +183,24 @@
   <!-- Main Content -->
   <main class="dash-main" aria-label="Admin Dashboard">
 
+    <!-- Mobile Header Bar -->
+    <div class="dash-mobile-top-bar">
+      <a href="{{ url_for('public.home') }}" class="dash-mobile-logo-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <div style="width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7c3aed,#2563eb);">
+          <img src="{{ url_for('static', filename='images/quiznova_logo.jpg') }}" alt="QuizNova" style="width:30px;height:30px;object-fit:cover;border-radius:8px;">
+        </div>
+        <div>
+          <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;color:white;line-height:1;">Quiz<span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nova</span></div>
+          <div style="font-size:9.5px;color:var(--brand-purple-light);font-weight:600;letter-spacing:0.02em;">Admin Console</div>
+        </div>
+      </a>
+      <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+
     <!-- Top Bar -->
-    <div class="dash-topbar" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div class="dash-topbar admin-header-topbar" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
       <div>
         <h1 class="font-display" style="font-size:24px;font-weight:800;color:white;display:flex;align-items:center;gap:10px;">
           Enterprise Admin Dashboard
@@ -84,7 +217,7 @@
     </div>
 
     <!-- Top Statistics Cards -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+    <div class="admin-kpi-grid">
       
       <div class="admin-stat-card">
         <div class="admin-stat-icon" style="background:rgba(108,99,255,0.15);color:var(--brand-purple-light);">👥</div>
@@ -154,7 +287,7 @@
         <a href="{{ url_for('admin.competitions') }}" class="btn btn-ghost btn-sm" style="font-size:12px;">View All Competitions →</a>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      <div class="admin-comp-grid">
         <div class="admin-stat-card">
           <div class="admin-stat-icon" style="background:rgba(124,58,237,0.15);color:#C084FC;">🏆</div>
           <div>
