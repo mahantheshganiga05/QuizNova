@@ -2,7 +2,154 @@
 {% block title %}Achievements — QuizNova{% endblock %}
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=20260816_v4">
+<style>
+/* Scoped Achievements CSS */
+.achievements-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--bg-card, rgba(255,255,255,0.03));
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.ach-summary-metrics {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.ach-summary-col { text-align: left; }
+.ach-summary-divider { width: 1px; height: 40px; background: var(--border, rgba(255,255,255,0.1)); }
+.ach-summary-progress { flex: 1; padding-left: 24px; }
+.ach-summary-val { font-family: var(--font-display); font-size: 2rem; font-weight: 700; }
+.ach-summary-label { font-size: 13px; color: var(--text-2); }
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .achievements-summary {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 20px 16px !important;
+    gap: 16px !important;
+    border-radius: 16px !important;
+    margin-bottom: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+  .ach-summary-metrics {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+  .ach-summary-col {
+    text-align: center !important;
+  }
+  .ach-summary-divider {
+    display: none !important;
+  }
+  .ach-summary-val {
+    font-size: 1.6rem !important;
+    text-align: center !important;
+  }
+  .ach-summary-label {
+    font-size: 11px !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    word-break: break-word !important;
+  }
+  .ach-summary-progress {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: block !important;
+    padding-left: 0 !important;
+    margin-top: 4px !important;
+    box-sizing: border-box !important;
+  }
+  .ach-progress-bar-wrap {
+    height: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .achievements-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .achievement-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 12px 8px !important;
+    gap: 6px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .ach-icon-wrap {
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 auto 2px auto !important;
+  }
+  .ach-icon-wrap svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .ach-name {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+  }
+  .ach-desc {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+    color: var(--text-2) !important;
+    word-break: break-word !important;
+  }
+  .ach-pts {
+    font-size: 10px !important;
+    padding: 2px 8px !important;
+    margin-top: auto !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .achievements-grid {
+    gap: 8px !important;
+  }
+  .achievement-card {
+    padding: 10px 6px !important;
+  }
+  .ach-name {
+    font-size: 11px !important;
+  }
+  .ach-desc {
+    font-size: 9.5px !important;
+  }
+}
+</style>
+{% endblock %}
 
 {% block content %}
 {% set earned_ids = earned | map(attribute='achievement_id') | list %}
