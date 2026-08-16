@@ -438,10 +438,10 @@
             {% for cert in user_certificates %}
             <div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
               <div>
-                <div style="font-size:13px;font-weight:700;color:white;">📜 {{ cert.subcategory.name if cert.subcategory else 'Quiz Certificate' }}</div>
-                <div style="font-size:10px;color:var(--text-3);">Score: {{ cert.score_percentage }}% • {{ cert.created_at.strftime('%d %b %Y') if cert.created_at else '' }}</div>
+                <div style="font-size:13px;font-weight:700;color:white;">📜 {{ cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'Quiz Certificate' }}</div>
+                <div style="font-size:10px;color:var(--text-3);">Score: {{ (cert.result.percentage | round) if cert.result else 0 }}% • {{ cert.issue_date.strftime('%d %b %Y') if cert.issue_date else '' }}</div>
               </div>
-              <a href="{{ url_for('api.download_certificate', cert_id=cert.id) }}" class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;">📥 Download</a>
+              <a href="{{ url_for('public.download_certificate_pdf', verification_id=cert.verification_id) }}" class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;">📥 Download</a>
             </div>
             {% endfor %}
           </div>

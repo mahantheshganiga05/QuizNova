@@ -142,8 +142,9 @@ def index():
         })
     # Add certificate generated notifications
     for cert in user_certificates[:2]:
+        sub_name = (cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else "Quiz")
         real_notifications.append({
-            'title': f'Certificate Generated: {cert.subcategory.name if cert.subcategory else "Quiz"}',
+            'title': f'Certificate Generated: {sub_name}',
             'time': cert.created_at.strftime('%b %d, %H:%M') if cert.created_at else 'Recently',
             'type': 'certificate'
         })
