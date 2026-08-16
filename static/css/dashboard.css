@@ -600,54 +600,51 @@
     white-space: nowrap !important;
   }
 
-  /* 3. SIX STATISTICS — COMPACT SINGLE-ROW HORIZONTAL STRIP */
+  /* 3. SIX STATISTICS — ALL 6 VISIBLE AT ONCE IN 1 ROW (NO SCROLL, NO SWIPE) */
   .stats-grid-6 {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    gap: 6px !important;
-    padding-bottom: 4px !important;
-    margin-bottom: 14px !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 4px !important;
     width: 100% !important;
     max-width: 100% !important;
+    margin-bottom: 14px !important;
     box-sizing: border-box !important;
-  }
-  .stats-grid-6::-webkit-scrollbar {
-    display: none !important;
+    overflow-x: hidden !important;
   }
   .stat-card-glass {
-    flex: 0 0 calc(28% - 5px) !important;
-    min-width: 76px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    height: 74px !important;
+    padding: 6px 2px !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
-    padding: 8px 4px !important;
-    gap: 4px !important;
+    gap: 2px !important;
     border-radius: 10px !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
   }
   .stat-card-glass::after {
     height: 1px !important;
   }
   .stat-icon-wrap {
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 13px !important;
-    border-radius: 6px !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 12px !important;
+    border-radius: 5px !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
   }
   .stat-val-num {
-    font-size: 13.5px !important;
+    font-size: 12.5px !important;
     font-weight: 800 !important;
     line-height: 1.1 !important;
     text-align: center !important;
+    white-space: nowrap !important;
   }
   .stat-lbl-txt {
-    font-size: 8.5px !important;
+    font-size: 8px !important;
     line-height: 1.1 !important;
     text-align: center !important;
     white-space: nowrap !important;
