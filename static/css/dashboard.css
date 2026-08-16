@@ -519,115 +519,233 @@
   }
 }
 
+/* Mobile Branding Header */
+.dash-mobile-top-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── LEADERBOARD PREVIEW (RESPONSIVE GRID) ────────────────── */
+.dash-leaderboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.dash-leaderboard-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-display);
+}
+.dash-leaderboard-sub {
+  font-size: 12px;
+  color: var(--text-2);
+}
+.dash-leaderboard-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dash-leaderboard-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dash-lb-rank-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: white;
+  font-weight: 800;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+.dash-lb-rank-badge.rank-1 { background: #F59E0B; }
+.dash-lb-rank-badge.rank-2 { background: #94A3B8; }
+.dash-lb-rank-badge.rank-3 { background: #B45309; }
+
+.dash-lb-user-info {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+.dash-lb-username {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-lb-stats {
+  font-size: 10px;
+  color: var(--brand-purple-light);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ── RESPONSIVE MEDIA QUERIES FOR STUDENT DASHBOARD ─────── */
+@media (max-width: 1100px) {
+  .dash-leaderboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .dash-mobile-top-bar {
+    display: flex !important;
+  }
+  .mobile-sidebar-btn {
+    display: inline-flex !important;
+    padding: 6px !important;
+    margin-bottom: 0 !important;
+  }
   .dash-main {
     margin-left: 0 !important;
-    padding: 12px !important;
-    gap: 16px !important;
+    padding: 10px !important;
+    gap: 12px !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
   }
-  .mobile-sidebar-btn {
-    display: inline-flex !important;
-  }
 
-  /* 1. STUDENT HERO TOPBAR */
+  /* 1. COMPACT STUDENT HERO SUMMARY CARD (40-50% SHORTER) */
   .dash-topbar-header {
-    padding: 16px 14px !important;
-    margin-bottom: 16px !important;
-    gap: 14px !important;
-    border-radius: 16px !important;
+    padding: 12px 10px !important;
+    margin-bottom: 12px !important;
+    gap: 10px !important;
+    border-radius: 14px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .header-left-title {
-    font-size: 19px !important;
-    line-height: 1.25 !important;
-    margin-bottom: 10px !important;
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 8px !important;
   }
   .header-meta-pills {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 6px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
     width: 100% !important;
   }
   .header-meta-pill {
-    padding: 5px 8px !important;
-    font-size: 11px !important;
-    border-radius: 8px !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    padding: 3px 7px !important;
+    font-size: 10px !important;
+    border-radius: 6px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
   }
   .header-action-btns {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
+    gap: 6px !important;
     width: 100% !important;
-    box-sizing: border-box !important;
     margin-top: 4px !important;
   }
   .header-action-btns .btn {
     width: 100% !important;
     justify-content: center !important;
-    font-size: 12px !important;
-    padding: 9px 8px !important;
+    font-size: 11px !important;
+    padding: 7px 6px !important;
     border-radius: var(--r-full) !important;
     text-align: center !important;
-    white-space: nowrap !important;
   }
 
-  /* 2. STATS GRID (EXACTLY 2 COLUMNS ON MOBILE) */
+  /* 2. MAIN 6 STATISTICS — MUST BE ONE SINGLE ROW */
   .stats-grid-6 {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
-    margin-bottom: 16px !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+    margin-bottom: 12px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .stat-card-glass {
-    padding: 12px 10px !important;
-    border-radius: 14px !important;
-    gap: 10px !important;
-    width: 100% !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 6px 2px !important;
+    gap: 3px !important;
+    border-radius: 10px !important;
     min-width: 0 !important;
+    width: 100% !important;
     box-sizing: border-box !important;
   }
+  .stat-card-glass::after {
+    height: 1px !important;
+  }
   .stat-icon-wrap {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 10px !important;
-    font-size: 18px !important;
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    margin: 0 auto !important;
     flex-shrink: 0 !important;
   }
   .stat-val-num {
-    font-size: 18px !important;
+    font-size: 12px !important;
     font-weight: 800 !important;
     line-height: 1.1 !important;
+    text-align: center !important;
   }
   .stat-lbl-txt {
-    font-size: 10.5px !important;
-    line-height: 1.2 !important;
-    word-break: break-word !important;
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
+  .lbl-full { display: none !important; }
+  .lbl-short { display: inline !important; }
 
   /* 3. MAIN DASHBOARD FLEX FLOW */
   .dash-main-grid {
     display: flex !important;
     flex-direction: column !important;
-    gap: 16px !important;
-    margin-bottom: 16px !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  /* 4. PERFORMANCE ANALYTICS & CHARTS */
+  /* 4. PERFORMANCE ANALYTICS (COMPACT CHART) */
+  .card.p-4, .card {
+    padding: 12px 10px !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
   .chart-canvas-wrap {
-    height: 220px !important;
+    height: 190px !important;
     width: 100% !important;
     max-width: 100% !important;
   }
@@ -638,85 +756,132 @@
 
   /* 5. COMPACT CATEGORY PERFORMANCE */
   .cat-progress-item {
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
   }
   .cat-progress-head {
-    font-size: 11px !important;
-    margin-bottom: 3px !important;
+    font-size: 10.5px !important;
+    margin-bottom: 2px !important;
   }
   .cat-progress-bar-wrap {
-    height: 5px !important;
+    height: 4px !important;
   }
 
-  /* 6. RECOMMENDED QUIZZES VERTICAL STACK */
+  /* 6. RECOMMENDED QUIZZES — MUST BE ONE SINGLE ROW */
   .rec-cards-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .rec-card-glass {
-    padding: 12px 14px !important;
-    border-radius: 14px !important;
+    padding: 8px 4px !important;
+    border-radius: 10px !important;
+    min-width: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+  .rec-card-cat {
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 2px !important;
+  }
+  .rec-card-title {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 4px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .rec-card-meta {
+    font-size: 8.5px !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .rec-card-btn {
+    padding: 5px 4px !important;
+    font-size: 10px !important;
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
   }
 
   /* 7. RECENT ACTIVITY & NOTIFICATIONS */
   .notif-item {
-    padding: 10px 12px !important;
-    border-radius: 10px !important;
-    gap: 10px !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+    gap: 8px !important;
   }
   .activity-item {
-    padding-block: 8px !important;
+    padding-block: 6px !important;
   }
   .activity-dot {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 12px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
   }
 
-  /* 8. LEADERBOARD PREVIEW GRID (2 COLUMNS ON MOBILE) */
+  /* 8. LEADERBOARD PREVIEW (COMPACT LIST) */
   .dash-leaderboard-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .dash-leaderboard-item {
-    padding: 10px 8px !important;
+    padding: 6px 10px !important;
     gap: 8px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .dash-lb-rank-badge {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+  }
+  .dash-lb-user-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+    margin-left: 4px !important;
   }
   .dash-lb-username {
-    font-size: 12px !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    line-height: 1.2 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: white !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .dash-lb-stats {
+    font-size: 10px !important;
+    color: var(--brand-purple-light) !important;
+    font-weight: 600 !important;
+    flex-shrink: 0 !important;
   }
 }
 
-@media (max-width: 480px) {
-  .dash-main {
-    padding: 10px !important;
-    gap: 12px !important;
-  }
-}
-
-@media (max-width: 360px) {
-  .header-action-btns {
-    grid-template-columns: 1fr !important;
-  }
-  .dash-leaderboard-grid {
-    grid-template-columns: 1fr !important;
-  }
+@media (max-width: 380px) {
   .stat-val-num {
-    font-size: 16px !important;
+    font-size: 11px !important;
   }
   .stat-lbl-txt {
+    font-size: 7.5px !important;
+  }
+  .rec-card-title {
     font-size: 10px !important;
   }
 }

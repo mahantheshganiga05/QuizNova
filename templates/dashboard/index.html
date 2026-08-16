@@ -192,10 +192,21 @@
   <!-- ── MAIN CONTENT ───────────────────────────────────── -->
   <main class="dash-main" aria-label="Student Dashboard">
 
-    <!-- Mobile Sidebar Toggle -->
-    <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar" style="margin-bottom:16px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
+    <!-- Mobile Top Header Branding Bar -->
+    <div class="dash-mobile-top-bar">
+      <a href="{{ url_for('public.home') }}" class="dash-mobile-logo-link" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <div class="sidebar-logo-mark" style="width:28px;height:28px;border-radius:7px;background:var(--g-brand);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(124,58,237,0.3);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:white;line-height:1;">QuizNova</div>
+          <div style="font-size:9.5px;color:var(--brand-purple-light);font-weight:600;letter-spacing:0.02em;">Student Dashboard</div>
+        </div>
+      </a>
+      <button class="mobile-sidebar-btn" id="sidebar-toggle" aria-label="Open sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
 
     <!-- ── TOP HEADER ─────────────────────────────────────── -->
     <div class="dash-topbar-header">
@@ -205,15 +216,15 @@
           {% if hour < 12 %}Good Morning{% elif hour < 17 %}Good Afternoon{% else %}Good Evening{% endif %}, {{ current_user.display_name.split()[0] }}! 👋
         </h1>
         <div class="header-meta-pills">
-          <div class="header-meta-pill">🏆 Overall Rank: <strong>#{{ stats.global_rank }}</strong></div>
-          <div class="header-meta-pill">🛡️ Current Level: <strong>Level {{ stats.current_level }}</strong></div>
-          <div class="header-meta-pill">⭐ XP Points: <strong>{{ stats.xp_points }} XP</strong></div>
-          <div class="header-meta-pill">💎 Total Points: <strong>{{ stats.total_points }} Pts</strong></div>
+          <div class="header-meta-pill">🏆 Rank: <strong>#{{ stats.global_rank }}</strong></div>
+          <div class="header-meta-pill">🛡️ Level: <strong>Lvl {{ stats.current_level }}</strong></div>
+          <div class="header-meta-pill">⭐ XP: <strong>{{ stats.xp_points }} XP</strong></div>
+          <div class="header-meta-pill">💎 Pts: <strong>{{ stats.total_points }} Pts</strong></div>
           <div class="header-meta-pill">🔥 Streak: <strong>{{ stats.current_streak_days }} Days</strong></div>
         </div>
       </div>
 
-      <div class="header-action-btns" style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div class="header-action-btns">
         <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary" style="box-shadow:0 0 20px rgba(124,58,237,0.4);">
           ⚡ Start Quiz
         </a>
@@ -229,7 +240,7 @@
         <div class="stat-icon-wrap ic-purple">📖</div>
         <div>
           <div class="stat-val-num">{{ stats.total_quizzes }}</div>
-          <div class="stat-lbl-txt">Total Quizzes</div>
+          <div class="stat-lbl-txt"><span class="lbl-full">Total Quizzes</span><span class="lbl-short">Quizzes</span></div>
         </div>
       </div>
 
@@ -237,7 +248,7 @@
         <div class="stat-icon-wrap ic-blue">🎯</div>
         <div>
           <div class="stat-val-num">{{ stats.avg_score }}%</div>
-          <div class="stat-lbl-txt">Average Score</div>
+          <div class="stat-lbl-txt"><span class="lbl-full">Average Score</span><span class="lbl-short">Avg Score</span></div>
         </div>
       </div>
 
@@ -245,7 +256,7 @@
         <div class="stat-icon-wrap ic-teal">🏆</div>
         <div>
           <div class="stat-val-num">#{{ stats.global_rank }}</div>
-          <div class="stat-lbl-txt">Global Rank</div>
+          <div class="stat-lbl-txt"><span class="lbl-full">Global Rank</span><span class="lbl-short">Rank</span></div>
         </div>
       </div>
 
@@ -253,7 +264,7 @@
         <div class="stat-icon-wrap ic-gold">⚔️</div>
         <div>
           <div class="stat-val-num">{{ stats.competitions_joined }}</div>
-          <div class="stat-lbl-txt">Competitions Joined</div>
+          <div class="stat-lbl-txt"><span class="lbl-full">Competitions Joined</span><span class="lbl-short">Joined</span></div>
         </div>
       </div>
 
@@ -261,7 +272,7 @@
         <div class="stat-icon-wrap ic-pink">📜</div>
         <div>
           <div class="stat-val-num">{{ stats.certificates_earned }}</div>
-          <div class="stat-lbl-txt">Certificates Earned</div>
+          <div class="stat-lbl-txt"><span class="lbl-full">Certificates Earned</span><span class="lbl-short">Certs</span></div>
         </div>
       </div>
 
@@ -269,7 +280,7 @@
         <div class="stat-icon-wrap ic-orange">🔥</div>
         <div>
           <div class="stat-val-num">{{ stats.current_streak_days }}d</div>
-          <div class="stat-lbl-txt">Current Streak</div>
+          <div class="stat-lbl-txt"><span class="lbl-full">Current Streak</span><span class="lbl-short">Streak</span></div>
         </div>
       </div>
     </div>
@@ -278,19 +289,19 @@
     <div class="dash-main-grid">
 
       <!-- LEFT COLUMN: Charts & Categories & Activity -->
-      <div style="display:flex;flex-direction:column;gap:24px;">
+      <div style="display:flex;flex-direction:column;gap:24px;" class="dash-left-col">
 
         <!-- Performance Analytics Chart -->
-        <div class="card p-4">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <div class="card p-4 chart-card-box">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;" class="chart-header-wrap">
             <div>
               <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);">Performance Analytics</h3>
               <p style="font-size:12px;color:var(--text-2);">Real quiz score trend and performance metrics from database.</p>
             </div>
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-ghost btn-sm" style="font-size:11px;">Score Trend</button>
-              <button class="btn btn-ghost btn-sm" style="font-size:11px;">Weekly</button>
-              <button class="btn btn-ghost btn-sm" style="font-size:11px;">Monthly</button>
+            <div style="display:flex;gap:4px;" class="chart-filter-btns">
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 8px;">Score Trend</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 8px;">Weekly</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 8px;">Monthly</button>
             </div>
           </div>
 
@@ -300,8 +311,8 @@
         </div>
 
         <!-- Category Performance -->
-        <div class="card p-4">
-          <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);margin-bottom:16px;">
+        <div class="card p-4 cat-perf-box">
+          <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);margin-bottom:14px;">
             Category Performance
           </h3>
 
@@ -323,7 +334,7 @@
         </div>
 
         <!-- Recommended Quizzes -->
-        <div class="card p-4">
+        <div class="card p-4 rec-quizzes-box">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;" class="rec-header-wrap">
             <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);">Recommended Quizzes</h3>
             <a href="{{ url_for('quiz.categories') }}" style="font-size:12px;color:var(--brand-purple-light);text-decoration:none;">View All Categories →</a>
@@ -333,9 +344,9 @@
             {% for sub in recommended_subs[:3] %}
             <div class="rec-card-glass">
               <div>
-                <div style="font-size:10px;font-weight:700;color:var(--brand-purple-light);text-transform:uppercase;margin-bottom:4px;">{{ sub.category.name if sub.category else 'Quiz' }}</div>
-                <h4 style="font-size:14px;font-weight:700;color:white;margin-bottom:8px;">{{ sub.name }}</h4>
-                <div style="font-size:11px;color:var(--text-2);margin-bottom:12px;display:flex;gap:10px;">
+                <div class="rec-card-cat">{{ sub.category.name if sub.category else 'Quiz' }}</div>
+                <h4 class="rec-card-title">{{ sub.name }}</h4>
+                <div class="rec-card-meta" style="font-size:11px;color:var(--text-2);margin-bottom:12px;display:flex;gap:10px;">
                   <span>⏱ {{ sub.time_limit_minutes }}m</span>
                   <span>❓ {{ sub.questions_per_quiz }} Qs</span>
                   <span>📊 {{ sub.difficulty_default | capitalize }}</span>
@@ -343,7 +354,7 @@
               </div>
               <form method="POST" action="{{ url_for('quiz.start', subcategory_id=sub.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-primary btn-sm w-full" style="width:100%;">Start Quiz →</button>
+                <button type="submit" class="btn btn-primary btn-sm rec-card-btn" style="width:100%;">Start Quiz →</button>
               </form>
             </div>
             {% endfor %}
@@ -353,7 +364,7 @@
       </div>
 
       <!-- RIGHT COLUMN: Activity, Upcoming Competitions, Leaderboard & Certificates -->
-      <div style="display:flex;flex-direction:column;gap:24px;">
+      <div style="display:flex;flex-direction:column;gap:24px;" class="dash-right-col">
 
         <!-- Real System Notifications -->
         {% if real_notifications %}
@@ -449,7 +460,7 @@
           <p class="dash-leaderboard-sub">Top performing students on QuizNova</p>
         </div>
         <a href="{{ url_for('quiz.leaderboard') }}" class="btn btn-primary btn-sm dash-lb-view-btn">
-          🏆 View Full Leaderboard →
+          🏆 View Full →
         </a>
       </div>
 
@@ -457,12 +468,12 @@
         {% for u, user_xp, user_avg in top_leaderboard_users %}
         <div class="dash-leaderboard-item">
           <div class="dash-lb-rank-badge rank-{{ loop.index }}">
-            {{ loop.index }}
+            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
           </div>
           <div class="dash-lb-user-info">
             <div class="dash-lb-username">{{ u.display_name }}</div>
-            <div class="dash-lb-stats">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
           </div>
+          <div class="dash-lb-stats">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
         </div>
         {% endfor %}
       </div>
