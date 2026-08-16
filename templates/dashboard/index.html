@@ -472,8 +472,8 @@
           </div>
           <div class="dash-lb-user-info">
             <div class="dash-lb-username">{{ u.display_name }}</div>
+            <div class="dash-lb-stats">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
           </div>
-          <div class="dash-lb-stats">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
         </div>
         {% endfor %}
       </div>
