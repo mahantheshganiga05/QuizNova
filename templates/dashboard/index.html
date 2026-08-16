@@ -294,7 +294,7 @@
             </div>
           </div>
 
-          <div style="height:240px;">
+          <div class="chart-canvas-wrap" style="height:240px;position:relative;width:100%;">
             <canvas id="performanceChart"></canvas>
           </div>
         </div>
@@ -324,7 +324,7 @@
 
         <!-- Recommended Quizzes -->
         <div class="card p-4">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;" class="rec-header-wrap">
             <h3 style="font-size:16px;font-weight:800;color:white;font-family:var(--font-display);">Recommended Quizzes</h3>
             <a href="{{ url_for('quiz.categories') }}" style="font-size:12px;color:var(--brand-purple-light);text-decoration:none;">View All Categories →</a>
           </div>
@@ -442,26 +442,26 @@
     </div>
 
     <!-- ── BOTTOM LEADERBOARD PREVIEW (TOP 5 STUDENTS) ─────── -->
-    <div class="card p-4">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div class="card p-4 dash-leaderboard-card">
+      <div class="dash-leaderboard-header">
         <div>
-          <h3 style="font-size:18px;font-weight:800;color:white;font-family:var(--font-display);">Leaderboard Preview</h3>
-          <p style="font-size:12px;color:var(--text-2);">Top performing students on QuizNova</p>
+          <h3 class="dash-leaderboard-title">Leaderboard Preview</h3>
+          <p class="dash-leaderboard-sub">Top performing students on QuizNova</p>
         </div>
-        <a href="{{ url_for('quiz.leaderboard') }}" class="btn btn-primary btn-sm">
+        <a href="{{ url_for('quiz.leaderboard') }}" class="btn btn-primary btn-sm dash-lb-view-btn">
           🏆 View Full Leaderboard →
         </a>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:12px;">
+      <div class="dash-leaderboard-grid">
         {% for u, user_xp, user_avg in top_leaderboard_users %}
-        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;">
-          <div style="width:28px;height:28px;border-radius:50%;background:{% if loop.index==1 %}#F59E0B{% elif loop.index==2 %}#94A3B8{% elif loop.index==3 %}#B45309{% else %}rgba(255,255,255,0.1){% endif %};color:white;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <div class="dash-leaderboard-item">
+          <div class="dash-lb-rank-badge rank-{{ loop.index }}">
             {{ loop.index }}
           </div>
-          <div style="overflow:hidden;">
-            <div style="font-size:13px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.display_name }}</div>
-            <div style="font-size:10px;color:var(--brand-purple-light);">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
+          <div class="dash-lb-user-info">
+            <div class="dash-lb-username">{{ u.display_name }}</div>
+            <div class="dash-lb-stats">{{ user_xp }} XP • {{ user_avg | round | int }}% Avg</div>
           </div>
         </div>
         {% endfor %}
