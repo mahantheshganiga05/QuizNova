@@ -226,7 +226,21 @@ def certificates():
              .filter_by(user_id=current_user.id, is_valid=True)
              .order_by(Certificate.created_at.desc())
              .all())
-    return render_template('dashboard/certificates.html', certificates=certs)
+
+    avg_score = 0.0
+    best_score = 0.0
+    if certs:
+        percentages = [float(c.result.percentage) for c in certs if c.result and c.result.percentage is not None]
+        if percentages:
+            avg_score = round(sum(percentages) / len(percentages), 1)
+            best_score = round(max(percentages), 1)
+
+    return render_template(
+        'dashboard/certificates.html',
+        certificates=certs,
+        avg_score=avg_score,
+        best_score=best_score
+    )
 
 
 @dashboard_bp.route('/settings', methods=['GET', 'POST'])
