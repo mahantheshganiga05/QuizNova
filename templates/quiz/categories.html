@@ -500,6 +500,166 @@
       text-overflow: ellipsis !important;
     }
   }
+
+  /* ═══════════════════════════════════════════════════════
+     CATEGORY PAGE EXCLUSIVE FEATURE CARDS (4 DOMAINS IN 1 SINGLE ROW ON MOBILE)
+  ════════════════════════════════════════════════════════ */
+  .cat-page-features-section {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+  .cat-page-feature-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .cat-page-feature-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--g-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 16px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .cat-page-feature-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(124, 58, 237, 0.5);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+  }
+  .cat-page-feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .cat-page-feature-content {
+    min-width: 0;
+    flex: 1;
+  }
+  .cat-page-feature-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 2px 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+    line-height: 1.25;
+  }
+  .cat-page-feature-desc {
+    font-size: 12px;
+    color: var(--text-2);
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  /* CATEGORY PAGE MOBILE RESPONSIVE FIT FOR 4 FEATURE CARDS IN 1 SINGLE ROW (360PX–768PX) */
+  @media (max-width: 768px) {
+    .cat-page-features-section {
+      padding-inline: 0 !important;
+    }
+    .cat-page-features-container {
+      padding-inline: 8px !important;
+    }
+    .cat-page-feature-cards-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 5px !important;
+      width: 100% !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
+    .cat-page-feature-card {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      text-align: center !important;
+      padding: 8px 3px !important;
+      gap: 4px !important;
+      border-radius: 12px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box !important;
+    }
+    .cat-page-feature-icon {
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 16px !important;
+      border-radius: 8px !important;
+      margin: 0 auto 2px auto !important;
+      flex-shrink: 0 !important;
+    }
+    .cat-page-feature-content {
+      width: 100% !important;
+      min-width: 0 !important;
+      text-align: center !important;
+    }
+    .cat-page-feature-title {
+      font-family: var(--font-display) !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      line-height: 1.25 !important;
+      text-align: center !important;
+      margin: 0 0 2px 0 !important;
+      color: #FFFFFF !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+      white-space: normal !important;
+    }
+    .cat-page-feature-desc {
+      font-size: 9px !important;
+      color: var(--text-2) !important;
+      line-height: 1.18 !important;
+      text-align: center !important;
+      margin: 0 !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+      white-space: normal !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .cat-page-feature-cards-grid {
+      gap: 4px !important;
+    }
+    .cat-page-feature-card {
+      padding: 6px 2px !important;
+      gap: 3px !important;
+    }
+    .cat-page-feature-icon {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 14px !important;
+    }
+    .cat-page-feature-title {
+      font-size: 10px !important;
+    }
+    .cat-page-feature-desc {
+      font-size: 8.5px !important;
+    }
+  }
 </style>
 
 <!-- Filter Tabs & Search Bar -->
@@ -581,42 +741,46 @@
   </div>
 </section>
 
-<!-- Footer Feature Highlights -->
-<section class="section-sm" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-1);">
-  <div class="container">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+<!-- Category Page Secondary Feature Quick-Links (4 Domains in 1 Single Row on Mobile) -->
+<section class="section-sm cat-page-features-section">
+  <div class="container cat-page-features-container">
+    <div class="cat-page-feature-cards-grid">
       
-      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;border-radius:8px;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-purple-light);flex-shrink:0;">📋</div>
-        <div>
-          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Curated Questions</h4>
-          <p style="font-size:11px;color:var(--text-2);">Handpicked by experts</p>
+      <!-- 1. Current Affairs -->
+      <a href="{{ url_for('quiz.subcategories', category_slug='aptitude') }}" class="cat-page-feature-card">
+        <div class="cat-page-feature-icon icon-bg-blue" aria-hidden="true">📋</div>
+        <div class="cat-page-feature-content">
+          <h4 class="cat-page-feature-title">Current Affairs</h4>
+          <p class="cat-page-feature-desc">Daily news & GK</p>
         </div>
-      </div>
+      </a>
 
-      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;border-radius:8px;background:rgba(57,200,255,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-cyan);flex-shrink:0;">🤖</div>
-        <div>
-          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Adaptive Learning</h4>
-          <p style="font-size:11px;color:var(--text-2);">Adjusts to your level</p>
+      <!-- 2. AI & Tech -->
+      <a href="{{ url_for('quiz.subcategories', category_slug='artificial-intelligence') }}" class="cat-page-feature-card">
+        <div class="cat-page-feature-icon icon-bg-purple" aria-hidden="true">🤖</div>
+        <div class="cat-page-feature-content">
+          <h4 class="cat-page-feature-title">AI & Tech</h4>
+          <p class="cat-page-feature-desc">Trends & ML models</p>
         </div>
-      </div>
+      </a>
 
-      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;color:var(--warning);flex-shrink:0;">📈</div>
-        <div>
-          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Track Progress</h4>
-          <p style="font-size:11px;color:var(--text-2);">Detailed analytics</p>
+      <!-- 3. Test Prep -->
+      <a href="{{ url_for('quiz.subcategories', category_slug='competitive-exams') }}" class="cat-page-feature-card">
+        <div class="cat-page-feature-icon icon-bg-cyan" aria-hidden="true">📈</div>
+        <div class="cat-page-feature-content">
+          <h4 class="cat-page-feature-title">Test Prep</h4>
+          <p class="cat-page-feature-desc">Excel in exams</p>
         </div>
-      </div>
+      </a>
 
-      <div class="card p-3" style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;color:var(--success);flex-shrink:0;">🏆</div>
-        <div>
-          <h4 style="font-size:13px;font-weight:700;color:var(--text-1);">Earn Certificates</h4>
-          <p style="font-size:11px;color:var(--text-2);">Showcase achievements</p>
+      <!-- 4. Earn & Win -->
+      <a href="{{ url_for('competitions.index') }}" class="cat-page-feature-card">
+        <div class="cat-page-feature-icon icon-bg-amber" aria-hidden="true">🏆</div>
+        <div class="cat-page-feature-content">
+          <h4 class="cat-page-feature-title">Earn & Win</h4>
+          <p class="cat-page-feature-desc">Contests & certs</p>
         </div>
-      </div>
+      </a>
 
     </div>
   </div>
