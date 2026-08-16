@@ -90,6 +90,14 @@ def ai_recommendations():
     return render_template('ai_recommendations.html')
 
 
+@public_bp.route('/leaderboard')
+@public_bp.route('/leaderboard/')
+def leaderboard():
+    """Global Leaderboard route alias."""
+    from routes.quiz import leaderboard as quiz_leaderboard
+    return quiz_leaderboard()
+
+
 @public_bp.route('/api/newsletter/subscribe', methods=['POST'])
 def newsletter_subscribe():
     """Handle real newsletter subscription via AJAX."""

@@ -2,6 +2,196 @@
 {% set load_charts = false %}
 {% block title %}Global Leaderboard — QuizNova{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=20260816_v5">
+<style>
+/* Leaderboard Scoped Mobile Responsive CSS */
+@media (max-width: 767px) {
+  /* Hero & Filter Section */
+  .section-eyebrow {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+  
+  .leaderboard-filter {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    padding: 10px !important;
+    justify-content: center !important;
+    margin-bottom: 16px !important;
+  }
+  .filter-label {
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 4px !important;
+    font-size: 12px !important;
+  }
+  .filter-btn {
+    padding: 5px 10px !important;
+    font-size: 11.5px !important;
+    border-radius: 9999px !important;
+  }
+
+  /* Table Card Container */
+  .table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Fixed Responsive Table */
+  table.data-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    box-sizing: border-box !important;
+  }
+
+  table.data-table th,
+  table.data-table td {
+    padding: 10px 3px !important;
+    font-size: 11.5px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Column Width Distributions */
+  table.data-table th:nth-child(1),
+  table.data-table td:nth-child(1) {
+    width: 14% !important;
+    text-align: center !important;
+  }
+
+  table.data-table th:nth-child(2),
+  table.data-table td:nth-child(2) {
+    width: 42% !important;
+    text-align: left !important;
+  }
+
+  table.data-table th:nth-child(3),
+  table.data-table td:nth-child(3) {
+    width: 14% !important;
+    text-align: center !important;
+  }
+
+  table.data-table th:nth-child(4),
+  table.data-table td:nth-child(4) {
+    width: 15% !important;
+    text-align: center !important;
+  }
+
+  table.data-table th:nth-child(5),
+  table.data-table td:nth-child(5) {
+    width: 15% !important;
+    text-align: center !important;
+  }
+
+  /* Rank Badge Styling */
+  .lb-rank {
+    font-size: 11.5px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1px !important;
+  }
+  .lb-rank svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  /* Player Truncation Guard */
+  .lb-player {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+  .lb-player .avatar {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 9.5px !important;
+    flex-shrink: 0 !important;
+  }
+  .lb-player-name {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    vertical-align: middle !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .lb-player-badge {
+    font-size: 8px !important;
+    padding: 1px 4px !important;
+    margin-left: 2px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Empty State Cell */
+  .lb-empty-cell {
+    text-align: center !important;
+    padding: 32px 16px !important;
+    color: var(--text-3) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    box-sizing: border-box !important;
+    font-size: 13px !important;
+  }
+
+  /* Sort Buttons */
+  .data-table .sort-btn {
+    font-size: 10px !important;
+    padding: 0 !important;
+  }
+
+  /* Podium Adjustment */
+  .podium {
+    padding: 16px 4px 0 4px !important;
+    gap: 6px !important;
+  }
+  .podium-col {
+    max-width: 95px !important;
+  }
+  .podium-name {
+    font-size: 10.5px !important;
+    max-width: 75px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .podium-score {
+    font-size: 10.5px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  table.data-table th,
+  table.data-table td {
+    padding: 8px 2px !important;
+    font-size: 10px !important;
+  }
+  .lb-player-name {
+    font-size: 10px !important;
+  }
+  .data-table .sort-btn {
+    font-size: 9px !important;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- Hero -->
@@ -128,12 +318,12 @@
                   {{ entry.user.username[0].upper() }}
                   {% endif %}
                 </div>
-                <span style="font-weight:600;font-size:14px;">
+                <span class="lb-player-name">
                   {{ entry.user.username }}
-                  {% if current_user.is_authenticated and entry.user.id == current_user.id %}
-                  <span class="badge badge-purple" style="margin-left:6px;">You</span>
-                  {% endif %}
                 </span>
+                {% if current_user.is_authenticated and entry.user.id == current_user.id %}
+                <span class="badge badge-purple lb-player-badge">You</span>
+                {% endif %}
               </div>
             </td>
             <td style="color:var(--text-2);">{{ entry.quiz_count }}</td>
@@ -148,7 +338,7 @@
           </tr>
           {% else %}
           <tr>
-            <td colspan="5" style="text-align:center;padding:var(--s8);color:var(--text-3);">
+            <td colspan="5" class="lb-empty-cell">
               No entries yet. Be the first to complete a quiz!
             </td>
           </tr>
