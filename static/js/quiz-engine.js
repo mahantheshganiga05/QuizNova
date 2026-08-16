@@ -233,11 +233,30 @@ function _updateUI() {
 
   // Count actually attempted/answered questions
   const answeredCount = Object.keys(state.answers).filter(k => state.answers[k] !== undefined && state.answers[k] !== null && state.answers[k] !== -1).length;
+  const pendingCount = total - answeredCount;
 
   if (progressText) progressText.textContent = `Question ${currentNum} of ${total}`;
   if (progressFill) progressFill.style.width = `${pctVal}%`;
   if (progressPct) progressPct.textContent = `${pctVal}% Completed`;
   if (paletteCounter) paletteCounter.textContent = `${answeredCount} / ${total} Attempted`;
+
+  // Mobile Sticky Progress Bar Update
+  const mobCurrent = document.getElementById('mobile-sp-current');
+  const mobAnswered = document.getElementById('mobile-sp-answered');
+  const mobPending = document.getElementById('mobile-sp-pending');
+
+  if (mobCurrent) mobCurrent.textContent = `Q ${currentNum} / ${total}`;
+  if (mobAnswered) mobAnswered.textContent = `✓ ${answeredCount} Answered`;
+  if (mobPending) mobPending.textContent = `• ${pendingCount} Pending`;
+
+  // Collapsible Palette Header Summary Update
+  const palSubCur = document.getElementById('pal-sub-cur');
+  const palSubAns = document.getElementById('pal-sub-ans');
+  const palSubPen = document.getElementById('pal-sub-pen');
+
+  if (palSubCur) palSubCur.textContent = `${currentNum}/${total}`;
+  if (palSubAns) palSubAns.textContent = `${answeredCount} Answered`;
+  if (palSubPen) palSubPen.textContent = `${pendingCount} Pending`;
 
   // Palette Buttons
   const paletteBtns = document.querySelectorAll('.palette-btn');
@@ -323,6 +342,17 @@ function _attachEvents() {
         // Scroll question card into view smoothly on mobile
         const slide = document.getElementById(`slide-${order}`);
         if (slide) slide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+
+    const collapseToggle = e.target.closest('#palette-collapse-toggle');
+    if (collapseToggle) {
+      const card = document.getElementById('palette-panel-card');
+      if (card) {
+        card.classList.toggle('expanded');
+        const isExpanded = card.classList.contains('expanded');
+        collapseToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
       }
       return;
     }

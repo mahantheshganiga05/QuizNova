@@ -87,6 +87,26 @@
 
   </header>
 
+  <!-- ── MOBILE STICKY QUIZ PROGRESS BAR ────────────────── -->
+  <div class="mobile-sticky-progress-bar" id="mobile-sticky-progress" aria-label="Quiz status summary">
+    <div class="sticky-progress-inner">
+      <div class="sticky-progress-item current-item">
+        <span class="sp-dot current"></span>
+        <span class="sp-text" id="mobile-sp-current">Q 1 / {{ questions | length }}</span>
+      </div>
+      <div class="sticky-progress-divider"></div>
+      <div class="sticky-progress-item answered-item">
+        <span class="sp-icon">✓</span>
+        <span class="sp-text" id="mobile-sp-answered">0 Answered</span>
+      </div>
+      <div class="sticky-progress-divider"></div>
+      <div class="sticky-progress-item pending-item">
+        <span class="sp-icon">•</span>
+        <span class="sp-text" id="mobile-sp-pending">{{ questions | length }} Pending</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ── MAIN BODY ──────────────────────────────────────────── -->
   <div class="quiz-body">
 
@@ -208,42 +228,54 @@
         </div>
       </div>
 
-      <!-- Section 2: Question Palette Card -->
-      <div class="panel-card" aria-label="Question palette">
-        <div class="panel-header-flex">
-          <div class="panel-header-row">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span class="panel-title">Question Palette</span>
+      <!-- Section 2: Question Palette Card (Collapsible on Mobile) -->
+      <div class="panel-card palette-panel-card" id="palette-panel-card" aria-label="Question palette">
+        <button type="button" class="palette-collapse-toggle" id="palette-collapse-toggle" aria-expanded="false" aria-controls="palette-collapsible-body">
+          <div class="palette-toggle-left">
+            <div class="panel-header-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span class="panel-title">Question Palette</span>
+            </div>
+            <div class="palette-summary-sub" id="palette-summary-sub">
+              <span id="pal-sub-cur">1/{{ questions | length }}</span> • 
+              <span id="pal-sub-ans">0 Answered</span> • 
+              <span id="pal-sub-pen">{{ questions | length }} Pending</span>
+            </div>
           </div>
-          <span class="palette-counter-badge" id="palette-counter-text">0 / {{ questions | length }} Attempted</span>
-        </div>
+          <div class="palette-toggle-right">
+            <span class="palette-counter-badge desktop-only-badge" id="palette-counter-text">0 / {{ questions | length }} Attempted</span>
+            <svg class="palette-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </button>
 
-        <div class="palette-grid" id="palette-grid" role="list">
-          {% for aq in questions %}
-          <button class="palette-btn {{ 'current' if loop.first }} {{ 'answered' if existing_answers.get(aq.id | string) is not none }} {{ 'bookmarked' if aq.is_bookmarked }}"
-                  type="button" data-order="{{ loop.index0 }}" role="listitem"
-                  id="palette-{{ loop.index0 }}" aria-label="Go to question {{ loop.index }}">
-            {{ loop.index }}
-          </button>
-          {% endfor %}
-        </div>
+        <div class="palette-collapsible-body" id="palette-collapsible-body">
+          <div class="palette-grid" id="palette-grid" role="list">
+            {% for aq in questions %}
+            <button class="palette-btn {{ 'current' if loop.first }} {{ 'answered' if existing_answers.get(aq.id | string) is not none }} {{ 'bookmarked' if aq.is_bookmarked }}"
+                    type="button" data-order="{{ loop.index0 }}" role="listitem"
+                    id="palette-{{ loop.index0 }}" aria-label="Go to question {{ loop.index }}">
+              {{ loop.index }}
+            </button>
+            {% endfor %}
+          </div>
 
-        <div class="palette-legend" aria-label="Palette legend">
-          <div class="legend-item">
-            <span class="legend-dot dot-current" aria-hidden="true"></span>
-            <span>Current</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot dot-answered" aria-hidden="true"></span>
-            <span>Answered</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot dot-bookmarked" aria-hidden="true"></span>
-            <span>Bookmarked</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot dot-unanswered" aria-hidden="true"></span>
-            <span>Unanswered</span>
+          <div class="palette-legend" aria-label="Palette legend">
+            <div class="legend-item">
+              <span class="legend-dot dot-current" aria-hidden="true"></span>
+              <span>Current</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-answered" aria-hidden="true"></span>
+              <span>Answered</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-bookmarked" aria-hidden="true"></span>
+              <span>Bookmarked</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-unanswered" aria-hidden="true"></span>
+              <span>Unanswered</span>
+            </div>
           </div>
         </div>
       </div>

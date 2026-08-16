@@ -301,7 +301,7 @@
 }
 
 .panel-header-row {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 0;
 }
 
 .panel-header-flex {
@@ -316,6 +316,34 @@
 .palette-counter-badge {
   font-size: 11px; font-weight: 700; color: #A78BFA;
   background: rgba(124, 58, 237, 0.12); padding: 2px 8px; border-radius: 99px;
+}
+
+/* Mobile Sticky Progress Bar & Collapsible Palette Defaults (Desktop) */
+.mobile-sticky-progress-bar {
+  display: none;
+}
+.palette-collapse-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: transparent; border: none; padding: 0;
+  color: inherit; text-align: left; pointer-events: none; margin-bottom: 14px;
+}
+.palette-toggle-left {
+  display: flex; align-items: center; gap: 8px;
+}
+.palette-toggle-right {
+  display: flex; align-items: center; gap: 8px;
+}
+.palette-summary-sub {
+  display: none;
+}
+.palette-chevron {
+  display: none;
+}
+.desktop-only-badge {
+  display: inline-flex;
+}
+.palette-collapsible-body {
+  display: block !important;
 }
 
 /* Section 1: Time Remaining Card */
@@ -492,6 +520,56 @@
   .quiz-exit-btn span {
     font-size: 10.5px !important;
   }
+
+  /* 1.5. MOBILE STICKY QUIZ PROGRESS BAR */
+  .mobile-sticky-progress-bar {
+    display: block !important;
+    position: sticky !important;
+    top: 50px !important;
+    z-index: 480 !important;
+    background: rgba(10, 9, 24, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 6px 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .sticky-progress-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 99px !important;
+    padding: 6px 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .sticky-progress-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #F1F1F8 !important;
+  }
+  .sticky-progress-divider {
+    width: 1px !important;
+    height: 14px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+  .sp-dot.current {
+    width: 6px !important; height: 6px !important;
+    border-radius: 50% !important; background: #A78BFA !important;
+    box-shadow: 0 0 6px #A78BFA !important;
+  }
+  .sp-icon {
+    font-size: 11px !important;
+  }
+  #mobile-sp-current { color: #C084FC !important; font-weight: 800 !important; }
+  #mobile-sp-answered { color: #10B981 !important; font-weight: 700 !important; }
+  #mobile-sp-pending { color: #9898B0 !important; font-weight: 600 !important; }
 
   /* 2. MOBILE VERTICAL FLEX CONTAINER */
   .quiz-body {
@@ -679,23 +757,51 @@
     font-size: 8.5px !important;
   }
 
-  /* 7. QUESTION PALETTE: 4 COLUMNS GRID & ATTEMPT COUNTER */
-  .panel-header-flex {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
-    margin-bottom: 8px !important;
+  /* 7. COLLAPSIBLE QUESTION PALETTE ON MOBILE */
+  .palette-collapse-toggle {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    margin-bottom: 0 !important;
   }
+  .palette-toggle-left {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+  }
+  .palette-summary-sub {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: #9898B0 !important;
+  }
+  #pal-sub-cur { color: #C084FC !important; font-weight: 700 !important; }
+  #pal-sub-ans { color: #10B981 !important; font-weight: 600 !important; }
+  #pal-sub-pen { color: #9898B0 !important; }
+  .desktop-only-badge {
+    display: none !important;
+  }
+  .palette-chevron {
+    display: block !important;
+    transition: transform 0.25s ease !important;
+    color: #A78BFA !important;
+  }
+  .palette-panel-card.expanded .palette-chevron {
+    transform: rotate(180deg) !important;
+  }
+  .palette-collapsible-body {
+    display: none !important;
+    padding-top: 12px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-top: 10px !important;
+  }
+  .palette-panel-card.expanded .palette-collapsible-body {
+    display: block !important;
+  }
+
   .panel-title {
     font-size: 13.5px !important;
-  }
-  .palette-counter-badge {
-    font-size: 11px !important;
-    padding: 3px 8px !important;
-    background: rgba(124, 58, 237, 0.15) !important;
-    border: 1px solid rgba(124, 58, 237, 0.3) !important;
-    color: #C084FC !important;
   }
   .palette-grid {
     display: grid !important;
