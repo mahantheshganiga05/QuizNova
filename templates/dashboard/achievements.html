@@ -39,28 +39,31 @@
 
     <!-- Summary -->
     <div class="achievements-summary card" data-aos="fade-up">
-      <div>
-        <div class="ach-summary-val font-display" style="background:var(--g-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ earned | length }}</div>
-        <div class="ach-summary-label">Earned</div>
-      </div>
-      <div style="width:1px;background:var(--border);"></div>
-      <div>
-        <div class="ach-summary-val font-display">{{ all_achievements | length }}</div>
-        <div class="ach-summary-label">Total</div>
-      </div>
-      <div style="width:1px;background:var(--border);"></div>
-      <div>
-        <div class="ach-summary-val font-display" style="color:var(--warning);">
-          {{ total_points }}
+      <div class="ach-summary-metrics">
+        <div class="ach-summary-col">
+          <div class="ach-summary-val font-display" style="background:var(--g-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ earned | length }}</div>
+          <div class="ach-summary-label">Earned</div>
         </div>
-        <div class="ach-summary-label">Points Earned</div>
+        <div class="ach-summary-divider"></div>
+        <div class="ach-summary-col">
+          <div class="ach-summary-val font-display">{{ all_achievements | length }}</div>
+          <div class="ach-summary-label">Total</div>
+        </div>
+        <div class="ach-summary-divider"></div>
+        <div class="ach-summary-col">
+          <div class="ach-summary-val font-display" style="color:var(--warning);">
+            {{ total_points }}
+          </div>
+          <div class="ach-summary-label">Points Earned</div>
+        </div>
       </div>
-      <div style="flex:1;padding-left:var(--s4);">
-        <div class="label-caps" style="margin-bottom:8px;">Progress</div>
-        <div style="height:8px;background:var(--bg-3);border-radius:var(--r-full);overflow:hidden;">
+
+      <div class="ach-summary-progress">
+        <div class="label-caps" style="margin-bottom:8px;font-size:11px;letter-spacing:0.08em;font-weight:700;color:var(--text-2);">PROGRESS</div>
+        <div class="ach-progress-bar-wrap" style="height:10px;background:var(--bg-3);border-radius:var(--r-full);overflow:hidden;width:100%;">
           <div style="height:100%;background:var(--g-brand);border-radius:var(--r-full);width:{{ ((earned | length / all_achievements | length) * 100) | round if all_achievements else 0 }}%;transition:width 1s ease;"></div>
         </div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:4px;">{{ ((earned | length / all_achievements | length) * 100) | round if all_achievements else 0 }}% complete</div>
+        <div style="font-size:12px;color:var(--brand-purple-light);font-weight:600;margin-top:6px;">{{ ((earned | length / all_achievements | length) * 100) | round if all_achievements else 0 }}% complete</div>
       </div>
     </div>
 

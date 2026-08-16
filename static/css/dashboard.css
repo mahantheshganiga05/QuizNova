@@ -201,10 +201,14 @@
 /* ─── ACHIEVEMENTS ────────────────────────────────────────── */
 .achievements-summary {
   display: flex; align-items: center; gap: var(--s4);
-  padding: var(--s3); border-radius: var(--r-lg);
+  padding: var(--s4); border-radius: var(--r-lg);
   background: var(--g-card); border: 1px solid var(--border);
   margin-bottom: var(--s4);
 }
+.ach-summary-metrics { display: flex; align-items: center; gap: var(--s4); }
+.ach-summary-col { text-align: left; }
+.ach-summary-divider { width: 1px; height: 40px; background: var(--border); }
+.ach-summary-progress { flex: 1; padding-left: var(--s4); }
 .ach-summary-val { font-family: var(--font-display); font-size: 2rem; font-weight: 700; }
 .ach-summary-label { font-size: 13px; color: var(--text-2); }
 
@@ -807,31 +811,46 @@
     box-sizing: border-box !important;
   }
   .achievements-summary {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 12px !important;
-    padding: 14px 12px !important;
-    border-radius: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px 16px !important;
+    gap: 16px !important;
+    border-radius: 16px !important;
     margin-bottom: 16px !important;
     width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
   }
-  .achievements-summary > div:nth-child(2),
-  .achievements-summary > div:nth-child(4) {
+  .ach-summary-metrics {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .ach-summary-col {
+    text-align: center !important;
+  }
+  .ach-summary-divider {
     display: none !important;
   }
-  .achievements-summary > div:nth-child(6) {
-    grid-column: 1 / -1 !important;
-    padding-left: 0 !important;
-    margin-top: 4px !important;
+  .ach-summary-progress {
     width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
     box-sizing: border-box !important;
+    margin-top: 4px !important;
   }
   .ach-summary-val {
     font-size: 1.6rem !important;
+    text-align: center !important;
   }
   .ach-summary-label {
     font-size: 11px !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    word-break: break-word !important;
   }
   .achievements-grid {
     display: grid !important;
