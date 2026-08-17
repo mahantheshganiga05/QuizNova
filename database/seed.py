@@ -297,11 +297,12 @@ def seed():
         # ADMIN USER
         # ---------------------------------------------------------------
         print("\n[1/6] Seeding admin user...")
-        if not User.query.filter_by(email='admin@quiznova.com').first():
+        admin = User.query.filter_by(email='mahantheshganiga05@gmail.com').first()
+        if not admin:
             admin = User(
-                username='admin',
-                email='admin@quiznova.com',
-                full_name='QuizNova Admin',
+                username='mahantheshganiga05',
+                email='mahantheshganiga05@gmail.com',
+                full_name='Mahanthesh Ganiga',
                 role='admin',
                 is_active=True,
                 email_verified=True,
@@ -309,9 +310,11 @@ def seed():
             admin.set_password('Admin@QuizNova1')
             db.session.add(admin)
             db.session.commit()
-            print("   [OK] Admin created: admin@quiznova.com / Admin@QuizNova1")
+            print("   [OK] Admin created: mahantheshganiga05@gmail.com")
         else:
-            print("   [OK] Admin already exists — skipped.")
+            admin.role = 'admin'
+            db.session.commit()
+            print("   [OK] Admin role confirmed for: mahantheshganiga05@gmail.com")
 
         # ---------------------------------------------------------------
         # DEMO STUDENT
