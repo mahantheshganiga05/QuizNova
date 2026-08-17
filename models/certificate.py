@@ -15,12 +15,12 @@ from models import db
 def _generate_verification_id() -> str:
     """
     Generate a unique verification ID for QR code URLs.
-    Format: QN-CERT-2026-XXXXXX (6 alphanumeric chars).
+    Format: QN-2026-XXXXXXXX (8 uppercase alphanumeric chars).
     """
     year = datetime.now().year
     chars = string.ascii_uppercase + string.digits
-    suffix = ''.join(random.choices(chars, k=6))
-    return f'QN-CERT-{year}-{suffix}'
+    suffix = ''.join(random.choices(chars, k=8))
+    return f'QN-{year}-{suffix}'
 
 
 class Certificate(db.Model):

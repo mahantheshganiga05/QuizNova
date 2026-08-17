@@ -52,9 +52,9 @@ def generate_certificate(result_id: int, recipient_name: str | None = None) -> C
     """
     result = Result.query.get_or_404(result_id)
 
-    # Check Score >= 70% Eligibility
-    if float(result.percentage) < 70.0:
-        raise ValueError('Certificate not available. You need at least 70% to earn this certificate.')
+    # Check Score >= 60.0% Eligibility
+    if float(result.percentage) < 60.0:
+        raise ValueError('Certificate not available. A minimum score of 60% is required.')
 
     user = User.query.get(result.user_id)
     if not user:
@@ -227,19 +227,23 @@ def _render_pdf(
         c.setFillColor(HexColor('#D4AF37'))
         c.circle(x, y, 3*mm, fill=1, stroke=0)
 
-    # Header: "QuizNova" brand + FOUNDED BY MAHANTHESH GANIGA
-    c.setFillColor(HexColor('#7C3AED'))
-    c.setFont('Helvetica-Bold', 26)
-    c.drawCentredString(page_w * 0.5, page_h - 28*mm, 'QuizNova')
-
-    c.setFillColor(HexColor('#9898B0'))
-    c.setFont('Helvetica-Bold', 8)
-    c.drawCentredString(page_w * 0.5, page_h - 34*mm, 'FOUNDED BY MAHANTHESH GANIGA')
-
-    # Divider line
-    c.setStrokeColor(HexColor('#D4AF37'))
-    c.setLineWidth(0.75)
-    c.line(40*mm, page_h - 38*mm, page_w - 40*mm, page_h - 38*mm)
+    # Top Center Logo: Original QuizNova Logo
+    logo_png = os.path.join(app_root, 'static', 'images', 'quiznova_logo.png')
+    logo_jpg = os.path.join(app_root, 'static', 'images', 'quiznova_logo.jpg')
+    logo_path = logo_png if os.path.exists(logo_png) else (logo_jpg if os.path.exists(logo_jpg) else None)
+    if logo_path:
+        try:
+            logo_w = 40*mm
+            logo_h = 13*mm
+            c.drawInlineImage(logo_path, page_w * 0.5 - logo_w/2, page_h - 26*mm, width=logo_w, height=logo_h)
+        except Exception:
+            c.setFillColor(HexColor('#7C3AED'))
+            c.setFont('Helvetica-Bold', 26)
+            c.drawCentredString(page_w * 0.5, page_h - 24*mm, 'QuizNova')
+    else:
+        c.setFillColor(HexColor('#7C3AED'))
+        c.setFont('Helvetica-Bold', 26)
+        c.drawCentredString(page_w * 0.5, page_h - 24*mm, 'QuizNova')
 
     # "CERTIFICATE OF ACHIEVEMENT" title
     c.setFillColor(HexColor('#F59E0B'))

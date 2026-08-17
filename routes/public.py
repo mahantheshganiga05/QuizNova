@@ -141,6 +141,7 @@ def pricing():
 
 
 @public_bp.route('/verify/<string:verification_id>')
+@public_bp.route('/certificate/verify/<string:verification_id>')
 def verify_certificate(verification_id):
     from models.certificate import Certificate
     cert = Certificate.query.filter_by(verification_id=verification_id).first()

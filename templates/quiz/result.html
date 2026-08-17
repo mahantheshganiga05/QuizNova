@@ -134,40 +134,46 @@
 
         <!-- CERTIFICATE SECTION -->
         {% set pct = (result.percentage | float) %}
-        {% if pct < 70 %}
+        {% if pct < 60 %}
           <div class="card p-3" style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; margin-top: 16px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="font-size:20px;">📜</div>
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--warning);">Certificate Not Available</div>
-                <div style="font-size:11.5px;color:var(--text-2);">You need at least 70% to earn this certificate. Keep practicing!</div>
+                <div style="font-size:11.5px;color:var(--text-2);">Certificate not available. A minimum score of 60% is required.</div>
               </div>
             </div>
           </div>
         {% else %}
           {% if result.has_certificate %}
             <div class="card p-3" style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; margin-top: 16px;">
-              <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:4px;">🎉 Certificate Ready!</div>
+              <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:4px;">🎉 Certificate Generated Successfully!</div>
               <div style="font-size:11.5px;color:var(--text-2);margin-bottom:10px;">Issued to: <strong>{{ result.certificate.recipient_name or current_user.display_name }}</strong></div>
-              <div style="display:flex;gap:8px;">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <a href="{{ url_for('public.view_certificate', verification_id=result.certificate.verification_id) }}" class="btn btn-primary btn-sm" style="font-size:11px;background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;">👁 View Certificate</a>
                 <a href="{{ url_for('public.download_certificate_pdf', verification_id=result.certificate.verification_id) }}" class="btn btn-ghost btn-sm" style="font-size:11px;">📥 Download PDF</a>
+                {% set linkedin_url = "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=" ~ (result.attempt.subcategory.name if result.attempt and result.attempt.subcategory else 'Quiz Certificate' | urlencode) ~ "&organizationName=QuizNova&issueYear=" ~ result.certificate.issue_date.year ~ "&issueMonth=" ~ result.certificate.issue_date.month ~ "&certUrl=" ~ ((request.host_url ~ "verify/" ~ result.certificate.verification_id) | urlencode) %}
+                <a href="{{ linkedin_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" style="font-size:11px;color:#60A5FA;">💼 Add to LinkedIn</a>
+                <button type="button" class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="window.QuizNova?.copyToClipboard(window.location.origin + '/verify/{{ result.certificate.verification_id }}', this)">🔗 Share</button>
               </div>
             </div>
           {% else %}
             <div class="card p-3" style="background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.35); border-radius: 14px; margin-top: 16px;">
-              <div style="font-size:14px;font-weight:800;color:white;margin-bottom:4px;">🎉 Congratulations!</div>
-              <div style="font-size:11.5px;color:var(--text-2);margin-bottom:12px;">You've scored 70% or above and earned a QuizNova Certificate of Achievement.</div>
+              <div style="font-size:14px;font-weight:800;color:white;margin-bottom:4px;">🎓 Certificate Unlocked!</div>
+              <div style="font-size:11.5px;color:var(--text-2);margin-bottom:12px;">You scored {{ pct | round }}%. You are eligible for a QuizNova Certificate of Achievement.</div>
               
               <form method="POST" action="{{ url_for('quiz.generate_certificate_route', result_id=result.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <label style="font-size:11px;font-weight:600;color:var(--brand-purple-light);display:block;margin-bottom:4px;">
-                  Enter your full name exactly as you want it to appear on your certificate:
+                <label style="font-size:12px;font-weight:700;color:white;display:block;margin-bottom:2px;">
+                  Enter your full name for the certificate
                 </label>
+                <div style="font-size:11px;color:var(--text-2);margin-bottom:8px;">
+                  Enter your full name exactly as you want it to appear on your certificate.
+                </div>
                 <input type="text" name="full_name" id="cert-full-name-input" class="form-control"
-                       value="{{ current_user.display_name }}" required
+                       value="{{ current_user.display_name }}" required minlength="2"
                        placeholder="Full Name (e.g. Mahanthesh Ganiga)"
-                       oninput="document.getElementById('cert-name-preview').textContent = this.value || '{{ current_user.display_name }}';"
+                       oninput="document.getElementById('cert-name-preview').textContent = this.value.trim() || '{{ current_user.display_name }}';"
                        style="background:rgba(15,23,42,0.9);border:1px solid rgba(124,58,237,0.4);color:white;border-radius:8px;padding:8px 12px;font-size:13px;width:100%;margin-bottom:8px;">
 
                 <div style="background:#050508;border:1px solid rgba(212,175,55,0.4);border-radius:8px;padding:8px;text-align:center;margin-bottom:10px;">

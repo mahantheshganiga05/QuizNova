@@ -80,14 +80,8 @@
           </div>
           <div style="text-align:right;">
             <div class="cert-card-date">{{ cert.issue_date.strftime('%d %b %Y') if cert.issue_date else '—' }}</div>
-            <div style="margin-top:4px;">
-              {% if cert_pct >= 90 %}
-                <span class="badge badge-warning">Distinction</span>
-              {% elif cert_pct >= 75 %}
-                <span class="badge badge-success">Merit</span>
-              {% else %}
-                <span class="badge badge-blue">Pass</span>
-              {% endif %}
+            <div style="margin-top:4px;display:flex;gap:4px;justify-content:flex-end;align-items:center;">
+              <span class="badge badge-success" style="font-size:10px;padding:2px 8px;border-radius:12px;background:rgba(16,185,129,0.15);color:#34D399;border:1px solid rgba(16,185,129,0.3);">✓ VERIFIED</span>
             </div>
           </div>
         </div>
@@ -138,7 +132,7 @@
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
       </div>
       <h2 class="empty-state-title">No Certificates Yet</h2>
-      <p class="empty-state-desc">Complete a quiz with a passing score (60%+) to earn your first verified certificate.</p>
+      <p class="empty-state-desc">Your certificates will appear here when you achieve 60% or above in eligible quizzes.</p>
       <a href="{{ url_for('quiz.categories') }}" class="btn btn-primary" id="empty-certs-start-btn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         Browse Quizzes
