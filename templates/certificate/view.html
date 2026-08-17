@@ -7,6 +7,7 @@
     max-width: 1080px;
     margin: 0 auto;
     padding: 24px 16px;
+    box-sizing: border-box;
   }
   .cert-actions-bar {
     display: flex;
@@ -21,23 +22,31 @@
     padding: 16px;
     backdrop-filter: blur(12px);
   }
-  .cert-frame-wrapper {
+
+  /* Responsive Scaling Viewport Wrapper */
+  .cert-viewport-wrapper {
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    max-width: 960px;
+    margin: 0 auto 32px auto;
+    position: relative;
+    overflow: hidden;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    margin-bottom: 32px;
+    align-items: flex-start;
+    aspect-ratio: 960 / 678;
   }
-  
-  /* A4 Landscape Canvas Frame (1123px x 794px ratio) */
+
+  /* Fixed 960x678 A4 Landscape Certificate Canvas */
   .cert-canvas-card {
     width: 960px;
-    min-width: 960px;
     height: 678px;
     background: #050508;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform-origin: top center;
+    transform: translateX(-50%) scale(var(--cert-scale, 1));
     box-sizing: border-box;
     border-radius: 4px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(124, 58, 237, 0.15);
@@ -79,6 +88,33 @@
     top: 0; left: 0; right: 0; height: 50%;
     background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
     pointer-events: none;
+  }
+
+  .cert-recipient-name-box {
+    display: inline-block;
+    position: relative;
+    max-width: 90%;
+    margin: 0 auto 4px auto;
+  }
+  .cert-recipient-name {
+    font-size: 32px;
+    font-weight: 800;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.02em;
+    padding: 0 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 820px;
+  }
+  .cert-name-underline {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #7C3AED, transparent);
+    position: absolute;
+    bottom: -4px;
+    left: 0;
   }
 
   @media (max-width: 767px) {
@@ -131,7 +167,7 @@
     </div>
 
     <!-- Certificate Landscape Canvas Container -->
-    <div class="cert-frame-wrapper" data-aos="fade-up">
+    <div class="cert-viewport-wrapper" data-aos="fade-up">
       <div class="cert-canvas-card" id="quiznova-certificate-card">
         <div class="cert-border-outer"></div>
         <div class="cert-border-inner"></div>
@@ -144,13 +180,13 @@
         <!-- Certificate Header -->
         <div style="text-align:center;position:relative;z-index:2;">
           <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;">
-            <img src="{{ url_for('static', filename='images/quiznova_logo.png') }}" alt="QuizNova" style="height:36px;object-fit:contain;" onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/quiznova_logo.jpg') }}';">
+            <img src="{{ url_for('static', filename='images/quiznova_logo.png') }}" alt="QuizNova" style="height:38px;object-fit:contain;" onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/quiznova_logo.jpg') }}';">
           </div>
-          <div style="width:70%;height:1px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:10px auto 0;"></div>
+          <div style="width:70%;height:1px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:8px auto 0;"></div>
         </div>
 
         <!-- Certificate Body -->
-        <div style="text-align:center;position:relative;z-index:2;margin:10px 0;">
+        <div style="text-align:center;position:relative;z-index:2;margin:8px 0;">
           <div style="font-family:'Cinzel',serif,sans-serif;font-size:24px;font-weight:800;color:#F59E0B;letter-spacing:0.08em;margin-bottom:6px;">
             CERTIFICATE OF ACHIEVEMENT
           </div>
@@ -159,18 +195,20 @@
           </div>
           
           <!-- Recipient Name -->
-          <div style="font-size:32px;font-weight:800;color:#FFFFFF;font-family:'Poppins',sans-serif;letter-spacing:0.02em;margin-bottom:4px;display:inline-block;position:relative;padding:0 20px;">
-            {{ cert.recipient_name or cert.user.display_name or cert.user.username }}
-            <div style="width:100%;height:2px;background:linear-gradient(90deg,transparent,#7C3AED,transparent);position:absolute;bottom:-4px;left:0;"></div>
+          <div class="cert-recipient-name-box">
+            <div class="cert-recipient-name" id="cert-recipient-name-text">
+              {{ cert.recipient_name or cert.user.display_name or cert.user.username }}
+            </div>
+            <div class="cert-name-underline"></div>
           </div>
 
           <div style="font-size:12px;color:#9898B0;margin-top:14px;margin-bottom:6px;">
-            For successfully completing the QuizNova Quiz and demonstrating outstanding knowledge and performance.
+            For successfully completing the QuizNova assessment and demonstrating outstanding knowledge and performance.
           </div>
 
           <!-- Quiz Title & Score Box -->
           <div style="font-size:20px;font-weight:800;color:#A78BFA;font-family:var(--font-display);margin-bottom:12px;">
-            {{ cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'QuizNova Knowledge Test' }}
+            {{ cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'QuizNova Knowledge Assessment' }}
           </div>
 
           <div style="display:inline-flex;flex-direction:column;align-items:center;background:#141425;border:1px solid rgba(124,58,237,0.4);border-radius:12px;padding:8px 24px;box-shadow:0 4px 14px rgba(0,0,0,0.3);margin-bottom:14px;">
@@ -244,21 +282,58 @@
 <!-- html2canvas for instant client-side PNG download -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
+function fitCertificateCanvas() {
+  const wrapper = document.querySelector('.cert-viewport-wrapper');
+  if (!wrapper) return;
+  const containerWidth = wrapper.clientWidth;
+  const scale = Math.min(1, containerWidth / 960);
+  wrapper.style.setProperty('--cert-scale', scale);
+  wrapper.style.height = (678 * scale) + 'px';
+  autoScaleRecipientName();
+}
+
+function autoScaleRecipientName() {
+  const nameEl = document.getElementById('cert-recipient-name-text');
+  if (!nameEl) return;
+  let fontSize = 32;
+  nameEl.style.fontSize = fontSize + 'px';
+  while (nameEl.scrollWidth > 800 && fontSize > 16) {
+    fontSize -= 1;
+    nameEl.style.fontSize = fontSize + 'px';
+  }
+}
+
+window.addEventListener('resize', fitCertificateCanvas);
+document.addEventListener('DOMContentLoaded', fitCertificateCanvas);
+
 function downloadCertificatePNG() {
   const card = document.getElementById('quiznova-certificate-card');
+  const wrapper = document.querySelector('.cert-viewport-wrapper');
   if (!card || typeof html2canvas === 'undefined') {
     alert('Preparing high-resolution PNG download...');
     return;
   }
+  
+  if (wrapper) {
+    wrapper.style.setProperty('--cert-scale', '1');
+    wrapper.style.height = '678px';
+  }
+
   html2canvas(card, {
     scale: 2,
     useCORS: true,
-    backgroundColor: '#050508'
+    backgroundColor: '#050508',
+    width: 960,
+    height: 678
   }).then(canvas => {
+    if (wrapper) fitCertificateCanvas();
     const link = document.createElement('a');
     link.download = 'QuizNova_Certificate_{{ cert.verification_id }}.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
+  }).catch(err => {
+    if (wrapper) fitCertificateCanvas();
+    console.error('PNG export error:', err);
   });
 }
 </script>

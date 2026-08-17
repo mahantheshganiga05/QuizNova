@@ -255,17 +255,24 @@ def _render_pdf(
     c.setFont('Helvetica', 11)
     c.drawCentredString(page_w * 0.5, page_h - 60*mm, 'This certificate is proudly presented to')
 
-    # Candidate Name (Large Elegant)
+    # Candidate Name (Dynamic Auto-Scale for Long Names)
+    font_size = 28
+    max_allowed_w = page_w - 60*mm
+    name_w = c.stringWidth(candidate_name, 'Helvetica-Bold', font_size)
+    if name_w > max_allowed_w:
+        font_size = max(14, font_size * (max_allowed_w / name_w))
+        name_w = c.stringWidth(candidate_name, 'Helvetica-Bold', font_size)
+
     c.setFillColor(HexColor('#FFFFFF'))
-    c.setFont('Helvetica-Bold', 28)
+    c.setFont('Helvetica-Bold', font_size)
     c.drawCentredString(page_w * 0.5, page_h - 74*mm, candidate_name)
 
     # Underline for name
-    name_width = c.stringWidth(candidate_name, 'Helvetica-Bold', 28)
     c.setStrokeColor(HexColor('#7C3AED'))
     c.setLineWidth(1.5)
     center = page_w * 0.5
-    c.line(center - name_width/2, page_h - 76.5*mm, center + name_width/2, page_h - 76.5*mm)
+    underline_w = min(name_w, max_allowed_w)
+    c.line(center - underline_w/2, page_h - 76.5*mm, center + underline_w/2, page_h - 76.5*mm)
 
     # Completion text
     c.setFillColor(HexColor('#9898B0'))
