@@ -1,0 +1,14 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">Your Quiz Results for {{ quiz_title }} 📊</h1>
+<p class="p">Hello <strong>{{ user_name }}</strong>,</p>
+<p class="p">You scored <strong>{{ score_percentage }}%</strong> in <strong>{{ quiz_title }}</strong>.</p>
+<div class="card" style="background-color: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.3);">
+  <p class="p" style="margin: 0; font-size: 14px; color: #FBBF24;">
+    A minimum score of 60% is required to earn a QuizNova certificate. Don't worry — practice makes perfect! Feel free to review the material and try again.
+  </p>
+</div>
+<div style="text-align: center; margin: 24px 0;">
+  <a href="{{ retry_url }}" class="btn">RETRY QUIZ</a>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">Your QuizNova Quiz Result is Ready 🎯</h1>
+<p class="p">Hello <strong>{{ user_name }}</strong>,</p>
+<p class="p">Your quiz evaluation is complete. Here is a summary of your performance:</p>
+<div class="card">
+  <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px; color: #F1F1F8;">
+    <tr><td><strong>Quiz Title:</strong></td><td>{{ quiz_title }}</td></tr>
+    <tr><td><strong>Category:</strong></td><td>{{ category_name }}</td></tr>
+    <tr><td><strong>Score:</strong></td><td><strong style="color: #34D399; font-size: 18px;">{{ score_percentage }}%</strong></td></tr>
+    <tr><td><strong>Completion Date:</strong></td><td>{{ completion_date }}</td></tr>
+  </table>
+</div>
+<div style="text-align: center; margin: 24px 0;">
+  <a href="{{ result_url }}" class="btn">VIEW RESULT</a>
+</div>
+{% endblock %}

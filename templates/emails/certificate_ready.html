@@ -1,0 +1,23 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">🎓 Your QuizNova Certificate is Ready!</h1>
+<p class="p">Hello <strong>{{ recipient_name }}</strong>,</p>
+<p class="p">Your official QuizNova Certificate of Achievement has been issued and verified.</p>
+<div class="card">
+  <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px; color: #F1F1F8;">
+    <tr><td><strong>Recipient:</strong></td><td>{{ recipient_name }}</td></tr>
+    <tr><td><strong>Quiz:</strong></td><td>{{ quiz_title }}</td></tr>
+    <tr><td><strong>Score:</strong></td><td><span class="badge" style="background:#064E3B;color:#34D399;border-color:#059669;">{{ score_percentage }}%</span></td></tr>
+    <tr><td><strong>Certificate ID:</strong></td><td><code style="color:#A78BFA;font-family:monospace;">{{ verification_id }}</code></td></tr>
+    <tr><td><strong>Issue Date:</strong></td><td>{{ issue_date }}</td></tr>
+  </table>
+</div>
+<div style="text-align: center; margin: 24px 0;">
+  <a href="{{ view_url }}" class="btn" style="margin-right: 6px;">VIEW CERTIFICATE</a>
+  <a href="{{ download_url }}" class="btn btn-secondary" style="margin-right: 6px;">DOWNLOAD PDF</a>
+  <a href="{{ linkedin_url }}" target="_blank" class="btn btn-secondary">ADD TO LINKEDIN</a>
+</div>
+<div style="text-align: center;">
+  <a href="{{ verify_url }}" style="font-size: 13px; color: #A78BFA; text-decoration: underline;">Verify Certificate Authenticity ({{ verification_id }})</a>
+</div>
+{% endblock %}

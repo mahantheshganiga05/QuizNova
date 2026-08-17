@@ -1,0 +1,25 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">🏆 Your QuizNova Competition Certificate is Ready!</h1>
+<p class="p">Congratulations <strong>{{ recipient_name }}</strong>!</p>
+<p class="p">You have been awarded an official Certificate for participating in <strong>{{ competition_title }}</strong>.</p>
+<div class="card">
+  <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px; color: #F1F1F8;">
+    <tr><td><strong>Competition:</strong></td><td>{{ competition_title }}</td></tr>
+    <tr><td><strong>Participant:</strong></td><td>{{ recipient_name }}</td></tr>
+    {% if rank_text %}
+      <tr><td><strong>Rank / Award:</strong></td><td><strong style="color:#F59E0B;">{{ rank_text }}</strong></td></tr>
+    {% endif %}
+    <tr><td><strong>Certificate ID:</strong></td><td><code style="color:#A78BFA;">{{ verification_id }}</code></td></tr>
+    <tr><td><strong>Issue Date:</strong></td><td>{{ issue_date }}</td></tr>
+  </table>
+</div>
+<div style="text-align: center; margin: 24px 0;">
+  <a href="{{ view_url }}" class="btn" style="margin-right: 6px;">VIEW CERTIFICATE</a>
+  <a href="{{ download_url }}" class="btn btn-secondary" style="margin-right: 6px;">DOWNLOAD PDF</a>
+  <a href="{{ linkedin_url }}" target="_blank" class="btn btn-secondary">ADD TO LINKEDIN</a>
+</div>
+<div style="text-align: center;">
+  <a href="{{ verify_url }}" style="font-size: 13px; color: #A78BFA; text-decoration: underline;">VERIFY CERTIFICATE</a>
+</div>
+{% endblock %}

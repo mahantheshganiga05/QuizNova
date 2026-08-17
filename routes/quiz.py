@@ -380,14 +380,14 @@ def leaderboard():
 @quiz_bp.route('/generate-certificate/<int:result_id>', methods=['POST'])
 @login_required
 def generate_certificate_route(result_id):
-    """Generate or update certificate for a passed quiz attempt (Score >= 70%)."""
+    """Generate or update certificate for a passed quiz attempt (Score >= 60.0%)."""
     result = Result.query.get_or_404(result_id)
     if result.user_id != current_user.id and not current_user.is_admin:
         flash('Unauthorized access.', 'error')
         return redirect(url_for('dashboard.index'))
 
-    if float(result.percentage) < 70.0:
-        flash('Certificate not available. You need at least 70% to earn this certificate.', 'warning')
+    if float(result.percentage) < 60.0:
+        flash('Certificate not available. You need at least 60% to earn this certificate.', 'warning')
         return redirect(url_for('quiz.result', attempt_id=result.attempt_id))
 
     full_name = request.form.get('full_name', '').strip()
@@ -409,4 +409,3 @@ def generate_certificate_route(result_id):
         current_app.logger.error(f'Certificate generation error: {e}')
         flash(f'Certificate generation error: {e}', 'error')
         return redirect(url_for('quiz.result', attempt_id=result.attempt_id))
-

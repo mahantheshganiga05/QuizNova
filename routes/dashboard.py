@@ -275,6 +275,14 @@ def settings():
                 db.session.commit()
                 flash('Password changed successfully.', 'success')
 
+        elif action == 'update_notifications':
+            current_user.notify_competitions = 'notify_competitions' in request.form
+            current_user.notify_quizzes = 'notify_quizzes' in request.form
+            current_user.notify_announcements = 'notify_announcements' in request.form
+            current_user.notify_marketing = 'notify_marketing' in request.form
+            db.session.commit()
+            flash('Email notification preferences saved successfully.', 'success')
+
         return redirect(url_for('dashboard.settings'))
 
     return render_template('dashboard/settings.html')

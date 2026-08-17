@@ -147,6 +147,27 @@ def register(slug):
     db.session.add(reg)
     db.session.commit()
 
+    # Send Competition Registration Email
+    try:
+        from services.email_service import send_html_email
+        site_url = (current_app.config.get('SITE_URL') or 'https://quiz-nova-nu.vercel.app').rstrip('/')
+        send_html_email(
+            to_email=reg.email,
+            subject="Competition Registration Confirmed 🏆",
+            template_name="competition_registration.html",
+            context={
+                'participant_name': reg.full_name,
+                'competition_title': comp.title,
+                'start_date': comp.start_date.strftime('%d %B %Y') if comp.start_date else 'TBA',
+                'reg_end_date': comp.reg_end_date.strftime('%d %B %Y') if comp.reg_end_date else 'TBA',
+                'competition_url': f"{site_url}/competitions/{comp.slug}"
+            },
+            notification_type="competition_registration",
+            related_object_id=str(reg.id)
+        )
+    except Exception as mail_err:
+        current_app.logger.warning(f"Competition registration email warning: {mail_err}")
+
     msg = f'🎉 Successfully registered for {comp.title}! Your Registration ID: QN-{reg.id:05d}'
     if is_ajax:
         return jsonify({'success': True, 'message': msg, 'reg_id': f'QN-{reg.id:05d}'})

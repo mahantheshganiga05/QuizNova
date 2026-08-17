@@ -128,9 +128,10 @@ class TestingConfig(BaseConfig):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_ENGINE_OPTIONS = {}
     WTF_CSRF_ENABLED = False
-    CERTIFICATE_ENABLED = False
-    MAIL_ENABLED = False
+    CERTIFICATE_ENABLED = True
+    MAIL_ENABLED = True
 
 
 class ProductionConfig(BaseConfig):

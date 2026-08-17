@@ -1,0 +1,15 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">⏰ {{ reminder_title }}</h1>
+<p class="p">Hello <strong>{{ recipient_name }}</strong>,</p>
+<p class="p">{{ reminder_message }}</p>
+<div class="card">
+  <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px; color: #F1F1F8;">
+    <tr><td><strong>Competition:</strong></td><td><strong style="color: #A78BFA;">{{ competition_title }}</strong></td></tr>
+    <tr><td><strong>Start Date:</strong></td><td>{{ start_date }}</td></tr>
+  </table>
+</div>
+<div style="text-align: center; margin: 28px 0;">
+  <a href="{{ competition_url }}" class="btn">VIEW COMPETITION</a>
+</div>
+{% endblock %}

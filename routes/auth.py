@@ -74,6 +74,21 @@ def register():
 
         login_user(user)
         flash('Welcome to QuizNova! Your account has been created.', 'success')
+
+        # Send Welcome Email
+        try:
+            from services.email_service import send_html_email
+            send_html_email(
+                to_email=user.email,
+                subject="Welcome to QuizNova! 🎉",
+                template_name="welcome.html",
+                context={'user_name': user.full_name or user.username},
+                notification_type="registration",
+                related_object_id=str(user.id)
+            )
+        except Exception as e:
+            current_app.logger.warning(f"Could not send welcome email: {e}")
+
         return redirect(url_for('dashboard.index'))
 
     return render_template('auth/register.html', errors={}, form_data={})
@@ -108,6 +123,26 @@ def login():
         login_user(user, remember=remember_me)
         user.record_login()
         db.session.commit()
+
+        # Send Login Security Alert
+        try:
+            from services.email_service import send_html_email
+            from datetime import datetime
+            send_html_email(
+                to_email=user.email,
+                subject="Security Alert: New Login to QuizNova 🛡️",
+                template_name="login_alert.html",
+                context={
+                    'user_name': user.full_name or user.username,
+                    'login_time': datetime.utcnow().strftime('%d %B %Y, %H:%M UTC'),
+                    'ip_address': request.remote_addr or '127.0.0.1',
+                    'user_agent': request.user_agent.string[:100] if request.user_agent else 'Browser'
+                },
+                notification_type="security_alert",
+                related_object_id=f"login_{user.id}_{int(datetime.utcnow().timestamp())}"
+            )
+        except Exception as e:
+            current_app.logger.warning(f"Could not send login alert email: {e}")
 
         next_page = request.args.get('next')
         if next_page and next_page.startswith('/'):
@@ -489,3 +524,83 @@ def github_callback():
         current_app.logger.error(f'GitHub OAuth error: {e}')
         flash('An error occurred while authenticating with GitHub. Please try again.', 'error')
         return redirect(url_for('auth.login'))
+
+
+# =============================================================================
+# Password Reset Routes
+# =============================================================================
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Request password reset link."""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard.index'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = secrets.token_urlsafe(32)
+            user.reset_token = token
+            from datetime import datetime, timedelta
+            user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+            db.session.commit()
+
+            site_url = (current_app.config.get('SITE_URL') or 'https://quiz-nova-nu.vercel.app').rstrip('/')
+            reset_url = f"{site_url}/reset-password/{token}"
+
+            try:
+                from services.email_service import send_html_email
+                send_html_email(
+                    to_email=user.email,
+                    subject="Reset your QuizNova password",
+                    template_name="password_reset.html",
+                    context={
+                        'user_name': user.full_name or user.username,
+                        'reset_url': reset_url
+                    },
+                    notification_type="password_reset",
+                    related_object_id=token
+                )
+            except Exception as e:
+                current_app.logger.error(f"Password reset email error: {e}")
+
+        flash("If an account with that email exists, we have sent a password reset link.", "info")
+        return redirect(url_for('auth.forgot_password'))
+
+    return render_template('auth/forgot_password.html')
+
+
+@auth_bp.route('/reset-password/<string:token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Set new password using reset token."""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard.index'))
+
+    from datetime import datetime
+    user = User.query.filter_by(reset_token=token).first()
+    if not user or not user.reset_token_expires or user.reset_token_expires < datetime.utcnow():
+        flash("Invalid or expired password reset link.", "error")
+        return redirect(url_for('auth.forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if len(password) < 6:
+            flash("Password must be at least 6 characters.", "error")
+            return render_template('auth/reset_password.html', token=token)
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template('auth/reset_password.html', token=token)
+
+        user.set_password(password)
+        user.reset_token = None
+        user.reset_token_expires = None
+        db.session.commit()
+
+        flash("Your password has been reset successfully. Please log in with your new password.", "success")
+        return redirect(url_for('auth.login'))
+
+    return render_template('auth/reset_password.html', token=token)

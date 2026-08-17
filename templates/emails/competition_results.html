@@ -1,0 +1,15 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">🏆 QuizNova Competition Results Are Live!</h1>
+<p class="p">Hello <strong>{{ recipient_name }}</strong>,</p>
+<p class="p">The official results for <strong>{{ competition_title }}</strong> have been published.</p>
+{% if user_rank %}
+<div class="card" style="text-align: center;">
+  <div style="font-size: 12px; color: #9898B0;">YOUR RESULT</div>
+  <div style="font-size: 28px; font-weight: 800; color: #F59E0B; margin: 6px 0;">Rank #{{ user_rank }}</div>
+</div>
+{% endif %}
+<div style="text-align: center; margin: 28px 0;">
+  <a href="{{ results_url }}" class="btn">VIEW RESULTS</a>
+</div>
+{% endblock %}

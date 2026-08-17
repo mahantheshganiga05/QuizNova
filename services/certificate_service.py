@@ -404,7 +404,7 @@ def _get_profile_photo_path(user: User) -> str | None:
 
 def send_certificate_email(cert: Certificate, user: User) -> bool:
     """
-    Send an email notification with certificate details & verification links.
+    Send an email notification with certificate details, PDF attachment, and verification links.
     Safe: logs message and returns status without throwing on unconfigured mail servers.
     """
     try:
@@ -412,17 +412,46 @@ def send_certificate_email(cert: Certificate, user: User) -> bool:
         recipient_name = cert.recipient_name or user.display_name
         sub_name = cert.result.attempt.subcategory.name if cert.result and cert.result.attempt and cert.result.attempt.subcategory else 'Quiz'
         pct = round(float(cert.result.percentage), 1) if cert.result else 0
-        site_url = current_app.config.get('SITE_URL', 'https://quiz-nova-nu.vercel.app')
-        verify_link = f'{site_url}/verify/{cert.verification_id}'
-        view_link = f'{site_url}/certificate/{cert.verification_id}'
+        site_url = (current_app.config.get('SITE_URL') or 'https://quiz-nova-nu.vercel.app').rstrip('/')
 
-        current_app.logger.info(
-            f'[EMAIL NOTIFICATION] Subject: 🎉 Your QuizNova Certificate of Achievement | To: {recipient_email}\n'
-            f'Recipient: {recipient_name} | Quiz: {sub_name} | Score: {pct}%\n'
-            f'Cert ID: {cert.verification_id}\n'
-            f'View Link: {view_link} | Verify Link: {verify_link}'
+        verify_url = f'{site_url}/verify/{cert.verification_id}'
+        view_url = f'{site_url}/certificate/{cert.verification_id}'
+        download_url = f'{site_url}/certificate/{cert.verification_id}/download/pdf'
+
+        import urllib.parse
+        encoded_sub = urllib.parse.quote(sub_name)
+        encoded_verify = urllib.parse.quote(verify_url)
+        issue_year = cert.issue_date.year if cert.issue_date else datetime.now().year
+        issue_month = cert.issue_date.month if cert.issue_date else datetime.now().month
+        linkedin_url = f"https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name={encoded_sub}&organizationName=QuizNova&issueYear={issue_year}&issueMonth={issue_month}&certUrl={encoded_verify}"
+
+        pdf_bytes = generate_certificate_pdf_bytes(cert).getvalue()
+
+        context = {
+            'recipient_name': recipient_name,
+            'quiz_title': sub_name,
+            'score_percentage': pct,
+            'verification_id': cert.verification_id,
+            'issue_date': cert.issue_date.strftime('%d %B %Y') if cert.issue_date else 'N/A',
+            'view_url': view_url,
+            'download_url': download_url,
+            'linkedin_url': linkedin_url,
+            'verify_url': verify_url,
+            'site_url': site_url
+        }
+
+        from services.email_service import send_email_with_attachment
+        sent = send_email_with_attachment(
+            to_email=recipient_email,
+            subject="🎓 Your QuizNova Certificate is Ready!",
+            template_name="certificate_ready.html",
+            context=context,
+            attachment_bytes=pdf_bytes,
+            attachment_filename=f"QuizNova_Certificate_{cert.verification_id}.pdf",
+            notification_type="certificate",
+            related_object_id=str(cert.id)
         )
-        return True
+        return sent
     except Exception as e:
         current_app.logger.error(f'Failed to send certificate email: {e}')
         return False

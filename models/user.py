@@ -37,6 +37,12 @@ class User(UserMixin, db.Model):
     avatar_url    = db.Column(db.String(500), nullable=True)
     last_login_at = db.Column(db.DateTime, nullable=True)
     login_count   = db.Column(db.Integer, nullable=False, default=0)
+    reset_token   = db.Column(db.String(100), nullable=True)
+    reset_token_expires = db.Column(db.DateTime, nullable=True)
+    notify_competitions  = db.Column(db.Boolean, nullable=False, default=True)
+    notify_quizzes       = db.Column(db.Boolean, nullable=False, default=True)
+    notify_announcements = db.Column(db.Boolean, nullable=False, default=True)
+    notify_marketing     = db.Column(db.Boolean, nullable=False, default=True)
     created_at    = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at    = db.Column(db.DateTime, nullable=False, default=datetime.utcnow,
                               onupdate=datetime.utcnow)

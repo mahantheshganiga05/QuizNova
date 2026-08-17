@@ -1,0 +1,15 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">Security Alert: New Login to QuizNova 🛡️</h1>
+<p class="p">Hello <strong>{{ user_name }}</strong>,</p>
+<p class="p">We noticed a new login to your QuizNova account.</p>
+<div class="card">
+  <p class="p" style="margin: 0 0 6px 0; color: #F1F1F8;"><strong>Date & Time:</strong> {{ login_time }}</p>
+  <p class="p" style="margin: 0 0 6px 0; color: #F1F1F8;"><strong>IP Address:</strong> {{ ip_address }}</p>
+  <p class="p" style="margin: 0; color: #F1F1F8;"><strong>Device / Browser:</strong> {{ user_agent }}</p>
+</div>
+<p class="p">If this was you, no action is needed. If you do not recognize this activity, please reset your password immediately to protect your account.</p>
+<div style="text-align: center; margin: 24px 0;">
+  <a href="{{ site_url }}/forgot-password" class="btn btn-secondary">Review Account Security</a>
+</div>
+{% endblock %}

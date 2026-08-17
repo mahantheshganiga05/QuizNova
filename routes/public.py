@@ -100,12 +100,11 @@ def leaderboard():
 
 @public_bp.route('/api/newsletter/subscribe', methods=['POST'])
 def newsletter_subscribe():
-    """Handle real newsletter subscription via AJAX."""
-    from app import csrf
-    # Exempt endpoint dynamically if needed, or handle input
+    """Handle real newsletter subscription via AJAX and send confirmation email."""
     from models.subscriber import NewsletterSubscriber
+    from models.user import User
     from utils.validators import validate_email
-    from flask import jsonify, request
+    from flask import jsonify, request, current_app
 
     data = request.get_json(silent=True) or request.form or request.args
     email = (data.get('email') or '').strip().lower()
@@ -114,25 +113,99 @@ def newsletter_subscribe():
     if err:
         return jsonify({'status': 'error', 'message': err}), 400
 
+    from models import db
+
     existing = NewsletterSubscriber.query.filter_by(email=email).first()
-    if existing:
+    if existing and existing.is_active:
         return jsonify({'status': 'info', 'message': "You're already subscribed!"}), 200
 
     try:
-        subscriber = NewsletterSubscriber(email=email)
-        from models import db
-        db.session.add(subscriber)
+        user = User.query.filter_by(email=email).first()
+        if existing:
+            existing.is_active = True
+            existing.unsubscribed_at = None
+            subscriber = existing
+        else:
+            subscriber = NewsletterSubscriber(email=email, user_id=user.id if user else None)
+            db.session.add(subscriber)
+        
         db.session.commit()
+
+        # Send confirmation email
+        try:
+            from services.email_service import send_html_email
+            send_html_email(
+                to_email=email,
+                subject="You're now subscribed to QuizNova updates 📢",
+                template_name="stay_updated_confirmation.html",
+                context={},
+                notification_type="stay_updated",
+                related_object_id=str(subscriber.id),
+                show_unsubscribe=True,
+                unsubscribe_token=subscriber.unsubscribe_token
+            )
+        except Exception as mail_err:
+            current_app.logger.warning(f"Newsletter confirmation email notice: {mail_err}")
+
         return jsonify({'status': 'success', 'message': "You're subscribed! We'll keep you updated."}), 200
     except Exception as e:
-        from models import db
         db.session.rollback()
         return jsonify({'status': 'error', 'message': 'An error occurred. Please try again.'}), 500
+
+
+@public_bp.route('/email/unsubscribe/<string:token>', methods=['GET', 'POST'])
+@public_bp.route('/email/unsubscribe', methods=['GET', 'POST'])
+def email_unsubscribe(token=None):
+    """Handle 1-click unsubscribe requests for marketing/informational emails."""
+    from models.subscriber import NewsletterSubscriber
+    from models.user import User
+    from models import db
+    from flask import render_template, request, flash
+
+    unsub_email = "User"
+    subscriber = None
+
+    if token:
+        subscriber = NewsletterSubscriber.query.filter_by(unsubscribe_token=token).first()
+    
+    req_email = request.args.get('email') or request.form.get('email')
+    if not subscriber and req_email:
+        clean_email = req_email.strip().lower()
+        subscriber = NewsletterSubscriber.query.filter_by(email=clean_email).first()
+
+    if subscriber:
+        unsub_email = subscriber.email
+        subscriber.is_active = False
+        from datetime import datetime
+        subscriber.unsubscribed_at = datetime.utcnow()
+
+        # Also update user marketing preference if user exists
+        user = User.query.filter_by(email=subscriber.email).first()
+        if user:
+            user.notify_marketing = False
+            user.notify_competitions = False
+            user.notify_announcements = False
+
+        db.session.commit()
+
+    return render_template('email_unsubscribe.html', email=unsub_email)
 
 
 @public_bp.route('/faq')
 def faq():
     return render_template('faq.html')
+
+
+@public_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password_alias():
+    from routes.auth import forgot_password
+    return forgot_password()
+
+
+@public_bp.route('/reset-password/<string:token>', methods=['GET', 'POST'])
+def reset_password_alias(token):
+    from routes.auth import reset_password
+    return reset_password(token)
 
 
 @public_bp.route('/pricing')

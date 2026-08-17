@@ -1,0 +1,10 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">🎓 You Earned a QuizNova Certificate!</h1>
+<p class="p">Congratulations <strong>{{ user_name }}</strong>!</p>
+<p class="p">You scored <strong>{{ score_percentage }}%</strong> in <strong>{{ quiz_title }}</strong>.</p>
+<p class="p">Because your score meets the required 60% threshold, you are eligible for an official QuizNova Certificate of Achievement!</p>
+<div style="text-align: center; margin: 28px 0;">
+  <a href="{{ cert_action_url }}" class="btn">GENERATE / VIEW CERTIFICATE</a>
+</div>
+{% endblock %}

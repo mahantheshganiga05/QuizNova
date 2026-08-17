@@ -1,0 +1,10 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 class="h1">Welcome to QuizNova! 🎉</h1>
+<p class="p">Hello <strong>{{ user_name }}</strong>,</p>
+<p class="p">Welcome to QuizNova! Your account has been successfully created. You can now access hundreds of interactive quizzes, test your knowledge, participate in live competitions, and earn verified certificates.</p>
+<div style="text-align: center; margin: 28px 0;">
+  <a href="{{ site_url }}/dashboard" class="btn">GO TO QUIZNOVA</a>
+</div>
+<p class="p">Happy learning,<br>The QuizNova Team</p>
+{% endblock %}

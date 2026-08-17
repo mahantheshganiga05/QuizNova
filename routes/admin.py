@@ -852,11 +852,21 @@ def publish_competition(comp_id):
     comp = Competition.query.get_or_404(comp_id)
     if comp.status == 'draft':
         comp.status = 'published'
-        msg = f'Competition "{comp.title}" has been published.'
+        db.session.commit()
+
+        # Trigger background deduplicated launch email
+        try:
+            from services.email_service import notify_competition_published
+            count = notify_competition_published(comp)
+            msg = f'Competition "{comp.title}" has been published! Sent notifications to {count} recipient(s).'
+        except Exception as mail_err:
+            current_app.logger.error(f'Competition published email notification error: {mail_err}')
+            msg = f'Competition "{comp.title}" has been published.'
     else:
         comp.status = 'draft'
+        db.session.commit()
         msg = f'Competition "{comp.title}" moved back to draft.'
-    db.session.commit()
+
     flash(msg, 'success')
     return redirect(url_for('admin.competitions'))
 
