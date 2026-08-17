@@ -22,6 +22,19 @@ from utils.helpers import secure_uuid_filename, ensure_dir
 auth_bp = Blueprint('auth', __name__)
 
 
+def get_post_login_redirect(user, next_page: str = None) -> str:
+    """
+    Determine post-login redirect URL dynamically based on user's database role.
+    If user.is_admin is True, redirect to Enterprise Admin Dashboard (/admin/dashboard).
+    Otherwise redirect to Student Dashboard (/dashboard/).
+    """
+    if next_page and next_page.startswith('/') and not next_page.startswith('//'):
+        return next_page
+    if user and getattr(user, 'is_admin', False):
+        return url_for('admin.dashboard')
+    return url_for('dashboard.index')
+
+
 # =============================================================================
 # Registration
 # =============================================================================
@@ -30,7 +43,7 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     """User registration page and handler."""
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(current_user))
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
@@ -89,7 +102,7 @@ def register():
         except Exception as e:
             current_app.logger.warning(f"Could not send welcome email: {e}")
 
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(user))
 
     return render_template('auth/register.html', errors={}, form_data={})
 
@@ -102,7 +115,7 @@ def register():
 def login():
     """User login page and handler."""
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(current_user))
 
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
@@ -144,14 +157,7 @@ def login():
         except Exception as e:
             current_app.logger.warning(f"Could not send login alert email: {e}")
 
-        next_page = request.args.get('next')
-        if next_page and next_page.startswith('/'):
-            return redirect(next_page)
-
-        if user.is_admin:
-            return redirect(url_for('admin.dashboard'))
-
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(user, next_page=request.args.get('next')))
 
     return render_template('auth/login.html', form_data={})
 
@@ -372,7 +378,7 @@ def google_callback():
         db.session.commit()
 
         flash(f'Welcome, {user.display_name}! Successfully logged in with Google.', 'success')
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(user))
 
     except Exception as e:
         current_app.logger.error(f'Google OAuth error: {e}')
@@ -518,7 +524,7 @@ def github_callback():
         db.session.commit()
 
         flash(f'Welcome, {user.display_name}! Successfully logged in with GitHub.', 'success')
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(user))
 
     except Exception as e:
         current_app.logger.error(f'GitHub OAuth error: {e}')
@@ -534,7 +540,7 @@ def github_callback():
 def forgot_password():
     """Request password reset link."""
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(current_user))
 
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
@@ -575,7 +581,7 @@ def forgot_password():
 def reset_password(token):
     """Set new password using reset token."""
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(get_post_login_redirect(current_user))
 
     from datetime import datetime
     user = User.query.filter_by(reset_token=token).first()
